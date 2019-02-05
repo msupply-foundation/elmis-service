@@ -82,9 +82,9 @@ Body:
 
 ### `POST /requisitions.json`
 
-| Endpoint             | Description         | Parameters                                               |
-| -------------------- | ------------------- | -------------------------------------------------------- |
-| `/requisitions.json` | Create requisition. | `emergency`<br>`facilityid`<br>`periodid`<br>`programid` |
+| Endpoint             | Description         | Parameters                                      |
+| -------------------- | ------------------- | ----------------------------------------------- |
+| `/requisitions.json` | Create requisition. | `emergency` `facilityid` `periodid` `programid` |
 
 #### Create new requisition (`facilityid=1`, `programid=2`, `periodid=3`)
 
@@ -448,9 +448,9 @@ Body:
 
 ### `POST /schedules.json`
 
-| Endpoint          | Description            | Content-Type | Body                              |
-| ----------------- | ---------------------- | ------------ | --------------------------------- |
-| `/schedules.json` | Create a new schedule. | `json`       | `code`<br>`name`<br>`description` |
+| Endpoint          | Description            | Content-Type | Body                        |
+| ----------------- | ---------------------- | ------------ | --------------------------- |
+| `/schedules.json` | Create a new schedule. | `json`       | `code` `name` `description` |
 
 #### Create new schedule (`code=MONTHLY`)
 
