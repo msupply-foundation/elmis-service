@@ -185,7 +185,7 @@ Notes:
 - Unless otherwise specified, all dates are in UNIX epoch date format, except for those specified as strings, which are in the format `"days/months/year"`.
 - `period.nextStartDate` is in format `"year-months-days"`.
 
-<div id='get-requisitions-facility'>
+<div id='get-requisitions-facility'/>
 
 ## `GET /logistics/periods.json`
 

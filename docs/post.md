@@ -88,6 +88,8 @@ Body:
 
 <div id='post-requisitions'/>
 
+### `POST /requisitions.json`
+
 | Endpoint             | Description         | Content-Type | Parameters                                               |
 | -------------------- | ------------------- | ------------ | -------------------------------------------------------- |
 | `/requisitions.json` | Create requisition. | `json`       | `emergency`<br>`facilityid`<br>`periodid`<br>`programid` |
@@ -352,6 +354,8 @@ Body:
 ```
 
 <div id='post-orders'/>
+
+### `POST /order.json`
 
 | Endpoint       | Description                  | Content-Type | Body                                                                             |
 | -------------- | ---------------------------- | ------------ | -------------------------------------------------------------------------------- |
