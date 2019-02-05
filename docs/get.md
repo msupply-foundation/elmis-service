@@ -189,9 +189,9 @@ Notes:
 
 ## `GET /logistics/periods.json`
 
-| Endpoint                  | Description            | Parameters                                 |
-| ------------------------- | ---------------------- | ------------------------------------------ |
-| `/logistics/periods.json` | Get all user programs. | `emergency`<br>`facilityId`<br>`programId` |
+| Endpoint                  | Description                                                      | Parameters                                 |
+| ------------------------- | ---------------------------------------------------------------- | ------------------------------------------ |
+| `/logistics/periods.json` | Get all requisitions associated with given facility and program. | `emergency`<br>`facilityId`<br>`programId` |
 
 #### Get all non-emergency requisitions for facility and program (`facilityId=1`, `programId=2`)
 

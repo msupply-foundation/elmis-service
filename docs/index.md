@@ -1,6 +1,7 @@
 - [`GET` endpoints](#get-endpoints)
   - [`/create/requisition/programs.json`](#get-programs)
   - [`/create/requisition/supervised/{id}/facilities.json`](#get-facilities)
+  - [`/logistics/periods.json`](#get-requisitions-facility)
   - [`/requisitions/{id}.json`](#get-requisitions)
 - [`POST` endpoints](#post-endpoints)
   - [`/j_spring_security_check`](#post-j-spring)
