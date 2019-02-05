@@ -47,6 +47,8 @@ Body:
 { "success": "R&R approved successfully!" }
 ```
 
+---
+
 <div id='put-authorise'/>
 
 ### `PUT requisitions/{id}/authorise.json`
@@ -93,6 +95,8 @@ Body:
 ```
 { "success": "R&R authorized successfully!" }
 ```
+
+---
 
 <div id='put-update'/>
 
@@ -152,6 +156,8 @@ Body:
 ```
 { "success": "R&R saved successfully!" }
 ```
+
+---
 
 <div id='put-submit'/>
 

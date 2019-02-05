@@ -16,17 +16,23 @@
   - [`/requisitions/{id}/update.json`](#put-update)
   - [`/requisitions/{id}/submit.json`](#put-submit)
 
+---
+
 <div id='get-endpoints'/>
 
 ## `GET` endpoints
 
 {% include_relative get.md %}
 
+---
+
 <div id='post-endpoints'/>
 
 ## `POST` endpoints
 
 {% include_relative post.md %}
+
+---
 
 <div id='put-endpoints'/>
 
