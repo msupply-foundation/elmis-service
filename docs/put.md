@@ -31,7 +31,7 @@ Notes:
 
 - The empty body is not optional, the request will fail if it is omitted.
 
-### Response for successful requisition approval.
+#### Response for successful requisition approval.
 
 Response:
 
@@ -80,7 +80,7 @@ Notes:
 
 - The empty body is not optional, the request will fail if it is omitted.
 
-### Response for successful requisition authorisation.
+#### Response for successful requisition authorisation.
 
 Response:
 
@@ -205,7 +205,7 @@ Notes:
 - `fullSupplyLineItems` is required to contain an object for each product specified by the requisition program.
 - `stockInHand = previousStockInHand + quantityReceived - quantityDispensed + totalLossesAndAdjustments`
 
-### Response for successful requisition submission.
+#### Response for successful requisition submission.
 
 Headers:
 
