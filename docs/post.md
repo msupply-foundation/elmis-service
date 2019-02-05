@@ -53,16 +53,10 @@ Body:
     "ALERT_SMS_NOTIFICATION_OVERDUE_REQUISITION": ...,
     "DEFAULT_SCHEDULE": ...
     },
-    "rights": [
-      {
-        "name": ...,
-        "type": ...
-      },
-      {
-        "name": ...,
-        "type": ...
-      }
-    ],
+    "rights": [ {
+      "name": ...,
+      "type": ...
+    }, ... ],
     "name": "msupply",
     "fullName": "M. Supply",
     "userId": ...,
@@ -81,18 +75,16 @@ Content-Type: application/json
 Body:
 
 ```
-{
-  "error": "The username or password you entered is incorrect. Please try again.
-}
+{ "error": "The username or password you entered is incorrect. Please try again. }
 ```
 
 <div id='post-requisitions'/>
 
 ### `POST /requisitions.json`
 
-| Endpoint             | Description         | Content-Type | Parameters                                               |
-| -------------------- | ------------------- | ------------ | -------------------------------------------------------- |
-| `/requisitions.json` | Create requisition. | `json`       | `emergency`<br>`facilityid`<br>`periodid`<br>`programid` |
+| Endpoint             | Description         | Parameters                                               |
+| -------------------- | ------------------- | -------------------------------------------------------- |
+| `/requisitions.json` | Create requisition. | `emergency`<br>`facilityid`<br>`periodid`<br>`programid` |
 
 #### Create new requisition (`facilityid=1`, `programid=2`, `periodid=3`)
 
@@ -198,138 +190,130 @@ Body:
     "status": "INITIATED",
     "fullSupplyItemsSubmittedCost": ...,
     "nonFullSupplyItemsSubmittedCost": ...,
-    "fullSupplyLineItems": [
-      {
+    "fullSupplyLineItems": [ {
+      "id": ...,
+      "rnrId": ...,
+      "product": ...
+      "productDisplayOrder": ...,
+      "productCode": ...,
+      "productPrimaryName": ...,
+      "productCategory": ...,
+      "productCategoryDisplayOrder": ...,
+      "roundToZero": ...,
+      "packRoundingThreshold": ...,
+      "packSize": ...,
+      "dosesPerMonth": ...,
+      "dosesPerDispensingUnit": ...,
+      "dispensingUnit": ...,
+      "maxMonthsOfStock": ...,
+      "fullSupply": ...,
+      "quantityReceived": ...,
+      "quantityDispensed": ...,
+      "previousStockInHand": ...,
+      "beginningBalance": ...,
+      "totalLossesAndAdjustments": ...,
+      "stockOutDays": ...,
+      "newPatientCount": ...,
+      "reportingDays": ...,
+      "previousNormalizedConsumptions": [...],
+      "price": ...,
+      "skipped": ...
+    }, ... ],
+    "nonFullSupplyLineItems: [ {
+      "id": ...,
+      "rnrId": ...,
+      "product": ...,
+      "productDisplayOrder": ...,
+      "productCode": ...,
+      "productCategory": ...,
+      "productCategoryDisplayOrder": ...,
+      "roundToZero": ...,
+      "packRoundingThreshold": ...,
+      "packSize": ...,
+      "dosesPerMonth": ...,
+      "dosesPerDispensingUnit": ...,
+      "dispensingUnit": ...,
+      "maxMonthsOfStock": ...,
+      "fullSupply": ...,
+      "quantityReceived": ...,
+      "quantityDispensed": ...,
+      "beginningBalance": ...,
+      "totalLossesAndAdjustments": ...,
+      "stockInHand": ...,
+      "stockOutDays": ...,
+      "newPatientCount": ...,
+      "quantityRequested": ...,
+      "reasonForRequestedQuantity": ...,
+      "amc": ...,
+      "normalizedConsumption": ...,
+      "calculatedOrderQuantity": ...,
+      "maxStockQuantity": ...,
+      "quantityApproved": ...,
+      "packsToShip": ...,
+      "price": ...,
+      "skipped": ...,
+    }, ... ],
+    "regimenLineItems": [ {
+      "id": ...,
+      "rnrId": ...,
+      "code": ...,
+      "name": ...,
+      "patientsOnTreatment": ...,
+      "remarks": ...,
+      "category": {
         "id": ...,
-        "rnrId": ...,
-        "product": ...
-        "productDisplayOrder": ...,
-        "productCode": ...,
-        "productPrimaryName": ...,
-        "productCategory": ...,
-        "productCategoryDisplayOrder": ...,
-        "roundToZero": ...,
-        "packRoundingThreshold": ...,
-        "packSize": ...,
-        "dosesPerMonth": ...,
-        "dosesPerDispensingUnit": ...,
-        "dispensingUnit": ...,
-        "maxMonthsOfStock": ...,
-        "fullSupply": ...,
-        "quantityReceived": ...,
-        "quantityDispensed": ...,
-        "previousStockInHand": ...,
-        "beginningBalance": ...,
-        "totalLossesAndAdjustments": ...,
-        "stockOutDays": ...,
-        "newPatientCount": ...,
-        "reportingDays": ...,
-        "previousNormalizedConsumptions": [...],
-        "price": ...,
-        "skipped": ...
-      }, ...
-    ],
-    "nonFullSupplyLineItems: [
-       {
-         "id": ...,
-         "rnrId": ...,
-         "product": ...,
-         "productDisplayOrder": ...,
-         "productCode": ...,
-         "productCategory": ...,
-         "productCategoryDisplayOrder": ...,
-         "roundToZero": ...,
-         "packRoundingThreshold": ...,
-         "packSize": ...,
-         "dosesPerMonth": ...,
-         "dosesPerDispensingUnit": ...,
-         "dispensingUnit": ...,
-         "maxMonthsOfStock": ...,
-         "fullSupply": ...,
-         "quantityReceived": ...,
-         "quantityDispensed": ...,
-         "beginningBalance": ...,
-         "totalLossesAndAdjustments": ...,
-         "stockInHand": ...,
-         "stockOutDays": ...,
-         "newPatientCount": ...,
-         "quantityRequested": ...,
-         "reasonForRequestedQuantity": ...,
-         "amc": ...,
-         "normalizedConsumption": ...,
-         "calculatedOrderQuantity": ...,
-         "maxStockQuantity": ...,
-         "quantityApproved": ...,
-         "packsToShip": ...,
-         "price": ...,
-         "skipped": ...,
-       },
-    ],
-    "regimenLineItems": [
-      {
-        "id": ...,
-        "rnrId": ...,
         "code": ...,
         "name": ...,
-        "patientsOnTreatment": ...,
-        "remarks": ...,
-        "category": {
-          "id": ...,
-          "code": ...,
-          "name": ...,
-          "displayedOrder": ...,
-        },
-        "regimenDisplayOrder": ...,
-        "skipped": ...
+        "displayedOrder": ...,
       },
-    ],
+      "regimenDisplayOrder": ...,
+      "skipped": ...
+    }, ... ],
     "equipmentLineItems": [...],
     "patientQuantifications": [...],
     "supervisoryNodeId": ...,
     "submittedDate": ...,
     "comments": [...],
     "rnrSignatures": [...],
-    "nonSkippedLineItems": [
-      {
-        "id": ...,
-        "rnrId": ...,
-        "product": ...,
-        "productDisplayOrder": ...,
-        "productCode": ...,
-        "productPrimaryName": ...,
-        "productCategory": ...,
-        "productCategoryDisplayOrder": ...,
-        "roundToZero": ...,
-        "packRoundingThreshold": ...,
-        "packSize": ...,
-        "dosesPerMonth": ...,
-        "dosesPerDispensingUnit": ...,
-        "dispensingUnit": ...,
-        "maxMonthsOfStock": ...,
-        "fullSupply": ...,
-        "quantityReceived": ...,
-        "quantityDispensed": ...,
-        "previousStockInHand": ...,
-        "beginningBalance": ...,
-        "totalLossesAndAdjustments": ...,
-        "stockInHand": ...,
-        "stockOutDays": ...,
-        "newPatientCount": ...,
-        "quantityRequested": ...,
-        "reasonForRequestedQuantity": ...,
-        "amc": ...,
-        "normalizedConsumption": ...,
-        "periodNormalizedConsumption": ...,
-        "calculatedOrderQuantity": ...,
-        "maxStockQuantity": ...,
-        "quantityApproved": ...,
-        "reportingDays": ...,
-        "packsToShip": ...,
-        "previousNormalizedConsumptions": [ ... ],
-        "price": ...,
-        "skipped": ...,
-      }
-    ]
+    "nonSkippedLineItems": [ {
+      "id": ...,
+      "rnrId": ...,
+      "product": ...,
+      "productDisplayOrder": ...,
+      "productCode": ...,
+      "productPrimaryName": ...,
+      "productCategory": ...,
+      "productCategoryDisplayOrder": ...,
+      "roundToZero": ...,
+      "packRoundingThreshold": ...,
+      "packSize": ...,
+      "dosesPerMonth": ...,
+      "dosesPerDispensingUnit": ...,
+      "dispensingUnit": ...,
+      "maxMonthsOfStock": ...,
+      "fullSupply": ...,
+      "quantityReceived": ...,
+      "quantityDispensed": ...,
+      "previousStockInHand": ...,
+      "beginningBalance": ...,
+      "totalLossesAndAdjustments": ...,
+      "stockInHand": ...,
+      "stockOutDays": ...,
+      "newPatientCount": ...,
+      "quantityRequested": ...,
+      "reasonForRequestedQuantity": ...,
+      "amc": ...,
+      "normalizedConsumption": ...,
+      "periodNormalizedConsumption": ...,
+      "calculatedOrderQuantity": ...,
+      "maxStockQuantity": ...,
+      "quantityApproved": ...,
+      "reportingDays": ...,
+      "packsToShip": ...,
+      "previousNormalizedConsumptions": [ ... ],
+      "price": ...,
+      "skipped": ...,
+    }, ... ]
     "forVirtualFacility": ...,
     "approvable": ...,
   },
@@ -348,18 +332,16 @@ Content-Type: application/json
 Body:
 
 ```
-{
-  "error": "error.rnr.previous.not.filled"
-}
+{ "error": "error.rnr.previous.not.filled" }
 ```
 
 <div id='post-orders'/>
 
 ### `POST /order.json`
 
-| Endpoint       | Description                  | Content-Type | Body                                                                             |
-| -------------- | ---------------------------- | ------------ | -------------------------------------------------------------------------------- |
-| `/orders.json` | Convert requisition to order | `json`       | `id`<br>`programName`<br>`programCode`<br>`programId`<br>`facilityName`<br>`...` |
+| Endpoint       | Description                  | Content-Type | Body                                                                              |
+| -------------- | ---------------------------- | ------------ | --------------------------------------------------------------------------------- |
+| `/orders.json` | Convert requisition to order | `json`       | `id`<br>`programName`<br>`programCode`<br>`programId`<br>`...`<br>`supplyDepotId` |
 
 #### Convert requisition to order (`id=1`)
 
