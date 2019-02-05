@@ -55,8 +55,8 @@ Body:
     },
     "rights": [
       {
-       "name": ...,
-       "type": ...
+        "name": ...,
+        "type": ...
       },
       {
         "name": ...,
@@ -264,22 +264,22 @@ Body:
        },
     ],
     "regimenLineItems": [
-  	  {
-  	    "id": ...,
-	    "rnrId": ...,
-	    "code": ...,
-	    "name": ...,
-	    "patientsOnTreatment": ...,
-	    "remarks": ...,
-	    "category": {
-	      "id": ...,
-	 	  "code": ...,
-		  "name": ...,
-		  "displayedOrder": ...,
-	    },
-	    "regimenDisplayOrder": ...,
-	    "skipped": ...
-	  },
+      {
+        "id": ...,
+        "rnrId": ...,
+        "code": ...,
+        "name": ...,
+        "patientsOnTreatment": ...,
+        "remarks": ...,
+        "category": {
+          "id": ...,
+          "code": ...,
+          "name": ...,
+          "displayedOrder": ...,
+        },
+        "regimenDisplayOrder": ...,
+        "skipped": ...
+      },
     ],
     "equipmentLineItems": [...],
     "patientQuantifications": [...],
@@ -449,11 +449,11 @@ Body:
 {
   comments: [
     {
-	  "id": id,
-	  "createdDate": ...,
-	  "rnrId": ...,
-	  "author": { ... },
-	  "commentText": "Example comment."
+      "id": id,
+      "createdDate": ...,
+      "rnrId": ...,
+      "author": { ... },
+      "commentText": "Example comment."
   ]
 }
 ```
@@ -505,10 +505,10 @@ Body:
 {
   "schedule": {
     "id": ...,
-	"code": "MONTHLY",
-	"name": "monthly",
-	"description: "Monthly schedule.".
-	"stringModifiedDate: ...
+    "code": "MONTHLY",
+    "name": "monthly",
+    "description: "Monthly schedule.".
+    "stringModifiedDate: ...
   },
   "success": "Monthly schedule created successfully"
 }
