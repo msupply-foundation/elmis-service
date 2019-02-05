@@ -82,8 +82,6 @@ Notes:
 
 #### Response for successful requisition authorisation.
 
-Response:
-
 Headers:
 
 ```
@@ -124,18 +122,16 @@ Body:
 ```
 {
   "id": id,
-  "fullSupplyLineItems": [
-    {
-      "id": ...,
-      "productCode": ...,
-      "stockInHand": ...,
-      "quantityReceived": ...,
-      "quantityDispensed": ...,
-      "previousStockInHand": ...,
-      "totalLossesAndAdjustments": ...,
-      "stockOutDays": ...
-    }, ...
-  ],
+  "fullSupplyLineItems": [ {
+    "id": ...,
+    "productCode": ...,
+    "stockInHand": ...,
+    "quantityReceived": ...,
+    "quantityDispensed": ...,
+    "previousStockInHand": ...,
+    "totalLossesAndAdjustments": ...,
+    "stockOutDays": ...
+  }, ... ],
   "nonFullSupplyLineItems": [...],
   "regimenLineItems": [...]
 }
@@ -184,18 +180,16 @@ Body:
 
 ```
 {
-  fullSupplyLineItems: [
-    {
-      id: ...,
-      productCode: ...,
-      stockInHand: ...,
-      quantityReceived: ...,
-      quantityDispensed: ...,
-      previousStockInHand: ...,
-      totalLossesAndAdjustments: ...,
-      stockOutDays: ...
-    }, ...
-  ]
+  fullSupplyLineItems: [ {
+    id: ...,
+    productCode: ...,
+    stockInHand: ...,
+    quantityReceived: ...,
+    quantityDispensed: ...,
+    previousStockInHand: ...,
+    totalLossesAndAdjustments: ...,
+    stockOutDays: ...
+  }, ... ]
 }
 ```
 

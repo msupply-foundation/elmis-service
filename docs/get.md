@@ -2,9 +2,9 @@
 
 ### `GET /requisitions/{id}.json`
 
-| Endpoint                  | Description                  | Parameters |
-| ------------------------- | ---------------------------- | ---------- |
-| `/requisitions/{id}.json` | Get requisition with id=`id` | None.      |
+| Endpoint                  | Description                  |
+| ------------------------- | ---------------------------- |
+| `/requisitions/{id}.json` | Get requisition with id=`id` |
 
 #### Get requisition (`id=1`)
 
@@ -232,7 +232,7 @@ Body:
     "stringStartDate": ...,
     "nextStartDate": ...
   }, ... ]
-  "rnr_list": [
+  "rnr_list": [ {
     "id": ...,
     "emergency": false,
     "facility": {
@@ -333,9 +333,9 @@ Notes:
 
 ### `GET /create/requisition/programs.json`
 
-| Endpoint                            | Description            | Parameters |
-| ----------------------------------- | ---------------------- | ---------- |
-| `/create/requisition/programs.json` | Get all user programs. | None.      |
+| Endpoint                            | Description            |
+| ----------------------------------- | ---------------------- |
+| `/create/requisition/programs.json` | Get all user programs. |
 
 #### Get all programs for logged in user.
 
@@ -363,25 +363,23 @@ Body:
 
 ```
 {
-  "programList": [
-    {
-      "id": ...,
-      "code": ...,
-      "name": ...,
-      "description": ...,
-      "active": ...,
-      "budgetingApplies": ...,
-      "templateConfigured": ...,
-      "regimenTemplateConfigured": ...,
-      "isEquiptmentConfigured": ...,
-      "enableSkipPeriod": ...,
-      "showNonFullSupplyTab": ...,
-      "hideSkippedProducts": ...,
-      "enableIvdForm": ...,
-      "push": ...,
-      "usePriceSchedule": ...
-    }, ...
-  ]
+  "programList": [ {
+    "id": ...,
+    "code": ...,
+    "name": ...,
+    "description": ...,
+    "active": ...,
+    "budgetingApplies": ...,
+    "templateConfigured": ...,
+    "regimenTemplateConfigured": ...,
+    "isEquiptmentConfigured": ...,
+    "enableSkipPeriod": ...,
+    "showNonFullSupplyTab": ...,
+    "hideSkippedProducts": ...,
+    "enableIvdForm": ...,
+    "push": ...,
+    "usePriceSchedule": ...
+  }, ... ]
 }
 ```
 
@@ -389,9 +387,9 @@ Body:
 
 ### `GET /create/requisition/supervised/{id}/facilities.json`
 
-| Endpoint                                              | Description                                                | Parameters |
-| ----------------------------------------------------- | ---------------------------------------------------------- | ---------- |
-| `/create/requisition/supervised/{id}/facilities.json` | Get facilities for logged in user and program with id=`id` | None.      |
+| Endpoint                                              | Description                                         |
+| ----------------------------------------------------- | --------------------------------------------------- |
+| `/create/requisition/supervised/{id}/facilities.json` | Get facilities associated with program with id=`id` |
 
 #### Get facilities for logged in user and program (`id=1`)
 
@@ -419,14 +417,12 @@ Body:
 
 ```
 {
-  "facilities": [
-    {
-      "id": ...,
-      "code": ...,
-      "name": ...,
-      "description": ...,
-      "virtualFacility": ...,
-    }, ...
-  ]
+  "facilities": [ {
+    "id": ...,
+    "code": ...,
+    "name": ...,
+    "description": ...,
+    "virtualFacility": ...,
+  }, ... ]
 }
 ```
