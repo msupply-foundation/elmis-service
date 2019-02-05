@@ -33,8 +33,6 @@ Notes:
 
 #### Response for successful requisition approval.
 
-Response:
-
 Headers:
 
 ```
@@ -142,8 +140,6 @@ Body:
 ```
 
 #### Response for successful requisition update.
-
-Response:
 
 Headers:
 
