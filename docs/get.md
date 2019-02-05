@@ -281,11 +281,11 @@ Body:
 {
   "facilities": [
     {
-	  "id": ...,
-	  "code": ...,
-	  "name": ...,
-	  "description": ...,
-	  "virtualFacility": ...,
+      "id": ...,
+      "code": ...,
+      "name": ...,
+      "description": ...,
+      "virtualFacility": ...,
     }, ...
   ]
 }
