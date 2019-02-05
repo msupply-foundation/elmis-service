@@ -22,6 +22,8 @@
 
 ## `GET` endpoints
 
+---
+
 {% include_relative get.md %}
 
 ---
@@ -30,6 +32,8 @@
 
 ## `POST` endpoints
 
+---
+
 {% include_relative post.md %}
 
 ---
@@ -37,5 +41,7 @@
 <div id='put-endpoints'/>
 
 ## `PUT` endpoints
+
+---
 
 {% include_relative put.md %}
