@@ -189,6 +189,150 @@ Notes:
 - Unless otherwise specified, all dates are in UNIX epoch date format, except for those specified as strings, which are in the format `"days/months/year"`.
 - `period.nextStartDate` is in format `"year-months-days"`.
 
+<div id='get-requisitions-facility'>
+
+## `GET /logistics/periods.json`
+
+| Endpoint                  | Description            | Parameters                                 |
+| ------------------------- | ---------------------- | ------------------------------------------ |
+| `/logistics/periods.json` | Get all user programs. | `emergency`<br>`facilityId`<br>`programId` |
+
+#### Get all non-emergency requisitions for facility and program (`facilityId=1`, `programId=2`)
+
+Request
+
+```
+/logistics/periods.json?emergency=false&facilityId=1&programId=2
+```
+
+Headers:
+
+```
+Cookie: JSESSIONID=...
+```
+
+#### Response to successful request for facility and program (`facilityId=1`, `programId=2`)
+
+Headers:
+
+```
+Content-Type: application/json
+```
+
+Body:
+
+```
+{
+  "periods": [ {
+    "id": ...,
+    "scheduleId": ...,
+    "name": ...,
+    "description": ...,
+    "numberOfMonths": ...,
+    "startDate": ...,
+    "endDate": ...,
+    "stringEndDate": ...,
+    "stringYear": ...,
+    "stringStartDate": ...,
+    "nextStartDate": ...
+  }, ... ]
+  "rnr_list": [
+    "id": ...,
+    "emergency": false,
+    "facility": {
+      "id": 1,
+      "code": ...,
+      "name": ...,
+      "geographicZone": {
+        "id": ...,
+        "code": ...,
+        "name": ...,
+        "level": {
+          "id": ...,
+          "code": ...,
+          "name": ...,
+          "levelNumber": ...
+        },
+        "parent": {
+          "code": ...,
+          "name": ...,
+          "level": {
+            "code": ...,
+            "name": ...
+          }
+        }
+      },
+      "facilityType": {
+        "id": ...,
+        "code": ...,
+        "name": ...,
+        "description": ...,
+        "nominalMaxMonth": ...,
+        "nominalEop": ...,
+        "displayOrder": ...,
+        "active": ...
+      },
+      "operatedBy": {
+        "id": ...,
+        "code": ...,
+        "text": ...,
+        "displayOrder": ...
+      }
+      "virtualFacility": ...
+    },
+    "program": {
+      "id": 1,
+      "code": ...,
+      "name": ...,
+      "description": ...,
+      "active": ...,
+      "budgetingApplies": ...,
+      "templateConfigured": ...,
+      "regimenTemplateConfigured": ...,
+      "isEquipmentConfigured": ...,
+      "enableSkipPeriod": ...,
+      "showNonFullSupplyTab": ...,
+      "hideSkippedProducts": ...,
+      "enableIvdForm": ...,
+      "push": ...,
+      "usePriceSchedule": ...
+    },
+    "period": {
+      "id": ...,
+      "scheduleId": ...,
+      "name": ...,
+      "description": ...,
+      "numberOfMonths": ...,
+      "startDate": ...,
+      "endDate": ...,
+      "stringEndDate": ...,
+      "stringYear": ...,
+      "stringStartDate": ...,
+      "nextStartDate": ...
+    },
+    "status": ...,
+    "fullSupplyItemsSubmittedCost": ...,
+    "nonFullSupplyItemsSubmittedCost": ...,
+    "fullSupplyLineItems": [...],
+    "nonFullSupplyLineItems": [...],
+    "regimenLineItems": [...],
+    "eqipmentLineItems": [...],
+    "patientQuantifications": [...].
+    "submittedDate": ...,
+    "comments": [...],
+    "nonSkippedLineItems": [...],
+    "forVirtualFacility": ...,
+    "approvable": ...,
+  } ],
+  "is_emergency": false
+}
+```
+
+Notes:
+
+- Unless otherwise specified, all dates are in UNIX epoch date format, except for those specified as strings, which are in the format `"days/months/year"`.
+- `period.nextStartDate` is in format `"year-months-days"`.
+
 <div id='get-programs'/>
 
 ### `GET /create/requisition/programs.json`
