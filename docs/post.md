@@ -78,6 +78,8 @@ Body:
 { "error": "The username or password you entered is incorrect. Please try again. }
 ```
 
+---
+
 <div id='post-requisitions'/>
 
 ### `POST /requisitions.json`
@@ -335,6 +337,8 @@ Body:
 { "error": "error.rnr.previous.not.filled" }
 ```
 
+---
+
 <div id='post-orders'/>
 
 ### `POST /order.json`
@@ -390,6 +394,8 @@ Notes:
 
 - All dates are in UNIX epoch format, except for those specified as strings, which are in the format `"days/months/year"`.
 
+---
+
 <div id='post-comments'/>
 
 ### `POST /requisitions/{id}/comments.json`
@@ -443,6 +449,8 @@ Body:
   ]
 }
 ```
+
+---
 
 <div id='post-schedules'/>
 
@@ -499,6 +507,8 @@ Body:
   "success": "Monthly schedule created successfully"
 }
 ```
+
+---
 
 <div id='post-periods'/>
 
