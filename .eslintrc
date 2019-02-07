@@ -1,0 +1,10 @@
+{
+  "extends": ["airbnb", "prettier"],
+  "rules": {
+    "max-len": ["error", { "code": 100 }]
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  }
+}
