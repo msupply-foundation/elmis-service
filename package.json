@@ -1,0 +1,59 @@
+{
+  "name": "elmis-service",
+  "version": "1.0.0",
+  "description": "Module for integration mSupply with eSigl",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "start": "babel-node ./src/index.js",
+    "test": "jest"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{json,md}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.js": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openmsupply/elmis-service.git"
+  },
+  "author": "Sussol",
+  "//": "No idea which license to use here, someone with license knowledge please amend",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/openmsupply/elmis-service/issues"
+  },
+  "homepage": "https://github.com/openmsupply/elmis-service#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.3.1",
+    "eslint": "^5.3.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-prettier": "^4.0.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.12.4",
+    "husky": "^1.3.1",
+    "jest": "^24.1.0",
+    "lint-staged": "^8.1.3",
+    "prettier": "1.16.4"
+  },
+  "dependencies": {
+    "axios": "^0.18.0"
+  }
+}
