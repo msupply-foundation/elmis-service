@@ -1,5 +1,5 @@
 import errorObject from '../../errors/errors';
-import facilitiesValidation from '../../validation';
+import { facilitiesValidation } from '../../validation';
 
 test('should return four', () => {
   const testingObject = [
