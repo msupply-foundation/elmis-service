@@ -1,4 +1,5 @@
 import parameterValidation from '../../validation';
+import errorObject from '../../errors/errors';
 
 test('should return true', () => {
   expect(parameterValidation({ requisition: {}, requisitionLines: [], regimeLines: [] })).toBe(
@@ -15,7 +16,7 @@ test('should throw when fields are not correct data types', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual('Parameter validation failed');
+  expect(errorCatcher).toEqual(errorObject('Parameter validation failed'));
   errorCatcher = null;
 
   // Requisition should be an object.
@@ -24,7 +25,7 @@ test('should throw when fields are not correct data types', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual('Parameter validation failed');
+  expect(errorCatcher).toEqual(errorObject('Parameter validation failed'));
 });
 
 test('should throw when parameter is not an object', () => {
@@ -34,7 +35,7 @@ test('should throw when parameter is not an object', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual('Parameter validation failed');
+  expect(errorCatcher).toEqual(errorObject('Parameter validation failed'));
 });
 
 test('should throw when fields not present', () => {
@@ -46,7 +47,7 @@ test('should throw when fields not present', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual('Parameter validation failed');
+  expect(errorCatcher).toEqual(errorObject('Parameter validation failed'));
   errorCatcher = null;
 
   // Requires a requisition field.
@@ -55,5 +56,5 @@ test('should throw when fields not present', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual('Parameter validation failed');
+  expect(errorCatcher).toEqual(errorObject('Parameter validation failed'));
 });
