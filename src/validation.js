@@ -23,3 +23,15 @@ export function facilitiesValidation(facilityCode, facilitiesList) {
     throw errorObject('Unfound facility');
   }
 }
+
+export function programValidation(programCode, programList) {
+  try {
+    const { id: programId } = programList.find(program => {
+      const { code } = program;
+      return code === programCode;
+    });
+    return programId;
+  } catch (e) {
+    throw errorObject('Could not find the Program');
+  }
+}
