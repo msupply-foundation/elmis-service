@@ -1,4 +1,4 @@
-import parameterValidation from '../../validation';
+import { parameterValidation } from '../../validation';
 import errorObject from '../../errors/errors';
 
 test('should return true', () => {
