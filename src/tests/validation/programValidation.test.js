@@ -1,4 +1,4 @@
-import programValidation from '../../validation';
+import { programValidation } from '../../validation';
 import errorObject from '../../errors/errors';
 
 test('should return id when code matches', () => {
