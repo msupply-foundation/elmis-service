@@ -1,6 +1,5 @@
 import errorObject from './errors/errors';
 
-/* eslint-disable no-throw-literal */
 export default function parameterValidation(inputParameters) {
   const { requisition, requisitionLines, regimeLines } = inputParameters;
 
