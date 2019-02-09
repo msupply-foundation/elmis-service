@@ -1,3 +1,8 @@
+export const ERROR_LOGIN = method => `${method} Error: Incorrect username or password`;
+export const ERROR_SERVER = method => `${method} Error: Unknown Server Error`;
+export const ERROR_UNKNOWN = method => `${method} Error: Unknown status code error (Not: 401, 500)`;
+export const ERROR_REQUEST = method => `${method} Error: Request malformed`;
+export const ERROR_COOKIE = method => `${method} Error: Unable to set session cookie`;
 /**
  * Simple method to return a formatted error object.
  * Can be refactored at a later date to be a class
@@ -6,11 +11,10 @@
  * TODO: Generic error code constants.
  * @param {string} message Description of the error
  */
-
-export default function errorObject(message) {
+export function errorObject(ERROR_CODE, method) {
   return {
     success: 'false',
-    message,
-    code: message,
+    message: ERROR_CODE(method),
+    code: ERROR_CODE.name,
   };
 }
