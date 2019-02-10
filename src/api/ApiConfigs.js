@@ -26,4 +26,11 @@ export default class ApiConfigs {
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     data: qs.stringify({ j_username: username, j_password: password }),
   });
+
+  static getProgramsConfig = () => ({
+    ...ApiConfigs.BASE_CONFIG,
+    url: 'create/requisitions/programs.json',
+    headers: { Cookie: ApiConfigs.cookie },
+    withCredentials: true,
+  });
 }
