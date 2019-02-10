@@ -21,16 +21,15 @@ export default class ApiConfigs {
 
   static getLoginConfig = (username, password) => ({
     ...ApiConfigs.BASE_CONFIG,
+    method: 'POST',
     url: '/j_spring_security_check',
-    withCredentials: true,
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     data: qs.stringify({ j_username: username, j_password: password }),
   });
 
   static getProgramsConfig = () => ({
     ...ApiConfigs.BASE_CONFIG,
-    url: '/create/requisitions/programs.json',
+    url: '/create/requisition/programs',
     headers: { Cookie: ApiConfigs.cookie },
-    withCredentials: true,
   });
 }

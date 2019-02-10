@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
 import axios from 'axios';
 import ApiConfigs from './api/ApiConfigs';
 import {
@@ -11,11 +13,15 @@ import {
 } from './errors/errors';
 
 export async function login(username, password) {
-  const config = ApiConfigs.getLoginConfig(username, password);
+  const config = ApiConfigs.getLoginConfig('Admin123', 'kathmandu312');
   try {
     const { headers } = await axios(config);
-    const cookie = headers['set-cooie'][0];
+    const cookie = headers['set-cookie'][0].split(';')[0];
+    console.log(headers);
+    console.log(cookie);
     ApiConfigs.setCookie(cookie);
+    // console.log(ApiConfigs.cookie);
+    return true;
   } catch (error) {
     const { response } = error;
     const { request } = error;
@@ -32,9 +38,13 @@ export async function login(username, password) {
 
 export async function programs() {
   const config = ApiConfigs.getProgramsConfig();
+  console.log(config);
   try {
-    const { data } = await axios(config);
+    const resp = await axios(config);
+    const { data } = resp;
+    // console.log(resp);
     const { programList } = data;
+    console.log(programList);
     return programList;
   } catch (error) {
     const { response } = error;
