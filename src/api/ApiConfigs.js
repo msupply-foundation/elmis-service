@@ -29,7 +29,7 @@ export default class ApiConfigs {
 
   static getProgramsConfig = () => ({
     ...ApiConfigs.BASE_CONFIG,
-    url: 'create/requisitions/programs.json',
+    url: '/create/requisitions/programs.json',
     headers: { Cookie: ApiConfigs.cookie },
     withCredentials: true,
   });
