@@ -1,13 +1,13 @@
-import errorObject from './errors/errors';
+import { errorObject, ERROR_VALIDATION } from './errors/errors';
 
 export function parameterValidation(inputParameters) {
   const { requisition, requisitionLines, regimeLines } = inputParameters;
 
   if (!(Array.isArray(requisitionLines) && Array.isArray(regimeLines))) {
-    throw errorObject('Parameter validation failed');
+    throw errorObject(ERROR_VALIDATION, 'parameterValidation', 'lines');
   }
-  if (!(typeof requisition === 'object' && !Array.isArray(requisition))) {
-    throw errorObject('Parameter validation failed');
+  if ((typeof requisition === 'object' && Array.isArray(requisition)) || !requisition) {
+    throw errorObject(ERROR_VALIDATION, 'parameterValidation', 'requisition');
   }
   return true;
 }
@@ -20,7 +20,7 @@ export function facilitiesValidation(facilityCode, facilitiesList) {
     });
     return facilityId;
   } catch (e) {
-    throw errorObject('Unfound facility');
+    throw errorObject(ERROR_VALIDATION, 'facilitiesValidation', 'facility');
   }
 }
 
@@ -32,6 +32,6 @@ export function programValidation(programCode, programList) {
     });
     return programId;
   } catch (e) {
-    throw errorObject('Could not find the Program');
+    throw errorObject(ERROR_VALIDATION, 'programValidation', 'program');
   }
 }
