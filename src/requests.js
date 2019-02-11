@@ -9,12 +9,27 @@ import {
   ERROR_COOKIE,
 } from './errors/errors';
 
+/**
+ * Method which will return a valid authentication cookie for eSigl.
+ * Returned with the name=value pair JSESSIONID=XXXX.
+ * eSigl will attempt to redirect after a succesful POST, returning
+ * the login page HTML. The axios login config limits redirects to 0,
+ * causing the response status 302, which has been set as a valid response
+ * code.
+ * Errors: Errors will be thrown within the try by either JS or Axios. An axios
+ * error will have a response or request property (or both). If an error is
+ * thrown with a response property, the request has returned from the server,
+ * but has an invalid status code. Without a response property, the request
+ * has failed to reach the server. With neither, the request has not been set at all.
+ * @param {string} username
+ * @param {string} password
+ */
+
 export default async function login(username, password) {
   const config = ApiConfigs.getLoginConfig(username, password);
   try {
     const { headers } = await axios(config);
-    const cookie = headers['set-cooie'][0];
-    ApiConfigs.setCookie(cookie);
+    return headers['set-cookie'][0].split(';')[0];
   } catch (error) {
     const { response } = error;
     const { request } = error;

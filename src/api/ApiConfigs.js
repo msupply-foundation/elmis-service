@@ -25,5 +25,7 @@ export default class ApiConfigs {
     withCredentials: true,
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     data: qs.stringify({ j_username: username, j_password: password }),
+    validateStatus: status => (status >= 200 && status < 300) || status === 302,
+    maxRedirects: 0,
   });
 }
