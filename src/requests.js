@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import axios from 'axios';
 import ApiConfigs from './api/ApiConfigs';
 import {
@@ -25,7 +26,7 @@ import {
  * @param {string} password
  */
 
-export default async function login(username, password) {
+export async function login(username, password) {
   const config = ApiConfigs.getLoginConfig(username, password);
   try {
     const { headers } = await axios(config);
