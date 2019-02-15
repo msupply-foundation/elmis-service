@@ -1,6 +1,8 @@
+// TODO: Add this to ESLint config if they occur
+// more then this file, eg in other tests.
 /* eslint-disable global-require */
-
 /* eslint-disable no-throw-literal */
+
 import '@babel/polyfill';
 import {
   errorObject,

@@ -1,6 +1,8 @@
 import { errorObject, ERROR_VALIDATION } from '../../errors/errors';
 import { facilitiesValidation } from '../../validation';
 
+// TODO: Potentially make a file for 'Test data' for
+// testing objects etc.
 test('should return four', () => {
   const testingObject = [
     {
