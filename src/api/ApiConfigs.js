@@ -8,6 +8,11 @@ import https from 'https';
 export default class ApiConfigs {
   static cookie = '';
 
+  // TODO: Solution for enterable URLS.
+  // Option: set URL method, similar to how cookies work.
+  // This needs to be done BEFORE MERGING INTO MASTER,
+  // however will keep like this for nwo as development
+  // is easier.
   static BASE_CONFIG = {
     baseURL: 'https://83.96.240.209',
     httpsAgent: new https.Agent({
