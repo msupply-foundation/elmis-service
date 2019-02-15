@@ -38,13 +38,9 @@ export async function login(username, password) {
 
 export async function programs() {
   const config = ApiConfigs.getProgramsConfig();
-  console.log(config);
   try {
-    const resp = await axios(config);
-    const { data } = resp;
-    // console.log(resp);
+    const { data } = await axios(config);
     const { programList } = data;
-    console.log(programList);
     return programList;
   } catch (error) {
     const { response } = error;
@@ -56,6 +52,6 @@ export async function programs() {
       throw errorObject(ERROR_UNKNOWN, 'Programs');
     }
     if (request) throw errorObject(ERROR_REQUEST, 'Programs');
-    throw errorObject(ERROR_COOKIE, 'Login');
+    throw errorObject(ERROR_COOKIE, 'Programs');
   }
 }
