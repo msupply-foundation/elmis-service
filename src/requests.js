@@ -19,11 +19,13 @@ import {
  * code.
  * Errors: Errors will be thrown within the try by either JS or Axios. An axios
  * error will have a response or request property (or both). If an error is
- * thrown with a response property, the request has returned from the server,
+ * thrown with a response property, the request has returned from the server
  * but has an invalid status code. Without a response property, the request
  * has failed to reach the server. With neither, the request has not been set at all.
- * @param {string} username
- * @param {string} password
+ *
+ * @param  {string} username eSigl username in plain text
+ * @param  {string} password Corresponding eSigl password in plain text
+ * @return {string} Valid eSigl JSession cookie
  */
 
 export async function login(username, password) {
