@@ -1,21 +1,16 @@
-/* eslint-disable global-require */
-/* eslint-disable no-throw-literal */
 import '@babel/polyfill';
-import { errorObject, ERROR_AUTHENTICATION } from '../../errors/errors';
 
-test('', async () => {
+beforeEach(() => {
+  jest.resetModules();
+  jest.dontMock('axios');
+});
+
+test('should throw a response error, as the response has no program list', async () => {
   jest.doMock('axios', () =>
     jest.fn(() => {
-      throw { response: { status: 401 } };
+      return { data: { programList: [] } };
     })
   );
   const { programs } = require('../../requests');
-  let errorCatcher;
-  try {
-    await programs();
-  } catch (error) {
-    errorCatcher = error;
-  }
-
-  expect(errorCatcher).toEqual(errorObject(ERROR_AUTHENTICATION, 'Programs'));
+  expect(await programs({ cookie: '', baseURL: '' })).toEqual([]);
 });
