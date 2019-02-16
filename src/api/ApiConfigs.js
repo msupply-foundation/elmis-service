@@ -29,4 +29,11 @@ export default class ApiConfigs {
     url: '/create/requisition/programs',
     headers: { Cookie: cookie },
   });
+
+  static getFacilitiesConfig = ({ baseURL, cookie }) => ({
+    ...ApiConfigs.BASE_CONFIG,
+    baseURL,
+    url: '/user/facilities.json',
+    headers: { Cookie: cookie },
+  });
 }
