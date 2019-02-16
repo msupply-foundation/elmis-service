@@ -3,12 +3,12 @@ import axios from 'axios';
 import ApiConfigs from './api/ApiConfigs';
 import {
   errorObject,
-  ERROR_LOGIN,
   ERROR_SERVER,
-  ERROR_UNKNOWN,
+  ERROR_UNKNOWN_RESPONSE,
   ERROR_REQUEST,
   ERROR_COOKIE,
   ERROR_AUTHENTICATION,
+  ERROR_UNKNOWN,
 } from './errors/errors';
 
 /**
@@ -24,46 +24,56 @@ import {
  * but has an invalid status code. Without a response property, the request
  * has failed to reach the server. With neither, the request has not been set at all.
  *
- * @param  {string} username eSigl username in plain text
- * @param  {string} password Corresponding eSigl password in plain text
+ * @param  {object} configParams = {
+ * username: eSigl username in plain text,
+ * password: eSigl corresponding password in plain text,
+ * baseURL: baseURL for the eSigl server
+ * }
  * @return {string} Valid eSigl JSession cookie
  */
 
-export async function login(username, password) {
-  const config = ApiConfigs.getLoginConfig(username, password);
+export async function login({ username, password, baseURL }) {
+  const config = ApiConfigs.getLoginConfig({ username, password, baseURL });
   try {
     const { headers } = await axios(config);
     return headers['set-cookie'][0].split(';')[0];
   } catch (error) {
-    const { response } = error;
-    const { request } = error;
+    const { response, request } = error;
     if (response) {
       const { status } = response;
-      if (status === 401) throw errorObject(ERROR_LOGIN, 'Login');
-      if (status === 500) throw errorObject(ERROR_SERVER, 'Login');
-      throw errorObject(ERROR_UNKNOWN, 'Login');
+      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'login');
+      if (status === 500) throw errorObject(ERROR_SERVER, 'login');
+      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'login', status);
     }
-    if (request) throw errorObject(ERROR_REQUEST, 'Login');
-    throw errorObject(ERROR_COOKIE, 'Login');
+    if (request) throw errorObject(ERROR_REQUEST, 'login');
+    throw errorObject(ERROR_COOKIE, 'login');
   }
 }
 
-export async function programs() {
-  const config = ApiConfigs.getProgramsConfig();
+/**
+ * Sends a request to eSigl for all programs the currently
+ * logged in user has access to.
+ * @param  {Object} configParams = {
+ * baseURL: baseURL for eSigl server,
+ * cookie: valid eSigl cookie string
+ * }
+ * @return {Array}  Array of program objects.
+ */
+export async function programs({ baseURL, cookie }) {
+  const config = ApiConfigs.getProgramsConfig({ baseURL, cookie });
   try {
     const { data } = await axios(config);
     const { programList } = data;
     return programList;
   } catch (error) {
-    const { response } = error;
-    const { request } = error;
+    const { response, request } = error;
     if (response) {
       const { status } = response;
-      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'Programs');
-      if (status === 500) throw errorObject(ERROR_SERVER, 'Programs');
-      throw errorObject(ERROR_UNKNOWN, 'Programs');
+      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'programs');
+      if (status === 500) throw errorObject(ERROR_SERVER, 'programs');
+      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'programs', status);
     }
-    if (request) throw errorObject(ERROR_REQUEST, 'Programs');
-    throw errorObject(ERROR_COOKIE, 'Programs');
+    if (request) throw errorObject(ERROR_REQUEST, 'programs');
+    throw errorObject(ERROR_UNKNOWN, 'programs');
   }
 }
