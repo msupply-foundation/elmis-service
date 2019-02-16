@@ -41,7 +41,7 @@ export function facilitiesValidation(facilityCode, facilitiesList) {
       return code === facilityCode;
     });
     return facilityId;
-  } catch (e) {
+  } catch (error) {
     throw errorObject(ERROR_VALIDATION, 'facilitiesValidation', 'facility');
   }
 }
@@ -61,7 +61,7 @@ export function programValidation(programCode, programList) {
       return code === programCode;
     });
     return programId;
-  } catch (e) {
+  } catch (error) {
     throw errorObject(ERROR_VALIDATION, 'programValidation', 'program');
   }
 }
