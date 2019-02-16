@@ -1,7 +1,9 @@
 {
   "extends": ["airbnb", "prettier"],
   "rules": {
-    "max-len": ["error", { "code": 100 }]
+    "max-len": ["error", { "code": 100 }],
+    "global-require": 0,
+    "no-throw-literal": "off"
   },
   "env": {
     "browser": true,
