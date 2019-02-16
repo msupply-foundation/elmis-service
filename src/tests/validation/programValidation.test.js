@@ -1,5 +1,8 @@
 import { programValidation } from '../../validation';
-import errorObject from '../../errors/errors';
+import { ERROR_VALIDATION, errorObject } from '../../errors/errors';
+
+// TODO: Potentially make a file for 'Test data' for
+// testing objects etc.
 
 test('should return id when code matches', () => {
   const testingObject = [
@@ -27,7 +30,7 @@ test('should throw on unmatched code', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(errorObject('Could not find the Program'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_VALIDATION, 'programValidation', 'program'));
 });
 
 test('should throw on empty array', () => {
@@ -40,5 +43,5 @@ test('should throw on empty array', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(errorObject('Could not find the Program'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_VALIDATION, 'programValidation', 'program'));
 });

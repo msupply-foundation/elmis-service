@@ -1,6 +1,8 @@
-import errorObject from '../../errors/errors';
+import { errorObject, ERROR_VALIDATION } from '../../errors/errors';
 import { facilitiesValidation } from '../../validation';
 
+// TODO: Potentially make a file for 'Test data' for
+// testing objects etc.
 test('should return four', () => {
   const testingObject = [
     {
@@ -50,7 +52,7 @@ test('should throw on code missing', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(errorObject('Unfound facility'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_VALIDATION, 'facilitiesValidation', 'facility'));
 });
 
 test('should throw on non array or empty object', () => {
@@ -62,5 +64,5 @@ test('should throw on non array or empty object', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(errorObject('Unfound facility'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_VALIDATION, 'facilitiesValidation', 'facility'));
 });
