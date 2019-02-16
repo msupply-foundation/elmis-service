@@ -77,3 +77,22 @@ export async function programs({ baseURL, cookie }) {
     throw errorObject(ERROR_UNKNOWN, 'programs');
   }
 }
+
+export async function facilities({ baseURL, cookie }) {
+  const config = ApiConfigs.getFacilitiesConfig({ baseURL, cookie });
+  try {
+    const { data } = await axios(config);
+    const { facilityList } = data;
+    return facilityList;
+  } catch (error) {
+    const { response, request } = error;
+    if (response) {
+      const { status } = response;
+      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'facilities');
+      if (status === 500) throw errorObject(ERROR_SERVER, 'facilities');
+      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'facilities', status);
+    }
+    if (request) throw errorObject(ERROR_REQUEST, 'facilities');
+    throw errorObject(ERROR_UNKNOWN, 'facilities');
+  }
+}
