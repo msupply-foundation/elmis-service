@@ -18,10 +18,10 @@ export function parameterValidation(inputParameters) {
   const { requisition, requisitionLines, regimeLines } = inputParameters;
 
   if (!(Array.isArray(requisitionLines) && Array.isArray(regimeLines))) {
-    throw errorObject(ERROR_VALIDATION, 'parameterValidation', 'lines');
+    throw errorObject(ERROR_VALIDATION, 'parameterValidation');
   }
   if ((typeof requisition === 'object' && Array.isArray(requisition)) || !requisition) {
-    throw errorObject(ERROR_VALIDATION, 'parameterValidation', 'requisition');
+    throw errorObject(ERROR_VALIDATION, 'parameterValidation');
   }
   return true;
 }
@@ -42,7 +42,7 @@ export function facilitiesValidation(facilityCode, facilitiesList) {
     });
     return facilityId;
   } catch (error) {
-    throw errorObject(ERROR_VALIDATION, 'facilitiesValidation', 'facility');
+    throw errorObject(ERROR_VALIDATION, 'facilitiesValidation');
   }
 }
 
@@ -62,6 +62,26 @@ export function programValidation(programCode, programList) {
     });
     return programId;
   } catch (error) {
-    throw errorObject(ERROR_VALIDATION, 'programValidation', 'program');
+    throw errorObject(ERROR_VALIDATION, 'programValidation');
+  }
+}
+
+/**
+ * Matches an input incoming date string with the next period
+ * of the period list for a eSIGL program and facility. The
+ * incoming date must match the first element of the periodList,
+ * as requisitions must be entered sequentially.
+ * @param  {String} incomingDate   - UTC Format date string for the outgoing requisition.
+ * @param  {Object} outgoingPeriod - Period objects from eSIGL.
+ * @return {number} the ID of the period matched with the incoming date.
+ */
+export default function periodValidation(incomingDate, outgoingPeriod) {
+  try {
+    const { startDate } = outgoingPeriod;
+    const incomingDateMonth = new Date(incomingDate).getMonth();
+    const outgoingPeriodMonth = new Date(startDate * 1000).getMonth();
+    return outgoingPeriodMonth === incomingDateMonth;
+  } catch (error) {
+    throw errorObject(ERROR_VALIDATION, 'periodValidation');
   }
 }
