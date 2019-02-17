@@ -24,11 +24,11 @@ import {
  * but has an invalid status code. Without a response property, the request
  * has failed to reach the server. With neither, the request has not been set at all.
  *
- * @param  {object} configParams = {
+ * @param  {Object} configParams
  * @param  {string} configParams.username - plain text username for eSIGL
  * @param  {string} configParams.password - plain text password for eSIGL
  * @param  {string} configParams.baseURL - baseURL for eSIGL
- * }
+ *
  * @return {string} Valid eSigl JSession cookie
  */
 
