@@ -25,9 +25,9 @@ import {
  * has failed to reach the server. With neither, the request has not been set at all.
  *
  * @param  {object} configParams = {
- * username: eSigl username in plain text,
- * password: eSigl corresponding password in plain text,
- * baseURL: baseURL for the eSigl server
+ * @param  {string} configParams.username - plain text username for eSIGL
+ * @param  {string} configParams.password - plain text password for eSIGL
+ * @param  {string} configParams.baseURL - baseURL for eSIGL
  * }
  * @return {string} Valid eSigl JSession cookie
  */
@@ -77,6 +77,16 @@ export async function programs({ baseURL, cookie }) {
   }
 }
 
+/**
+ * Sends a request to eSigl for all facilities the currently
+ * logged in user has access to.
+ *
+ * @param  {Object} configParams
+ * @param  {string} configParams.baseURL - baseURL for eSIGL
+ * @param  {string} configParams.cookie  - valid cookie string for eSIGL server
+ *
+ * @return {Array}  Array of program objects.
+ */
 export async function facilities({ baseURL, cookie }) {
   const config = ApiConfigs.getFacilitiesConfig({ baseURL, cookie });
   try {
