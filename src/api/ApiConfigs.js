@@ -48,7 +48,7 @@ export default class ApiConfigs {
   static getAuthorizeConfig = ({ baseURL, cookie, requisitionId }) => ({
     ...ApiConfigs.BASE_CONFIG,
     baseURL,
-    method: 'POST',
+    method: 'PUT',
     data: {},
     url: `/requisitions/${requisitionId}/authorize.json`,
     headers: { Cookie: cookie, 'Content-Type': 'application/javascript' },
@@ -57,7 +57,7 @@ export default class ApiConfigs {
   static getApproveConfig = ({ baseURL, cookie, requisitionId }) => ({
     ...ApiConfigs.BASE_CONFIG,
     baseURL,
-    method: 'POST',
+    method: 'PUT',
     data: {},
     url: `/requisitions/${requisitionId}/approve.json`,
     headers: { Cookie: cookie, 'Content-Type': 'application/javascript' },
@@ -66,7 +66,7 @@ export default class ApiConfigs {
   static getSubmitConfig = ({ baseURL, cookie, requisitionId }) => ({
     ...ApiConfigs.BASE_CONFIG,
     baseURL,
-    method: 'POST',
+    method: 'PUT',
     data: {},
     url: `/requisitions/${requisitionId}/submit.json`,
     headers: { Cookie: cookie, 'Content-Type': 'application/javascript' },

@@ -57,7 +57,7 @@ test('Authorization config fields should be equal', () => {
   expect(config.baseURL).toBe('url');
   expect(config.headers).toEqual({ Cookie: 'cookie', 'Content-Type': 'application/javascript' });
   expect(config.url).toBe('/requisitions/1/authorize.json');
-  expect(config.method).toBe('POST');
+  expect(config.method).toBe('PUT');
   expect(config.data).toEqual({});
 });
 
@@ -70,7 +70,7 @@ test('Approving config fields should be equal', () => {
   expect(config.baseURL).toBe('url');
   expect(config.headers).toEqual({ Cookie: 'cookie', 'Content-Type': 'application/javascript' });
   expect(config.url).toBe('/requisitions/1/approve.json');
-  expect(config.method).toBe('POST');
+  expect(config.method).toBe('PUT');
   expect(config.data).toEqual({});
 });
 
@@ -83,7 +83,7 @@ test('Submitting config fields should be equal', () => {
   expect(config.baseURL).toBe('url');
   expect(config.headers).toEqual({ Cookie: 'cookie', 'Content-Type': 'application/javascript' });
   expect(config.url).toBe('/requisitions/1/submit.json');
-  expect(config.method).toBe('POST');
+  expect(config.method).toBe('PUT');
   expect(config.data).toEqual({});
 });
 
