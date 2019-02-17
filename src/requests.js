@@ -152,7 +152,7 @@ export async function periods({ baseURL, cookie, emergency, facilityId, programI
  * @param  {string}  configParams.cookie          - valid cookie string for eSIGL server
  * @param  {boolean} configParams.requisitionID   - eSIGL id of the requisition to authorize
  *
- * @return {Array}  Array of period objects.
+ * @return {bool}    confirmation of a requisition being succesfully authorized
  */
 export async function authorizeRequisition({ baseURL, cookie, requisitionId }) {
   const config = ApiConfigs.getAuthorizeConfig({
