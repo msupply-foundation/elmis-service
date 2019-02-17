@@ -16,3 +16,12 @@ test('Login config fields should be equal', () => {
   expect(config.data).toBe('j_username=user123&j_password=password123');
   expect(config.url).toBe('/j_spring_security_check');
 });
+
+test('Programs config fields should be equal', () => {
+  const config = ApiConfigs.getProgramsConfig({
+    baseURL: 'url',
+    cookie: 'cookie',
+  });
+  expect(config.baseURL).toBe('url');
+  expect(config.headers).toEqual({ Cookie: 'cookie' });
+});
