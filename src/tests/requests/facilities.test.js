@@ -8,9 +8,9 @@ beforeEach(() => {
 test('should return the facilityList from response', async () => {
   jest.doMock('axios', () =>
     jest.fn(() => {
-      return { data: { facilityList: [] } };
+      return { data: { facilities: [] } };
     })
   );
   const { facilities } = require('../../requests');
-  expect(await facilities({ cookie: '', baseURL: '' })).toEqual([]);
+  expect(await facilities({ cookie: '', baseURL: '', programId: 1 })).toEqual([]);
 });

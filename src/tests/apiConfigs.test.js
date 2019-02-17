@@ -30,8 +30,10 @@ test('Facilities config fields should be equal', () => {
   const config = ApiConfigs.getFacilitiesConfig({
     baseURL: 'url',
     cookie: 'cookie',
+    programId: 1,
   });
   expect(config.baseURL).toBe('url');
+  expect(config.url).toBe(`/create/requisition/supervised/1/facilities.json`);
   expect(config.headers).toEqual({ Cookie: 'cookie' });
 });
 

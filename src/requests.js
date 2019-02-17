@@ -86,11 +86,11 @@ export async function programs({ baseURL, cookie }) {
  *
  * @return {Array}  Array of facility objects.
  */
-export async function facilities({ baseURL, cookie }) {
-  const config = ApiConfigs.getFacilitiesConfig({ baseURL, cookie });
+export async function facilities({ baseURL, cookie, programId }) {
+  const config = ApiConfigs.getFacilitiesConfig({ baseURL, cookie, programId });
   try {
     const { data } = await axios(config);
-    const { facilityList } = data;
+    const { facilities: facilityList } = data;
     return facilityList;
   } catch (error) {
     const { response, request } = error;

@@ -30,10 +30,10 @@ export default class ApiConfigs {
     headers: { Cookie: cookie },
   });
 
-  static getFacilitiesConfig = ({ baseURL, cookie }) => ({
+  static getFacilitiesConfig = ({ baseURL, cookie, programId }) => ({
     ...ApiConfigs.BASE_CONFIG,
     baseURL,
-    url: '/user/facilities.json',
+    url: `/create/requisition/supervised/${programId}/facilities.json`,
     headers: { Cookie: cookie },
   });
 
