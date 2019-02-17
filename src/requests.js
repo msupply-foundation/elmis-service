@@ -318,3 +318,30 @@ export async function createRequisition({
     throw errorObject(ERROR_UNKNOWN, 'createRequisition');
   }
 }
+
+/**
+ *
+ * @param  {Object}    configParams
+ * @param  {string}    configParams.baseURL       - baseURL for eSIGL
+ * @param  {string}    configParams.cookie        - valid cookie string for eSIGL server
+ * @param  {Object}    configParams.requisition   - the requisition object to save
+ * @return {number}    eSIGL ID of the newly created requisition.
+ */
+export async function updateRequisition({ baseURL, cookie, requisition }) {
+  const config = ApiConfigs.getUpdateConfig({ baseURL, cookie, requisition });
+  try {
+    const { data } = await axios(config);
+    const { success } = data;
+    return success === 'R&R saved successfully!';
+  } catch (error) {
+    const { response, request } = error;
+    if (response) {
+      const { status } = response;
+      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'updateRequisition');
+      if (status === 500) throw errorObject(ERROR_SERVER, 'updateRequisition');
+      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'updateRequisition', status);
+    }
+    if (request) throw errorObject(ERROR_REQUEST, 'updateRequisition');
+    throw errorObject(ERROR_UNKNOWN, 'updateRequisition');
+  }
+}
