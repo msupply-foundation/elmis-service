@@ -273,3 +273,48 @@ export async function requisitionToOrder({ baseURL, cookie, requisitionId }) {
     throw errorObject(ERROR_UNKNOWN, 'requisitionToOrder');
   }
 }
+
+/**
+ *
+ * @param  {Object}  configParams
+ * @param  {string}  configParams.baseURL     - baseURL for eSIGL
+ * @param  {string}  configParams.cookie      - valid cookie string for eSIGL server
+ * @param  {bool}    configParams.emergency   - Bool for emergency requisition(true) or not(false)
+ * @param  {number}  configParams.periodId    - eSIGL period ID of the requisition to create
+ * @param  {number}  configParams.facilityId  - eSIGL facility ID of the requisition to create
+ * @param  {number}  configParams.programId   - eSIGL program ID of the requisition to create
+ * @return {number}  eSIGL ID of the newly created requisition.
+ */
+export async function createRequisition({
+  baseURL,
+  cookie,
+  emergency,
+  periodId,
+  facilityId,
+  programId,
+}) {
+  const config = ApiConfigs.getCreateRequisitionConfig({
+    baseURL,
+    cookie,
+    emergency,
+    periodId,
+    facilityId,
+    programId,
+  });
+  try {
+    const { data } = await axios(config);
+    const { Rnr } = data;
+    const { Id } = Rnr;
+    return Id;
+  } catch (error) {
+    const { response, request } = error;
+    if (response) {
+      const { status } = response;
+      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'createRequisition');
+      if (status === 500) throw errorObject(ERROR_SERVER, 'createRequisition');
+      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'createRequisition', status);
+    }
+    if (request) throw errorObject(ERROR_REQUEST, 'createRequisition');
+    throw errorObject(ERROR_UNKNOWN, 'createRequisition');
+  }
+}

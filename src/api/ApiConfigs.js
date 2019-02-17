@@ -80,4 +80,21 @@ export default class ApiConfigs {
     url: '/orders.json',
     headers: { Cookie: cookie, 'Content-Type': 'application/json' },
   });
+
+  static getCreateRequisitionConfig = ({
+    baseURL,
+    cookie,
+    emergency,
+    periodId,
+    facilityId,
+    programId,
+  }) => ({
+    ...ApiConfigs.BASE_CONFIG,
+    baseURL,
+    method: 'POST',
+    params: { emergency, periodId, facilityId, programId },
+    paramsSerializer: params => qs.stringify(params),
+    url: '/requisitions.json',
+    headers: { Cookie: cookie },
+  });
 }
