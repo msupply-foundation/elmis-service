@@ -259,8 +259,8 @@ export async function requisitionToOrder({ baseURL, cookie, requisitionId }) {
     requisitionId,
   });
   try {
-    const { data } = await axios(config);
-    return Object.entries(data).length === 0 && data.constructor === Object;
+    const { status } = await axios(config);
+    return status === 201;
   } catch (error) {
     const { response, request } = error;
     if (response) {
