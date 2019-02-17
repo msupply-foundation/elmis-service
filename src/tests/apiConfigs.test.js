@@ -36,16 +36,16 @@ test('Facilities config fields should be equal', () => {
 });
 
 test('Periods config fields should be equal', () => {
+  const params = { emergency: false, facilityId: 1, programId: 1 };
   const config = ApiConfigs.getPeriodsConfig({
     baseURL: 'url',
     cookie: 'cookie',
-    emergency: false,
-    facilityId: 1,
-    programId: 1,
+    ...params,
   });
   expect(config.baseURL).toBe('url');
   expect(config.headers).toEqual({ Cookie: 'cookie' });
-  expect(config.data).toBe('emergency=false&facilityId=1&programId=1');
+  expect(config.params).toEqual({ ...params });
+  expect(config.paramsSerializer(params)).toBe('emergency=false&facilityId=1&programId=1');
 });
 
 test('Authorization config fields should be equal', () => {
