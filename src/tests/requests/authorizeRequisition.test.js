@@ -6,7 +6,9 @@ beforeEach(() => {
 });
 
 test('should return true from response', async () => {
-  jest.doMock('axios', () => jest.fn(() => ({ success: 'R&R authorized successfully!' })));
+  jest.doMock('axios', () =>
+    jest.fn(() => ({ data: { success: 'R&R authorized successfully!' } }))
+  );
   const { authorizeRequisition } = require('../../requests');
   expect(await authorizeRequisition({ cookie: '', baseURL: '', requisitionId: 1 })).toEqual(true);
 });

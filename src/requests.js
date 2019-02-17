@@ -142,3 +142,37 @@ export async function periods({ baseURL, cookie, emergency, facilityId, programI
     throw errorObject(ERROR_UNKNOWN, 'periods');
   }
 }
+
+// TODO: Investigate error codes on trying to authorize a requisition which is not
+// able to be authorized.
+/**
+ *
+ * @param  {Object}  configParams
+ * @param  {string}  configParams.baseURL         - baseURL for eSIGL
+ * @param  {string}  configParams.cookie          - valid cookie string for eSIGL server
+ * @param  {boolean} configParams.requisitionID   - eSIGL id of the requisition to authorize
+ *
+ * @return {Array}  Array of period objects.
+ */
+export async function authorizeRequisition({ baseURL, cookie, requisitionId }) {
+  const config = ApiConfigs.getAuthorizeConfig({
+    baseURL,
+    cookie,
+    requisitionId,
+  });
+  try {
+    const { data } = await axios(config);
+    const { success } = data;
+    return success === 'R&R authorized successfully!';
+  } catch (error) {
+    const { response, request } = error;
+    if (response) {
+      const { status } = response;
+      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'authorizeRequisition');
+      if (status === 500) throw errorObject(ERROR_SERVER, 'authorizeRequisition');
+      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'authorizeRequisition', status);
+    }
+    if (request) throw errorObject(ERROR_REQUEST, 'authorizeRequisition');
+    throw errorObject(ERROR_UNKNOWN, 'authorizeRequisition');
+  }
+}
