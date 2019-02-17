@@ -41,7 +41,16 @@ export default class ApiConfigs {
     ...ApiConfigs.BASE_CONFIG,
     baseURL,
     data: qs.stringify({ emergency, facilityId, programId }),
-    url: '/user/facilities.json',
+    url: 'logistics/periods.json',
     headers: { Cookie: cookie },
+  });
+
+  static getAuthorizeConfig = ({ baseURL, cookie, requisitionId }) => ({
+    ...ApiConfigs.BASE_CONFIG,
+    baseURL,
+    method: 'POST',
+    data: {},
+    url: `/requisitions/${requisitionId}/authorize.json`,
+    headers: { Cookie: cookie, 'Content-Type': 'application/javascript' },
   });
 }

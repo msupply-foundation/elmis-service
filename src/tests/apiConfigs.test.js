@@ -47,3 +47,16 @@ test('Periods config fields should be equal', () => {
   expect(config.headers).toEqual({ Cookie: 'cookie' });
   expect(config.data).toBe('emergency=false&facilityId=1&programId=1');
 });
+
+test('Authorization config fields should be equal', () => {
+  const config = ApiConfigs.getAuthorizeConfig({
+    baseURL: 'url',
+    cookie: 'cookie',
+    requisitionId: 1,
+  });
+  expect(config.baseURL).toBe('url');
+  expect(config.headers).toEqual({ Cookie: 'cookie', 'Content-Type': 'application/javascript' });
+  expect(config.url).toBe('/requisitions/1/authorize.json');
+  expect(config.method).toBe('POST');
+  expect(config.data).toEqual({});
+});
