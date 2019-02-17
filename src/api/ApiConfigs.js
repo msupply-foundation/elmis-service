@@ -40,7 +40,8 @@ export default class ApiConfigs {
   static getPeriodsConfig = ({ baseURL, cookie, emergency, facilityId, programId }) => ({
     ...ApiConfigs.BASE_CONFIG,
     baseURL,
-    data: qs.stringify({ emergency, facilityId, programId }),
+    params: { emergency, facilityId, programId },
+    paramsSerializer: params => qs.stringify(params),
     url: 'logistics/periods.json',
     headers: { Cookie: cookie },
   });
