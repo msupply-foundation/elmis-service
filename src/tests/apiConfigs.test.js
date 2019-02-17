@@ -117,3 +117,27 @@ test('Create requisition config fields should be equal', () => {
     'emergency=false&periodId=1&facilityId=1&programId=1'
   );
 });
+
+test('Update requisition config fields should be equal', () => {
+  const config = ApiConfigs.getUpdateConfig({
+    baseURL: 'url',
+    cookie: 'cookie',
+    requisition: {
+      Id: 1,
+      fullSupplyLineItems: [],
+      nonFullysupplyLineItems: [],
+      regimenLineItems: [],
+    },
+  });
+
+  expect(config.baseURL).toBe('url');
+  expect(config.headers).toEqual({ Cookie: 'cookie' });
+  expect(config.url).toBe('/requisitions/1/save.json');
+  expect(config.method).toBe('PUT');
+  expect(config.data).toEqual({
+    Id: 1,
+    fullSupplyLineItems: [],
+    nonFullysupplyLineItems: [],
+    regimenLineItems: [],
+  });
+});
