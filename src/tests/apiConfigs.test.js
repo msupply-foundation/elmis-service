@@ -60,3 +60,16 @@ test('Authorization config fields should be equal', () => {
   expect(config.method).toBe('POST');
   expect(config.data).toEqual({});
 });
+
+test('Approving config fields should be equal', () => {
+  const config = ApiConfigs.getApproveConfig({
+    baseURL: 'url',
+    cookie: 'cookie',
+    requisitionId: 1,
+  });
+  expect(config.baseURL).toBe('url');
+  expect(config.headers).toEqual({ Cookie: 'cookie', 'Content-Type': 'application/javascript' });
+  expect(config.url).toBe('/requisitions/1/approve.json');
+  expect(config.method).toBe('POST');
+  expect(config.data).toEqual({});
+});
