@@ -242,3 +242,34 @@ export async function submitRequisition({ baseURL, cookie, requisitionId }) {
     throw errorObject(ERROR_UNKNOWN, 'submitRequisition');
   }
 }
+
+/**
+ *
+ * @param  {Object}  configParams
+ * @param  {string}  configParams.baseURL         - baseURL for eSIGL
+ * @param  {string}  configParams.cookie          - valid cookie string for eSIGL server
+ * @param  {boolean} configParams.requisitionId   - eSIGL id of the requisition to convert
+ *
+ * @return {bool}    confirmation of a requisition being succesfully converted
+ */
+export async function requisitionToOrder({ baseURL, cookie, requisitionId }) {
+  const config = ApiConfigs.getOrderConfig({
+    baseURL,
+    cookie,
+    requisitionId,
+  });
+  try {
+    const { data } = await axios(config);
+    return Object.entries(data).length === 0 && data.constructor === Object;
+  } catch (error) {
+    const { response, request } = error;
+    if (response) {
+      const { status } = response;
+      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'requisitionToOrder');
+      if (status === 500) throw errorObject(ERROR_SERVER, 'requisitionToOrder');
+      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'requisitionToOrder', status);
+    }
+    if (request) throw errorObject(ERROR_REQUEST, 'requisitionToOrder');
+    throw errorObject(ERROR_UNKNOWN, 'requisitionToOrder');
+  }
+}
