@@ -41,7 +41,7 @@ export default class ApiConfigs {
     ...ApiConfigs.BASE_CONFIG,
     baseURL,
     data: qs.stringify({ emergency, facilityId, programId }),
-    url: '/user/facilities.json',
+    url: 'logistics/periods.json',
     headers: { Cookie: cookie },
   });
 
