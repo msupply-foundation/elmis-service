@@ -12,7 +12,6 @@ test('should return true from response', async () => {
     await updateRequisition({
       cookie: '',
       baseURL: '',
-      requisitionId: 1,
       requisition: {
         Id: 1,
         fullSupplyLineItems: [],
