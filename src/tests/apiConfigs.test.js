@@ -88,14 +88,14 @@ test('Submitting config fields should be equal', () => {
 });
 
 test('Requisition to order config fields should be equal', () => {
-  const config = ApiConfigs.getSubmitConfig({
+  const config = ApiConfigs.getOrderConfig({
     baseURL: 'url',
     cookie: 'cookie',
     requisitionId: 1,
   });
   expect(config.baseURL).toBe('url');
   expect(config.headers).toEqual({ Cookie: 'cookie', 'Content-Type': 'application/json' });
-  expect(config.data).toBe([{ id: 1 }]);
+  expect(config.data).toEqual([{ id: 1 }]);
   expect(config.url).toBe('/orders.json');
   expect(config.method).toBe('POST');
 });

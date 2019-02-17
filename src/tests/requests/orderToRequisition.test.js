@@ -6,7 +6,7 @@ beforeEach(() => {
 });
 
 test('should return true from response', async () => {
-  jest.doMock('axios', () => jest.fn(() => ({})));
+  jest.doMock('axios', () => jest.fn(() => ({ data: {} })));
   const { requisitionToOrder } = require('../../requests');
   expect(await requisitionToOrder({ cookie: '', baseURL: '', requisitionId: 1 })).toEqual(true);
 });
