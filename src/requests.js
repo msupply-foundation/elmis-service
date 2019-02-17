@@ -176,3 +176,37 @@ export async function authorizeRequisition({ baseURL, cookie, requisitionId }) {
     throw errorObject(ERROR_UNKNOWN, 'authorizeRequisition');
   }
 }
+
+// TODO: Investigate error codes on trying to authorize a requisition which is not
+// able to be authorized.
+/**
+ *
+ * @param  {Object}  configParams
+ * @param  {string}  configParams.baseURL         - baseURL for eSIGL
+ * @param  {string}  configParams.cookie          - valid cookie string for eSIGL server
+ * @param  {boolean} configParams.requisitionID   - eSIGL id of the requisition to approve
+ *
+ * @return {bool}    confirmation of a requisition being succesfully approved
+ */
+export async function approveRequisition({ baseURL, cookie, requisitionId }) {
+  const config = ApiConfigs.getApproveConfig({
+    baseURL,
+    cookie,
+    requisitionId,
+  });
+  try {
+    const { data } = await axios(config);
+    const { success } = data;
+    return success === 'R&R approved successfully!';
+  } catch (error) {
+    const { response, request } = error;
+    if (response) {
+      const { status } = response;
+      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'approveRequisition');
+      if (status === 500) throw errorObject(ERROR_SERVER, 'approveRequisition');
+      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'approveRequisition', status);
+    }
+    if (request) throw errorObject(ERROR_REQUEST, 'approveRequisition');
+    throw errorObject(ERROR_UNKNOWN, 'approveRequisition');
+  }
+}
