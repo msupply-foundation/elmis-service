@@ -71,4 +71,13 @@ export default class ApiConfigs {
     url: `/requisitions/${requisitionId}/submit.json`,
     headers: { Cookie: cookie, 'Content-Type': 'application/javascript' },
   });
+
+  static getSubmitConfig = ({ baseURL, cookie, requisitionId }) => ({
+    ...ApiConfigs.BASE_CONFIG,
+    baseURL,
+    method: 'POST',
+    data: [{ id: requisitionId }],
+    url: '/orders.json',
+    headers: { Cookie: cookie, 'Content-Type': 'application/json' },
+  });
 }
