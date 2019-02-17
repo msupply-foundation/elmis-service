@@ -150,7 +150,7 @@ export async function periods({ baseURL, cookie, emergency, facilityId, programI
  * @param  {Object}  configParams
  * @param  {string}  configParams.baseURL         - baseURL for eSIGL
  * @param  {string}  configParams.cookie          - valid cookie string for eSIGL server
- * @param  {boolean} configParams.requisitionID   - eSIGL id of the requisition to authorize
+ * @param  {boolean} configParams.requisitionId   - eSIGL id of the requisition to authorize
  *
  * @return {bool}    confirmation of a requisition being succesfully authorized
  */
@@ -184,7 +184,7 @@ export async function authorizeRequisition({ baseURL, cookie, requisitionId }) {
  * @param  {Object}  configParams
  * @param  {string}  configParams.baseURL         - baseURL for eSIGL
  * @param  {string}  configParams.cookie          - valid cookie string for eSIGL server
- * @param  {boolean} configParams.requisitionID   - eSIGL id of the requisition to approve
+ * @param  {boolean} configParams.requisitionId   - eSIGL id of the requisition to approve
  *
  * @return {bool}    confirmation of a requisition being succesfully approved
  */
@@ -208,5 +208,37 @@ export async function approveRequisition({ baseURL, cookie, requisitionId }) {
     }
     if (request) throw errorObject(ERROR_REQUEST, 'approveRequisition');
     throw errorObject(ERROR_UNKNOWN, 'approveRequisition');
+  }
+}
+
+/**
+ *
+ * @param  {Object}  configParams
+ * @param  {string}  configParams.baseURL         - baseURL for eSIGL
+ * @param  {string}  configParams.cookie          - valid cookie string for eSIGL server
+ * @param  {boolean} configParams.requisitionId   - eSIGL id of the requisition to approve
+ *
+ * @return {bool}    confirmation of a requisition being succesfully submitted
+ */
+export async function submitRequisition({ baseURL, cookie, requisitionId }) {
+  const config = ApiConfigs.getApproveConfig({
+    baseURL,
+    cookie,
+    requisitionId,
+  });
+  try {
+    const { data } = await axios(config);
+    const { success } = data;
+    return success === 'R&R submitted successfully!';
+  } catch (error) {
+    const { response, request } = error;
+    if (response) {
+      const { status } = response;
+      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'submitRequisition');
+      if (status === 500) throw errorObject(ERROR_SERVER, 'submitRequisition');
+      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'submitRequisition', status);
+    }
+    if (request) throw errorObject(ERROR_REQUEST, 'submitRequisition');
+    throw errorObject(ERROR_UNKNOWN, 'submitRequisition');
   }
 }
