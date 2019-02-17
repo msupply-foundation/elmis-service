@@ -105,3 +105,30 @@ export async function facilities({ baseURL, cookie }) {
     throw errorObject(ERROR_UNKNOWN, 'facilities');
   }
 }
+
+// TODO: Doc string to document parameters for method while using a single variable
+// for the parameter and arguments for config? Could also extend to each request method.
+export async function periods({ baseURL, cookie, emergency, facilityId, programId }) {
+  const config = ApiConfigs.getPeriodsConfig({
+    baseURL,
+    cookie,
+    emergency,
+    facilityId,
+    programId,
+  });
+  try {
+    const { data } = await axios(config);
+    const { periods: periodsList } = data;
+    return periodsList;
+  } catch (error) {
+    const { response, request } = error;
+    if (response) {
+      const { status } = response;
+      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'periods');
+      if (status === 500) throw errorObject(ERROR_SERVER, 'periods');
+      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'periods', status);
+    }
+    if (request) throw errorObject(ERROR_REQUEST, 'periods');
+    throw errorObject(ERROR_UNKNOWN, 'periods');
+  }
+}
