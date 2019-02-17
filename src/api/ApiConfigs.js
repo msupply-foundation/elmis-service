@@ -72,7 +72,7 @@ export default class ApiConfigs {
     headers: { Cookie: cookie, 'Content-Type': 'application/javascript' },
   });
 
-  static getSubmitConfig = ({ baseURL, cookie, requisitionId }) => ({
+  static getOrderConfig = ({ baseURL, cookie, requisitionId }) => ({
     ...ApiConfigs.BASE_CONFIG,
     baseURL,
     method: 'POST',
