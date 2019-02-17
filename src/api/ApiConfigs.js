@@ -53,4 +53,13 @@ export default class ApiConfigs {
     url: `/requisitions/${requisitionId}/authorize.json`,
     headers: { Cookie: cookie, 'Content-Type': 'application/javascript' },
   });
+
+  static getApproveConfig = ({ baseURL, cookie, requisitionId }) => ({
+    ...ApiConfigs.BASE_CONFIG,
+    baseURL,
+    method: 'POST',
+    data: {},
+    url: `/requisitions/${requisitionId}/approve.json`,
+    headers: { Cookie: cookie, 'Content-Type': 'application/javascript' },
+  });
 }
