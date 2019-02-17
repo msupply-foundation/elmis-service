@@ -101,18 +101,19 @@ test('Requisition to order config fields should be equal', () => {
 });
 
 test('Create requisition config fields should be equal', () => {
+  const params = { emergency: false, periodId: 1, facilityId: 1, programId: 1 };
   const config = ApiConfigs.getCreateRequisitionConfig({
     baseURL: 'url',
     cookie: 'cookie',
-    emergency: false,
-    periodId: 1,
-    facilityId: 1,
-    programId: 1,
+    ...params,
   });
+
   expect(config.baseURL).toBe('url');
   expect(config.headers).toEqual({ Cookie: 'cookie' });
   expect(config.url).toBe('/requisitions.json');
   expect(config.method).toBe('POST');
-  expect(config.params).toEqual({ emergency: false, periodId: 1, facilityId: 1, programId: 1 });
-  expect(config.paramsSerializer()).toBe('emergency=false&periodId=1&facilityId=1&programId=1');
+  expect(config.params).toEqual(...params);
+  expect(config.paramsSerializer(params)).toBe(
+    'emergency=false&periodId=1&facilityId=1&programId=1'
+  );
 });
