@@ -25,3 +25,12 @@ test('Programs config fields should be equal', () => {
   expect(config.baseURL).toBe('url');
   expect(config.headers).toEqual({ Cookie: 'cookie' });
 });
+
+test('Facilities config fields should be equal', () => {
+  const config = ApiConfigs.getFacilitiesConfig({
+    baseURL: 'url',
+    cookie: 'cookie',
+  });
+  expect(config.baseURL).toBe('url');
+  expect(config.headers).toEqual({ Cookie: 'cookie' });
+});
