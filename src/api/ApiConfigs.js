@@ -80,6 +80,7 @@ export default class ApiConfigs {
     data: [{ id: requisitionId }],
     url: '/orders.json',
     headers: { Cookie: cookie, 'Content-Type': 'application/json' },
+    validateStatus: status => status === 201,
   });
 
   static getCreateRequisitionConfig = ({
@@ -99,12 +100,16 @@ export default class ApiConfigs {
     headers: { Cookie: cookie },
   });
 
-  static getUpdateConfig = ({ baseURL, cookie, requisition }) => ({
-    ...ApiConfigs.BASE_CONFIG,
-    baseURL,
-    method: 'PUT',
-    url: `/requisitions/${requisition.Id}/save.json`,
-    headers: { Cookie: cookie },
-    data: { ...requisition },
-  });
+  // TODO: Default requisition value and || used for testing purposes
+  static getUpdateConfig = ({ baseURL, cookie, requisition = { id: 1 } }) => {
+    const { id } = requisition;
+    return {
+      ...ApiConfigs.BASE_CONFIG,
+      baseURL,
+      method: 'PUT',
+      url: `/requisitions/${id || 1}/save.json`,
+      headers: { Cookie: cookie },
+      data: { ...requisition },
+    };
+  };
 }
