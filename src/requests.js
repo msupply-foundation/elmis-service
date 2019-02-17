@@ -53,10 +53,9 @@ export async function login({ username, password, baseURL }) {
 /**
  * Sends a request to eSigl for all programs the currently
  * logged in user has access to.
- * @param  {Object} configParams = {
- * baseURL: baseURL for eSigl server,
- * cookie: valid eSigl cookie string
- * }
+ * @param  {Object} configParams
+ * @param  {string} configParams.baseURL - baseURL for eSIGL
+ * @param  {string} configParams.cookie  - valid cookie string for eSIGL server
  * @return {Array}  Array of program objects.
  */
 export async function programs({ baseURL, cookie }) {
