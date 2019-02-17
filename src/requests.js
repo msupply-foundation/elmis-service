@@ -85,7 +85,7 @@ export async function programs({ baseURL, cookie }) {
  * @param  {string} configParams.baseURL - baseURL for eSIGL
  * @param  {string} configParams.cookie  - valid cookie string for eSIGL server
  *
- * @return {Array}  Array of program objects.
+ * @return {Array}  Array of facility objects.
  */
 export async function facilities({ baseURL, cookie }) {
   const config = ApiConfigs.getFacilitiesConfig({ baseURL, cookie });
@@ -108,6 +108,17 @@ export async function facilities({ baseURL, cookie }) {
 
 // TODO: Doc string to document parameters for method while using a single variable
 // for the parameter and arguments for config? Could also extend to each request method.
+/**
+ *
+ * @param  {Object}  configParams
+ * @param  {string}  configParams.baseURL     - baseURL for eSIGL
+ * @param  {string}  configParams.cookie      - valid cookie string for eSIGL server
+ * @param  {boolean} configParams.emergency   - boolean indicating an emergency period
+ * @param  {number}  configParams.facilityId  - facility id of assosciated periods
+ * @param  {number}  configParams.programId   - program id of assosciated periods
+ *
+ * @return {Array}  Array of period objects.
+ */
 export async function periods({ baseURL, cookie, emergency, facilityId, programId }) {
   const config = ApiConfigs.getPeriodsConfig({
     baseURL,

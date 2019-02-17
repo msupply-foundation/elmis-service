@@ -34,11 +34,12 @@ test('Facilities config fields should be equal', () => {
   expect(config.baseURL).toBe('url');
   expect(config.headers).toEqual({ Cookie: 'cookie' });
 });
+
 test('Periods config fields should be equal', () => {
   const config = ApiConfigs.getPeriodsConfig({
     baseURL: 'url',
     cookie: 'cookie',
-    emergency: 'false',
+    emergency: false,
     facilityId: 1,
     programId: 1,
   });
