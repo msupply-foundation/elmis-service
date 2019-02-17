@@ -36,4 +36,12 @@ export default class ApiConfigs {
     url: '/user/facilities.json',
     headers: { Cookie: cookie },
   });
+
+  static getPeriodsConfig = ({ baseURL, cookie, emergency, facilityId, programId }) => ({
+    ...ApiConfigs.BASE_CONFIG,
+    baseURL,
+    data: qs.stringify({ emergency, facilityId, programId }),
+    url: '/user/facilities.json',
+    headers: { Cookie: cookie },
+  });
 }

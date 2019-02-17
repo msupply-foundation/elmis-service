@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import axios from 'axios';
 import ApiConfigs from './api/ApiConfigs';
 import {
@@ -85,7 +84,7 @@ export async function programs({ baseURL, cookie }) {
  * @param  {string} configParams.baseURL - baseURL for eSIGL
  * @param  {string} configParams.cookie  - valid cookie string for eSIGL server
  *
- * @return {Array}  Array of program objects.
+ * @return {Array}  Array of facility objects.
  */
 export async function facilities({ baseURL, cookie }) {
   const config = ApiConfigs.getFacilitiesConfig({ baseURL, cookie });
@@ -103,5 +102,43 @@ export async function facilities({ baseURL, cookie }) {
     }
     if (request) throw errorObject(ERROR_REQUEST, 'facilities');
     throw errorObject(ERROR_UNKNOWN, 'facilities');
+  }
+}
+
+// TODO: Doc string to document parameters for method while using a single variable
+// for the parameter and arguments for config? Could also extend to each request method.
+/**
+ *
+ * @param  {Object}  configParams
+ * @param  {string}  configParams.baseURL     - baseURL for eSIGL
+ * @param  {string}  configParams.cookie      - valid cookie string for eSIGL server
+ * @param  {boolean} configParams.emergency   - boolean indicating an emergency period
+ * @param  {number}  configParams.facilityId  - facility id of assosciated periods
+ * @param  {number}  configParams.programId   - program id of assosciated periods
+ *
+ * @return {Array}  Array of period objects.
+ */
+export async function periods({ baseURL, cookie, emergency, facilityId, programId }) {
+  const config = ApiConfigs.getPeriodsConfig({
+    baseURL,
+    cookie,
+    emergency,
+    facilityId,
+    programId,
+  });
+  try {
+    const { data } = await axios(config);
+    const { periods: periodsList } = data;
+    return periodsList;
+  } catch (error) {
+    const { response, request } = error;
+    if (response) {
+      const { status } = response;
+      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'periods');
+      if (status === 500) throw errorObject(ERROR_SERVER, 'periods');
+      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'periods', status);
+    }
+    if (request) throw errorObject(ERROR_REQUEST, 'periods');
+    throw errorObject(ERROR_UNKNOWN, 'periods');
   }
 }
