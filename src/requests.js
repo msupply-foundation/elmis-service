@@ -24,11 +24,11 @@ import {
  * but has an invalid status code. Without a response property, the request
  * has failed to reach the server. With neither, the request has not been set at all.
  *
- * @param  {object} configParams = {
- * username: eSigl username in plain text,
- * password: eSigl corresponding password in plain text,
- * baseURL: baseURL for the eSigl server
- * }
+ * @param  {Object} configParams
+ * @param  {string} configParams.username - plain text username for eSIGL
+ * @param  {string} configParams.password - plain text password for eSIGL
+ * @param  {string} configParams.baseURL - baseURL for eSIGL
+ *
  * @return {string} Valid eSigl JSession cookie
  */
 
@@ -53,10 +53,9 @@ export async function login({ username, password, baseURL }) {
 /**
  * Sends a request to eSigl for all programs the currently
  * logged in user has access to.
- * @param  {Object} configParams = {
- * baseURL: baseURL for eSigl server,
- * cookie: valid eSigl cookie string
- * }
+ * @param  {Object} configParams
+ * @param  {string} configParams.baseURL - baseURL for eSIGL
+ * @param  {string} configParams.cookie  - valid cookie string for eSIGL server
  * @return {Array}  Array of program objects.
  */
 export async function programs({ baseURL, cookie }) {
@@ -75,5 +74,34 @@ export async function programs({ baseURL, cookie }) {
     }
     if (request) throw errorObject(ERROR_REQUEST, 'programs');
     throw errorObject(ERROR_UNKNOWN, 'programs');
+  }
+}
+
+/**
+ * Sends a request to eSigl for all facilities the currently
+ * logged in user has access to.
+ *
+ * @param  {Object} configParams
+ * @param  {string} configParams.baseURL - baseURL for eSIGL
+ * @param  {string} configParams.cookie  - valid cookie string for eSIGL server
+ *
+ * @return {Array}  Array of program objects.
+ */
+export async function facilities({ baseURL, cookie }) {
+  const config = ApiConfigs.getFacilitiesConfig({ baseURL, cookie });
+  try {
+    const { data } = await axios(config);
+    const { facilityList } = data;
+    return facilityList;
+  } catch (error) {
+    const { response, request } = error;
+    if (response) {
+      const { status } = response;
+      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'facilities');
+      if (status === 500) throw errorObject(ERROR_SERVER, 'facilities');
+      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'facilities', status);
+    }
+    if (request) throw errorObject(ERROR_REQUEST, 'facilities');
+    throw errorObject(ERROR_UNKNOWN, 'facilities');
   }
 }

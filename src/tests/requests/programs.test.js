@@ -5,7 +5,7 @@ beforeEach(() => {
   jest.dontMock('axios');
 });
 
-test('should throw a response error, as the response has no program list', async () => {
+test('should return the programList from response', async () => {
   jest.doMock('axios', () =>
     jest.fn(() => {
       return { data: { programList: [] } };
