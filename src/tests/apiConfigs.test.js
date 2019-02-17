@@ -55,7 +55,8 @@ test('Authorization config fields should be equal', () => {
     requisitionId: 1,
   });
   expect(config.baseURL).toBe('url');
-  expect(config.headers).toEqual({ Cookie: 'cookie' });
-  expect(config.data).toBe(1);
+  expect(config.headers).toEqual({ Cookie: 'cookie', 'Content-Type': 'application/javascript' });
+  expect(config.url).toBe('/requisitions/1/authorize.json');
   expect(config.method).toBe('POST');
+  expect(config.data).toEqual({});
 });

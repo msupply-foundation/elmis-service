@@ -44,4 +44,13 @@ export default class ApiConfigs {
     url: '/user/facilities.json',
     headers: { Cookie: cookie },
   });
+
+  static getAuthorizeConfig = ({ baseURL, cookie, requisitionId }) => ({
+    ...ApiConfigs.BASE_CONFIG,
+    baseURL,
+    method: 'POST',
+    data: {},
+    url: `/requisitions/${requisitionId}/authorize.json`,
+    headers: { Cookie: cookie, 'Content-Type': 'application/javascript' },
+  });
 }
