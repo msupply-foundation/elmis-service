@@ -7,9 +7,9 @@ beforeEach(() => {
 
 test('should return true from response', async () => {
   jest.doMock('axios', () => jest.fn(() => ({ data: { rnr: { Id: 1 } } })));
-  const { approveRequisition } = require('../../requests');
+  const { createRequisition } = require('../../requests');
   expect(
-    await approveRequisition({
+    await createRequisition({
       cookie: '',
       baseURL: '',
       emergency: false,
