@@ -6,7 +6,7 @@ beforeEach(() => {
 });
 
 test('should return true from response', async () => {
-  jest.doMock('axios', () => jest.fn(() => ({ data: { Rnr: { Id: 1 } } })));
+  jest.doMock('axios', () => jest.fn(() => ({ data: { rnr: { id: 1 } } })));
   const { createRequisition } = require('../../requests');
   expect(
     await createRequisition({
@@ -17,5 +17,5 @@ test('should return true from response', async () => {
       facilityId: 1,
       programId: 1,
     })
-  ).toEqual(1);
+  ).toEqual({ id: 1 });
 });
