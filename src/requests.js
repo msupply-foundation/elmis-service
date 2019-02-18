@@ -303,9 +303,8 @@ export async function createRequisition({
   });
   try {
     const { data } = await axios(config);
-    const { Rnr } = data;
-    const { Id } = Rnr;
-    return Id;
+    const { rnr } = data;
+    return rnr;
   } catch (error) {
     const { response, request } = error;
     if (response) {
