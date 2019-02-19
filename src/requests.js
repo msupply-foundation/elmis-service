@@ -344,3 +344,29 @@ export async function updateRequisition({ baseURL, cookie, requisition }) {
     throw errorObject(ERROR_UNKNOWN, 'updateRequisition');
   }
 }
+
+/**
+ *
+ * @param  {Object} configParams
+ * @param  {string} configParams.baseURL         - baseURL for eSIGL
+ * @param  {string} configParams.cookie          - valid cookie string for eSIGL server
+ * @param  {Object} configParams.requisitionId   - the requisitionId of the requisition to delete
+ * @return {bool}   Indication of deletion success
+ */
+export async function deleteRequisition({ baseURL, cookie, requisitionId }) {
+  const config = ApiConfigs.getDeleteConfig({ baseURL, cookie, requisitionId });
+  try {
+    const { status } = await axios(config);
+    return status === 200;
+  } catch (error) {
+    const { response, request } = error;
+    if (response) {
+      const { status } = response;
+      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'deleteRequisition');
+      if (status === 500) throw errorObject(ERROR_SERVER, 'deleteRequisition');
+      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'deleteRequisition', status);
+    }
+    if (request) throw errorObject(ERROR_REQUEST, 'deleteRequisition');
+    throw errorObject(ERROR_UNKNOWN, 'deleteRequisition');
+  }
+}

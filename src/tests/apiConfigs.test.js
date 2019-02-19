@@ -143,3 +143,11 @@ test('Update requisition config fields should be equal', () => {
     regimenLineItems: [],
   });
 });
+
+test('Update requisition config fields should be equal', () => {
+  const config = ApiConfigs.getDeleteConfig({ baseURL: 'url', cookie: 'cookie', requisitionId: 1 });
+  expect(config.baseURL).toBe('url');
+  expect(config.headers).toEqual({ Cookie: 'cookie' });
+  expect(config.url).toBe('/requisitions/delete/1.json');
+  expect(config.method).toBe('POST');
+});
