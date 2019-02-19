@@ -345,6 +345,14 @@ export async function updateRequisition({ baseURL, cookie, requisition }) {
   }
 }
 
+/**
+ *
+ * @param  {Object} configParams
+ * @param  {string} configParams.baseURL         - baseURL for eSIGL
+ * @param  {string} configParams.cookie          - valid cookie string for eSIGL server
+ * @param  {Object} configParams.requisitionId   - the requisitionId of the requisition to delete
+ * @return {bool}   Indication of deletion success
+ */
 export async function deleteRequisition({ baseURL, cookie, requisitionId }) {
   const config = ApiConfigs.getDeleteConfig({ baseURL, cookie, requisitionId });
   try {
