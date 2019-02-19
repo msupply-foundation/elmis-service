@@ -112,4 +112,12 @@ export default class ApiConfigs {
       data: { ...requisition },
     };
   };
+
+  static getDeleteConfig = ({ baseURL, cookie, requisitionId }) => ({
+    ...ApiConfigs.BASE_CONFIG,
+    baseURL,
+    method: 'POST',
+    url: `/requisitions/delete/${requisitionId}.json`,
+    headers: { Cookie: cookie },
+  });
 }
