@@ -16,6 +16,7 @@ export const ERROR_REQUEST = method => `${method} Error: Request malformed`;
 export const ERROR_COOKIE = method => `${method} Error: Unable to set session cookie`;
 export const ERROR_AUTHENTICATION = method => `${method} Error: Authentication error`;
 export const ERROR_VALIDATION = method => `${method} Error: Malformed or Incorrect input`;
+export const ERROR_PERIOD = (method, message) => `${method} Error: ${message}`;
 
 /**
  * Simple method to return a formatted error object.
