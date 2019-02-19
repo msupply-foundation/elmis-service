@@ -1,50 +1,65 @@
 /* eslint-disable camelcase */
 // eSigl previousStockInHand in 4d?
 
-const matchFullSupplyLines = outgoingProductCode => incomingFullSupplyLineItem => {
-  const { productCode: incomingProductCode } = incomingFullSupplyLineItem;
-  return incomingProductCode === outgoingProductCode;
+const matchFullSupplyLines = outgoingProductCode => requisitionLineItem => {
+  const { item } = requisitionLineItem;
+  const { code } = item;
+  return code === outgoingProductCode;
 };
 
-function fullSupplyLineItemsMapping(incomingFullSupplyLineItems, outgoingFullSupplyLineItems) {
+function fullSupplyLineItemsMapping(requisitionLines, fullSupplyLineItems) {
   const updatedFullSupplyLineItems = [];
-  outgoingFullSupplyLineItems.forEach((outgoingFullSupplyLineItem, index) => {
-    const { productCode: outgoingProductCode } = outgoingFullSupplyLineItem;
+  fullSupplyLineItems.forEach((fullSupplyLineItem, index) => {
+    const { productCode: outgoingProductCode } = fullSupplyLineItem;
     const matchingFunction = matchFullSupplyLines(outgoingProductCode);
-    const matchedSupplyLineItem = incomingFullSupplyLineItems.find(matchingFunction);
+    const matchedRequisitionLine = requisitionLines.find(matchingFunction);
 
-    if (!matchedSupplyLineItem) throw Error;
-
+    if (!matchedRequisitionLine) throw Error;
+    const { beginningBalance: outgoingPrevStock } = fullSupplyLineItem;
     const {
       stock_on_hand: stockInHand,
       Cust_stock_received: quantityReceived,
       actualQuan: quantityDispensed,
       Cust_loss_adjust: totalLossesAndAdjustments,
       days_out_or_new_demand: stockOutDays,
-    } = matchedSupplyLineItem;
+      suggested_quantity: calculatedOrderQuantity,
+      comment: reasonForRequestedQuantity,
+      previous_stock_on_hand: beginningBalance,
+      adjusted_consumption: normalizedConsumption,
+    } = matchedRequisitionLine;
+
+    if (outgoingPrevStock !== beginningBalance) throw Error;
 
     const updatedFullSupplyLineItem = {
-      ...outgoingFullSupplyLineItem,
+      ...fullSupplyLineItem,
       stockInHand,
       quantityReceived,
       quantityDispensed,
       totalLossesAndAdjustments,
       stockOutDays,
+      calculatedOrderQuantity,
+      reasonForRequestedQuantity,
+      beginningBalance,
+      normalizedConsumption,
     };
 
     updatedFullSupplyLineItems.push(updatedFullSupplyLineItem);
-    incomingFullSupplyLineItems.splice(index, 1);
+    fullSupplyLineItems.splice(index, 1);
   });
 
   return updatedFullSupplyLineItems;
 }
 
 export default function requisitionMapping(incomingRequisition, outgoingRequisition) {
-  const { fullSupplyLineItems: outgoingFullSupplyLineItems } = outgoingRequisition;
-  const { fullSupplyLineItems: incomingFullSupplyLineItems } = incomingRequisition;
-  if (outgoingFullSupplyLineItems.length !== incomingFullSupplyLineItems.length) {
+  const { fullSupplyLineItems } = outgoingRequisition;
+  const { requisitionLines } = incomingRequisition;
+  if (fullSupplyLineItems.length !== requisitionLines.length) {
     throw Error;
   }
 
-  fullSupplyLineItemsMapping(incomingFullSupplyLineItems, outgoingFullSupplyLineItems);
+  const updatedRequisition = { ...outgoingRequisition };
+  updatedRequisition.fullSupplyLineItems = fullSupplyLineItemsMapping(
+    requisitionLines,
+    fullSupplyLineItems
+  );
 }
