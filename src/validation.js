@@ -1,4 +1,5 @@
-import { errorObject, ERROR_VALIDATION } from './errors/errors';
+/* eslint-disable camelcase */
+import { errorObject, ERROR_VALIDATION, ERROR_PERIOD } from './errors/errors';
 
 // TODO: Validation the incorrect term? Some methods also return IDs etc
 // TODO: Some methods can be made more generic, will keep as is for initial
@@ -71,17 +72,42 @@ export function programValidation(programCode, programList) {
  * of the period list for a eSIGL program and facility. The
  * incoming date must match the first element of the periodList,
  * as requisitions must be entered sequentially.
- * @param  {String} incomingDate   - UTC Format date string for the outgoing requisition.
- * @param  {Object} outgoingPeriod - Period objects from eSIGL.
+ * @param  {String} incomingDate   - ISO Format date string for the outgoing requisition.
+ * @param  {Object} outgoingPeriod - Period object from eSIGL.
  * @return {number} the ID of the period matched with the incoming date.
  */
-export default function periodValidation(incomingDate, outgoingPeriod) {
-  try {
-    const { startDate } = outgoingPeriod;
-    const incomingDateMonth = new Date(incomingDate).getMonth();
-    const outgoingPeriodMonth = new Date(startDate * 1000).getMonth();
-    return outgoingPeriodMonth === incomingDateMonth;
-  } catch (error) {
-    throw errorObject(ERROR_VALIDATION, 'periodValidation');
+export function periodValidation(incomingDateString, outgoingPeriods) {
+  const { rnr_list, periods } = outgoingPeriods;
+
+  if (rnr_list.length > 0) {
+    throw errorObject(
+      ERROR_PERIOD,
+      'periodValidation',
+      'There is already an unsubmitted requisition for this period'
+    );
   }
+
+  if (periods.length === 0) {
+    throw errorObject(
+      ERROR_PERIOD,
+      'periodValidation',
+      'There are no periods created for this schedule'
+    );
+  }
+
+  const [period] = periods;
+  const { startDate } = period;
+  const incomingDate = new Date(incomingDateString);
+  const outgoingPeriod = new Date(startDate * 1000);
+
+  if (Number.isNaN(incomingDate.getTime())) {
+    throw errorObject(ERROR_PERIOD, 'periodValidation', 'Invalid input time');
+  }
+  if (Number.isNaN(outgoingPeriod.getTime())) {
+    throw errorObject(ERROR_PERIOD, 'periodValidation', 'Outgoing period is malformed');
+  }
+
+  const incomingDateMonth = incomingDate.getMonth();
+  const outgoingPeriodMonth = outgoingPeriod.getMonth();
+  return incomingDateMonth === outgoingPeriodMonth;
 }
