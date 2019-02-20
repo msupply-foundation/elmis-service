@@ -46,16 +46,20 @@ const getMappedFields = requisitionLine => {
  * Merges an array of requiisition lines (incoming requisiton lines)
  * with fully supply line items (outgoing requisition lines)
  *
- * @param {Array}  requisitionLines    Requisition lines of the incoming requisition
- * @param {Array}  fullSupplyLineItems Fully supply line items of the outgoing requisition
+ * @param  {Array}  requisitionLines    Requisition lines of the incoming requisition
+ * @param  {Array}  fullSupplyLineItems Fully supply line items of the outgoing requisition
  * @return {Array} The merged requisition lines.
  */
 function requisitionItemsMerge(requisitionLines, fullSupplyLineItems) {
   const lineItems = [...fullSupplyLineItems];
   const updatedLineItems = [];
-  lineItems.forEach((lineItem, index) => {
+  lineItems.forEach(lineItem => {
     const { productCode: outgoingCode } = lineItem;
-    const matchedRequisitionLine = requisitionLines.find(({ item }) => item.code === outgoingCode);
+    const matchedRequisitionLineIndex = requisitionLines.findIndex(
+      ({ item }) => item.code === outgoingCode
+    );
+    const matchedRequisitionLine = { ...requisitionLines[matchedRequisitionLineIndex] };
+    requisitionLines.splice(matchedRequisitionLineIndex, 1);
     if (!matchedRequisitionLine) {
       throw errorObject(
         ERROR_MERGE,
@@ -76,7 +80,6 @@ function requisitionItemsMerge(requisitionLines, fullSupplyLineItems) {
 
     const updatedLineItem = { ...lineItem, ...remainingFields, beginningBalance };
     updatedLineItems.push(updatedLineItem);
-    lineItems.splice(index, 1);
   });
   return updatedLineItems;
 }
