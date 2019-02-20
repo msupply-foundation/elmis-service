@@ -1,65 +1,60 @@
 /* eslint-disable camelcase */
 // eSigl previousStockInHand in 4d?
 
-const matchFullSupplyLines = outgoingProductCode => requisitionLineItem => {
+const fields = {
+  stockInHand: 'stock_on_hand',
+  quantityReceived: 'Cust_stock_received',
+  quantityDispensed: 'actualQuan',
+  totalLossesAndAdjustments: 'Cust_loss_adjust',
+  stockOutDays: 'days_out_or_new_demand',
+  calculatedOrderQuantity: 'suggested_quantity',
+  reasonForRequestedQuantity: 'comment',
+  beginningBalance: 'previous_stock_on_hand',
+  normalizedConsumption: 'adjusted_consumption',
+};
+
+const getMappedFields = requisitionLine => {
+  const updatedRequisition = {};
+  Object.entries(fields).forEach(([key, value]) => {
+    updatedRequisition[key] = requisitionLine[value];
+  });
+  return updatedRequisition;
+};
+
+const findSupplyLine = outgoingProductCode => requisitionLineItem => {
   const { item } = requisitionLineItem;
   const { code } = item;
   return code === outgoingProductCode;
 };
 
-function fullSupplyLineItemsMapping(requisitionLines, fullSupplyLineItems) {
-  const updatedFullSupplyLineItems = [];
-  fullSupplyLineItems.forEach((fullSupplyLineItem, index) => {
-    const { productCode: outgoingProductCode } = fullSupplyLineItem;
-    const matchingFunction = matchFullSupplyLines(outgoingProductCode);
+function requisitionItemsMerge(requisitionLines, fullSupplyLineItems) {
+  const lineItems = [...fullSupplyLineItems];
+  const updatedLineItems = [];
+  lineItems.forEach((lineItem, index) => {
+    const { productCode: outgoingProductCode } = lineItem;
+    const matchingFunction = findSupplyLine(outgoingProductCode);
     const matchedRequisitionLine = requisitionLines.find(matchingFunction);
-
     if (!matchedRequisitionLine) throw Error;
-    const { beginningBalance: outgoingPrevStock } = fullSupplyLineItem;
-    const {
-      stock_on_hand: stockInHand,
-      Cust_stock_received: quantityReceived,
-      actualQuan: quantityDispensed,
-      Cust_loss_adjust: totalLossesAndAdjustments,
-      days_out_or_new_demand: stockOutDays,
-      suggested_quantity: calculatedOrderQuantity,
-      comment: reasonForRequestedQuantity,
-      previous_stock_on_hand: beginningBalance,
-      adjusted_consumption: normalizedConsumption,
-    } = matchedRequisitionLine;
 
+    const { beginningBalance: outgoingPrevStock } = lineItem;
+    const { beginningBalance, ...remainingFields } = getMappedFields(matchedRequisitionLine);
     if (outgoingPrevStock !== beginningBalance) throw Error;
 
-    const updatedFullSupplyLineItem = {
-      ...fullSupplyLineItem,
-      stockInHand,
-      quantityReceived,
-      quantityDispensed,
-      totalLossesAndAdjustments,
-      stockOutDays,
-      calculatedOrderQuantity,
-      reasonForRequestedQuantity,
-      beginningBalance,
-      normalizedConsumption,
-    };
-
-    updatedFullSupplyLineItems.push(updatedFullSupplyLineItem);
-    fullSupplyLineItems.splice(index, 1);
+    const updatedLineItem = { ...lineItem, ...remainingFields, beginningBalance };
+    updatedLineItems.push(updatedLineItem);
+    lineItems.splice(index, 1);
   });
-
-  return updatedFullSupplyLineItems;
+  return updatedLineItems;
 }
 
-export default function requisitionMapping(incomingRequisition, outgoingRequisition) {
-  const { fullSupplyLineItems } = outgoingRequisition;
+export default function requisitionMerge(incomingRequisition, outgoingRequisition) {
+  const { fullSupplyLineItems: lineItems } = outgoingRequisition;
   const { requisitionLines } = incomingRequisition;
-  if (fullSupplyLineItems.length !== requisitionLines.length) {
+  if (lineItems.length !== requisitionLines.length) {
     throw Error;
   }
 
-  const updatedRequisition = { ...outgoingRequisition };
-  updatedRequisition.fullSupplyLineItems = fullSupplyLineItemsMapping(
-    requisitionLines,
-    fullSupplyLineItems
-  );
+  const fullSupplyLineItems = requisitionItemsMerge(requisitionLines, lineItems);
+  const updatedRequisition = { ...outgoingRequisition, fullSupplyLineItems };
+  return updatedRequisition;
 }
