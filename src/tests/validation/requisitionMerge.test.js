@@ -1,5 +1,6 @@
 import '@babel/polyfill';
 import requisitionMerge from '../../requisitionMerge';
+import { ERROR_MERGE, errorObject } from '../../errors/errors';
 
 beforeEach(() => {
   jest.resetModules();
@@ -9,6 +10,7 @@ beforeEach(() => {
 const outgoingRequisition = {
   fullSupplyLineItems: [
     {
+      id: 1,
       productCode: 'AAA',
       stockInHand: 1,
       quantityReceived: 1,
@@ -21,6 +23,7 @@ const outgoingRequisition = {
       normalizedConsumption: 1,
     },
     {
+      id: 2,
       productCode: 'BBB',
       stockInHand: 1,
       quantityReceived: 1,
@@ -38,6 +41,9 @@ const outgoingRequisition = {
 const incomingRequisition = {
   requisitionLines: [
     {
+      ID: 3,
+      extraFieldOne: 1,
+      extraFieldTwo: 1,
       stock_on_hand: 3,
       Cust_stock_received: 3,
       actualQuan: 3,
@@ -52,6 +58,9 @@ const incomingRequisition = {
       },
     },
     {
+      ID: 4,
+      extraFieldOne: 1,
+      extraFieldTwo: 1,
       stock_on_hand: 3,
       Cust_stock_received: 3,
       actualQuan: 3,
@@ -71,6 +80,7 @@ const incomingRequisition = {
 const mergedRequisition = {
   fullSupplyLineItems: [
     {
+      id: 1,
       productCode: 'AAA',
       stockInHand: 3,
       quantityReceived: 3,
@@ -83,6 +93,7 @@ const mergedRequisition = {
       normalizedConsumption: 3,
     },
     {
+      id: 2,
       productCode: 'BBB',
       stockInHand: 3,
       quantityReceived: 3,
@@ -99,4 +110,85 @@ const mergedRequisition = {
 
 test('should return a new object', () => {
   expect(requisitionMerge(incomingRequisition, outgoingRequisition)).toEqual(mergedRequisition);
+});
+
+test('should return an ERROR_MERGE, due to having to many requisition line items', () => {
+  let errorCatcher;
+  const requisitionLines = [...incomingRequisition.requisitionLines];
+  requisitionLines.push({});
+  const testingRequisition = { ...incomingRequisition, requisitionLines };
+  try {
+    requisitionMerge(testingRequisition, outgoingRequisition);
+  } catch (error) {
+    errorCatcher = error;
+  }
+
+  expect(errorCatcher).toEqual(
+    errorObject(ERROR_MERGE, 'requisitionMerge', 'Too many requisitionLineItems provided.')
+  );
+});
+
+test('should return an ERROR_MERGE, due to having not enough requisition line items', () => {
+  let errorCatcher;
+  const requisitionLines = [...incomingRequisition.requisitionLines];
+  requisitionLines.pop();
+  const testingRequisition = { ...incomingRequisition, requisitionLines };
+  try {
+    requisitionMerge(testingRequisition, outgoingRequisition);
+  } catch (error) {
+    errorCatcher = error;
+  }
+
+  expect(errorCatcher).toEqual(
+    errorObject(ERROR_MERGE, 'requisitionMerge', 'Not enough requisitionLineItems provided.')
+  );
+});
+
+test('should return an ERROR_MERGE, for an unmatched item', () => {
+  let errorCatcher;
+  const requisitionLines = [...incomingRequisition.requisitionLines];
+  const firstLine = { ...requisitionLines[0] };
+  const itemCopy = { ...firstLine.item };
+  itemCopy.code = 'CCC';
+  firstLine.item = itemCopy;
+  requisitionLines[0] = firstLine;
+
+  const testingRequisition = { ...incomingRequisition, requisitionLines };
+  try {
+    requisitionMerge(testingRequisition, outgoingRequisition);
+  } catch (error) {
+    errorCatcher = error;
+  }
+
+  expect(errorCatcher).toEqual(
+    errorObject(
+      ERROR_MERGE,
+      'requisitionItemsMerge',
+      `could not find a match for outgoing line item ${
+        outgoingRequisition.fullSupplyLineItems[0].id
+      }`
+    )
+  );
+});
+
+test('should return an ERROR_MERGE, for differences in previous stock', () => {
+  let errorCatcher;
+  const requisitionLines = [...incomingRequisition.requisitionLines];
+  const [firstLine] = requisitionLines;
+  firstLine.previous_stock_on_hand = 10;
+  const testingRequisition = { ...incomingRequisition, requisitionLines };
+
+  try {
+    requisitionMerge(testingRequisition, outgoingRequisition);
+  } catch (error) {
+    errorCatcher = error;
+  }
+
+  expect(errorCatcher).toEqual(
+    errorObject(
+      ERROR_MERGE,
+      'requisitionItemsMerge',
+      `${incomingRequisition.requisitionLines[0].ID} has an incorrect previous stock quantity`
+    )
+  );
 });
