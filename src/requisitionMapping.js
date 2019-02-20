@@ -1,3 +1,5 @@
+import { ERROR_MERGE, errorObject } from './errors/errors';
+
 /* eslint-disable camelcase */
 // eSigl previousStockInHand in 4d?
 
@@ -54,11 +56,23 @@ function requisitionItemsMerge(requisitionLines, fullSupplyLineItems) {
   lineItems.forEach((lineItem, index) => {
     const { productCode: outgoingCode } = lineItem;
     const matchedRequisitionLine = requisitionLines.find(({ item }) => item.code === outgoingCode);
-    if (!matchedRequisitionLine) throw Error;
+    if (!matchedRequisitionLine) {
+      throw errorObject(
+        ERROR_MERGE,
+        'requisitionItemsMerge',
+        `could not find a match for ${matchedRequisitionLine.ID}`
+      );
+    }
 
     const { beginningBalance: outgoingPrevStock } = lineItem;
     const { beginningBalance, ...remainingFields } = getMappedFields(matchedRequisitionLine);
-    if (outgoingPrevStock !== beginningBalance) throw Error;
+    if (outgoingPrevStock !== beginningBalance) {
+      throw errorObject(
+        ERROR_MERGE,
+        'requisitionItemsMerge',
+        `${matchedRequisitionLine.ID} has an incorrect previos stock quantity`
+      );
+    }
 
     const updatedLineItem = { ...lineItem, ...remainingFields, beginningBalance };
     updatedLineItems.push(updatedLineItem);
@@ -78,8 +92,11 @@ function requisitionItemsMerge(requisitionLines, fullSupplyLineItems) {
 export default function requisitionMerge(incomingRequisition, outgoingRequisition) {
   const { fullSupplyLineItems: lineItems } = outgoingRequisition;
   const { requisitionLines } = incomingRequisition;
-  if (lineItems.length !== requisitionLines.length) {
-    throw Error;
+  if (lineItems.length > requisitionLines.length) {
+    throw errorObject(ERROR_MERGE, 'requisitionMerge', 'Not enough requisitionLineItems provided.');
+  }
+  if (lineItems.length < requisitionLines.length) {
+    throw errorObject(ERROR_MERGE, 'requisitionMerge', 'Too many requisitionLineItems provided.');
   }
 
   const fullSupplyLineItems = requisitionItemsMerge(requisitionLines, lineItems);
