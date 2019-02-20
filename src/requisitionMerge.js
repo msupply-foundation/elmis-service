@@ -52,21 +52,23 @@ const getMappedFields = requisitionLine => {
  */
 function requisitionItemsMerge(requisitionLines, fullSupplyLineItems) {
   const lineItems = [...fullSupplyLineItems];
+  const reqLines = [...requisitionLines];
   const updatedLineItems = [];
   lineItems.forEach(lineItem => {
     const { productCode: outgoingCode } = lineItem;
-    const matchedRequisitionLineIndex = requisitionLines.findIndex(
+    const matchedRequisitionLineIndex = reqLines.findIndex(
       ({ item }) => item.code === outgoingCode
     );
-    const matchedRequisitionLine = { ...requisitionLines[matchedRequisitionLineIndex] };
-    requisitionLines.splice(matchedRequisitionLineIndex, 1);
-    if (!matchedRequisitionLine) {
+    if (matchedRequisitionLineIndex < 0) {
       throw errorObject(
         ERROR_MERGE,
         'requisitionItemsMerge',
-        `could not find a match for ${matchedRequisitionLine.ID}`
+        `could not find a match for outgoing line item ${lineItem.id}`
       );
     }
+
+    const matchedRequisitionLine = { ...reqLines[matchedRequisitionLineIndex] };
+    reqLines.splice(matchedRequisitionLineIndex, 1);
 
     const { beginningBalance: outgoingPrevStock } = lineItem;
     const { beginningBalance, ...remainingFields } = getMappedFields(matchedRequisitionLine);
@@ -74,7 +76,7 @@ function requisitionItemsMerge(requisitionLines, fullSupplyLineItems) {
       throw errorObject(
         ERROR_MERGE,
         'requisitionItemsMerge',
-        `${matchedRequisitionLine.ID} has an incorrect previos stock quantity`
+        `${matchedRequisitionLine.ID} has an incorrect previous stock quantity`
       );
     }
 
@@ -93,8 +95,9 @@ function requisitionItemsMerge(requisitionLines, fullSupplyLineItems) {
  * @return {Object} the updated eSIGL requisition with incoming values applied.
  */
 export default function requisitionMerge(incomingRequisition, outgoingRequisition) {
-  const { fullSupplyLineItems: lineItems } = outgoingRequisition;
   const { requisitionLines } = incomingRequisition;
+  const { fullSupplyLineItems: lineItems } = outgoingRequisition;
+
   if (lineItems.length > requisitionLines.length) {
     throw errorObject(ERROR_MERGE, 'requisitionMerge', 'Not enough requisitionLineItems provided.');
   }
