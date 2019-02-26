@@ -15,10 +15,11 @@ export const ERROR_UNKNOWN_RESPONSE = (method, status) =>
 export const ERROR_REQUEST = method => `${method} Error: Request malformed`;
 export const ERROR_COOKIE = method => `${method} Error: Unable to set session cookie`;
 export const ERROR_AUTHENTICATION = method => `${method} Error: Authentication error`;
-export const ERROR_VALIDATION = (method, additional) =>
-  `${method} Error: Malformed input during ${additional} check`;
 export const ERROR_MERGE = (method, additional) =>
   `${method} Error: Merging failed due to ${additional}`;
+export const ERROR_VALIDATION = method => `${method} Error: Malformed or Incorrect input`;
+export const ERROR_PERIOD = (method, message) => `${method} Error: ${message}`;
+
 /**
  * Simple method to return a formatted error object.
  * Can be refactored at a later date to be a class
