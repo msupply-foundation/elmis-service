@@ -21,6 +21,7 @@ const outgoingRequisition = {
       reasonForRequestedQuantity: 'Comment',
       beginningBalance: 3,
       normalizedConsumption: 1,
+      anAdditionalField: 1,
     },
     {
       id: 2,
@@ -34,6 +35,7 @@ const outgoingRequisition = {
       reasonForRequestedQuantity: 'Comment',
       beginningBalance: 3,
       normalizedConsumption: 1,
+      anAdditionalField: 1,
     },
   ],
 };
@@ -91,6 +93,7 @@ const mergedRequisition = {
       reasonForRequestedQuantity: 'Comment',
       beginningBalance: 3,
       normalizedConsumption: 3,
+      anAdditionalField: 1,
     },
     {
       id: 2,
@@ -104,6 +107,7 @@ const mergedRequisition = {
       reasonForRequestedQuantity: 'Comment',
       beginningBalance: 3,
       normalizedConsumption: 3,
+      anAdditionalField: 1,
     },
   ],
 };
@@ -164,7 +168,7 @@ test('should return an ERROR_MERGE, for an unmatched item', () => {
     errorObject(
       ERROR_MERGE,
       'requisitionItemsMerge',
-      `could not find a match for outgoing line item ${
+      `Could not find a match for an outgoing line item ${
         outgoingRequisition.fullSupplyLineItems[0].id
       }`
     )
