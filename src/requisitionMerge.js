@@ -1,10 +1,8 @@
+/* eslint-disable camelcase */
 import { ERROR_MERGE, errorObject } from './errors/errors';
 
-/* eslint-disable camelcase */
-// eSigl previousStockInHand in 4d?
-
 /**
- * Functions which will merge an incoming requisition (The requisition
+ * Functions which merge an incoming requisition (The requisition
  * which should be sent to eSIGL) with the outgoing requisition (the
  * requiisition which was retrieved from the eSIGL server).
  */
@@ -14,7 +12,7 @@ import { ERROR_MERGE, errorObject } from './errors/errors';
  * Keys are fields of the outgoing requisition, values are
  * fields of the incoming requisition.
  */
-const requisitionLineFields = {
+const MERGE_FIELDS_MAPPING = {
   stockInHand: 'stock_on_hand',
   quantityReceived: 'Cust_stock_received',
   quantityDispensed: 'actualQuan',
@@ -26,6 +24,20 @@ const requisitionLineFields = {
   normalizedConsumption: 'adjusted_consumption',
 };
 
+const unMatchedError = id =>
+  errorObject(
+    ERROR_MERGE,
+    'requisitionItemsMerge',
+    `Could not find a match for an outgoing line item ${id}`
+  );
+
+const incorrectPrevStock = id =>
+  errorObject(
+    ERROR_MERGE,
+    'requisitionItemsMerge',
+    `${id} has an incorrect previous stock quantity`
+  );
+
 /**
  * Function which returns an object of key/value pairs where the key
  * is the outgoing requisition field and value is from the incoming
@@ -34,56 +46,44 @@ const requisitionLineFields = {
  * @param  {Object} requisitionLine From the incoming requisition.
  * @return {Object} Correct key, value pairs to use in the updated line
  */
-const getMappedFields = requisitionLine => {
+const getMappedFields = incomingLine => {
   const updatedRequisition = {};
-  Object.entries(requisitionLineFields).forEach(([key, value]) => {
-    updatedRequisition[key] = requisitionLine[value];
+  Object.entries(MERGE_FIELDS_MAPPING).forEach(([key, value]) => {
+    updatedRequisition[key] = incomingLine[value];
   });
   return updatedRequisition;
 };
+
+const findMatchedRequisition = outgoingCode => ({ item }) => item.code === outgoingCode;
 
 /**
  * Merges an array of requiisition lines (incoming requisiton lines)
  * with fully supply line items (outgoing requisition lines)
  *
- * @param  {Array}  requisitionLines    Requisition lines of the incoming requisition
- * @param  {Array}  fullSupplyLineItems Fully supply line items of the outgoing requisition
+ * @param  {Array}  incomingRequisitionLines    Requisition lines of the incoming requisition
+ * @param  {Array}  outgoingRequisitionLines Fully supply line items of the outgoing requisition
  * @return {Array} The merged requisition lines.
  */
-function requisitionItemsMerge(requisitionLines, fullSupplyLineItems) {
-  const lineItems = [...fullSupplyLineItems];
-  const reqLines = [...requisitionLines];
-  const updatedLineItems = [];
-  lineItems.forEach(lineItem => {
-    const { productCode: outgoingCode } = lineItem;
-    const matchedRequisitionLineIndex = reqLines.findIndex(
-      ({ item }) => item.code === outgoingCode
-    );
-    if (matchedRequisitionLineIndex < 0) {
-      throw errorObject(
-        ERROR_MERGE,
-        'requisitionItemsMerge',
-        `could not find a match for outgoing line item ${lineItem.id}`
-      );
-    }
+function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLines) {
+  const incomingLines = [...incomingRequisitionLines];
+  const outgoingLines = [...outgoingRequisitionLines];
+  const updatedLines = [];
 
-    const matchedRequisitionLine = { ...reqLines[matchedRequisitionLineIndex] };
-    reqLines.splice(matchedRequisitionLineIndex, 1);
+  outgoingLines.forEach(outgoingLine => {
+    const { productCode: outgoingCode } = outgoingLine;
+    const { ...matchedIncomingLine } = incomingLines.find(findMatchedRequisition(outgoingCode));
 
-    const { beginningBalance: outgoingPrevStock } = lineItem;
-    const { beginningBalance, ...remainingFields } = getMappedFields(matchedRequisitionLine);
-    if (outgoingPrevStock !== beginningBalance) {
-      throw errorObject(
-        ERROR_MERGE,
-        'requisitionItemsMerge',
-        `${matchedRequisitionLine.ID} has an incorrect previous stock quantity`
-      );
-    }
+    if (!matchedIncomingLine.ID) throw unMatchedError(outgoingLine.id);
 
-    const updatedLineItem = { ...lineItem, ...remainingFields, beginningBalance };
-    updatedLineItems.push(updatedLineItem);
+    const { beginningBalance: outgoingPrevStock } = outgoingLine;
+    const { beginningBalance, ...remainingIncomingFields } = getMappedFields(matchedIncomingLine);
+
+    if (outgoingPrevStock !== beginningBalance) throw incorrectPrevStock(matchedIncomingLine.ID);
+
+    updatedLines.push({ ...outgoingLine, ...remainingIncomingFields, beginningBalance });
   });
-  return updatedLineItems;
+
+  return updatedLines;
 }
 
 /**
@@ -95,17 +95,19 @@ function requisitionItemsMerge(requisitionLines, fullSupplyLineItems) {
  * @return {Object} the updated eSIGL requisition with incoming values applied.
  */
 export default function requisitionMerge(incomingRequisition, outgoingRequisition) {
-  const { requisitionLines } = incomingRequisition;
-  const { fullSupplyLineItems: lineItems } = outgoingRequisition;
+  const { requisitionLines: outgoingLines } = incomingRequisition;
+  const { fullSupplyLineItems: incomingLines } = outgoingRequisition;
 
-  if (lineItems.length > requisitionLines.length) {
+  if (incomingLines.length > outgoingLines.length) {
     throw errorObject(ERROR_MERGE, 'requisitionMerge', 'Not enough requisitionLineItems provided.');
   }
-  if (lineItems.length < requisitionLines.length) {
+
+  if (incomingLines.length < outgoingLines.length) {
     throw errorObject(ERROR_MERGE, 'requisitionMerge', 'Too many requisitionLineItems provided.');
   }
 
-  const fullSupplyLineItems = requisitionItemsMerge(requisitionLines, lineItems);
-  const updatedRequisition = { ...outgoingRequisition, fullSupplyLineItems };
-  return updatedRequisition;
+  return {
+    ...outgoingRequisition,
+    fullSupplyLineItems: requisitionItemsMerge(outgoingLines, incomingLines),
+  };
 }
