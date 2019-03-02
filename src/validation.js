@@ -136,12 +136,14 @@ export function loosePeriodValidation(incomingDateString, outgoingPeriods) {
 export function periodValidation({ start_date, end_date }, outgoingPeriods) {
   const { rnr_list, periods } = outgoingPeriods;
 
-  if (rnr_list.length) {
-    throw errorObject(
-      ERROR_PERIOD,
-      'periodValidation',
-      'There is already an unsubmitted requisition for this period'
-    );
+  if (rnr_list) {
+    if (rnr_list.length) {
+      throw errorObject(
+        ERROR_PERIOD,
+        'periodValidation',
+        'There is already an unsubmitted requisition for this period'
+      );
+    }
   }
 
   if (!periods.length) {
