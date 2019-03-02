@@ -12,31 +12,12 @@ import { ERROR_MERGE, errorObject } from './errors/errors';
  * Keys are fields of the outgoing requisition, values are
  * fields of the incoming requisition.
  */
+
 const MERGE_FIELDS_MAPPING = {
-  stockInHand: 'stock_on_hand',
   quantityReceived: 'Cust_stock_received',
   quantityDispensed: 'actualQuan',
   totalLossesAndAdjustments: 'Cust_loss_adjust',
-  stockOutDays: 'days_out_or_new_demand',
-  calculatedOrderQuantity: 'suggested_quantity',
-  reasonForRequestedQuantity: 'comment',
-  beginningBalance: 'previous_stock_on_hand',
-  normalizedConsumption: 'adjusted_consumption',
 };
-
-const unMatchedError = id =>
-  errorObject(
-    ERROR_MERGE,
-    'requisitionItemsMerge',
-    `Could not find a match for an outgoing line item ${id}`
-  );
-
-const incorrectPrevStock = id =>
-  errorObject(
-    ERROR_MERGE,
-    'requisitionItemsMerge',
-    `${id} has an incorrect previous stock quantity`
-  );
 
 /**
  * Function which returns an object of key/value pairs where the key
@@ -54,7 +35,9 @@ const getMappedFields = incomingLine => {
   return updatedRequisition;
 };
 
-const findMatchedRequisition = outgoingCode => ({ item }) => item.code === outgoingCode;
+const findMatchedRequisition = ({ code: incomingItemCode }) => ({
+  productCode: outgoingItemCode,
+}) => outgoingItemCode === incomingItemCode;
 
 /**
  * Merges an array of requiisition lines (incoming requisiton lines)
@@ -69,23 +52,55 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
   const outgoingLines = [...outgoingRequisitionLines];
   const updatedLines = [];
 
-  outgoingLines.forEach(outgoingLine => {
-    const { productCode: outgoingCode } = outgoingLine;
-    const { ...matchedIncomingLine } = incomingLines.find(findMatchedRequisition(outgoingCode));
+  incomingLines.forEach(incomingLine => {
+    const { item } = incomingLine;
+    const matchedOutgoingLineIndex = outgoingLines.findIndex(findMatchedRequisition(item));
 
-    if (!matchedIncomingLine.ID) throw unMatchedError(outgoingLine.id);
+    if (matchedOutgoingLineIndex < 0)
+      throw errorObject(
+        ERROR_MERGE,
+        'requisitionItemsMerge',
+        `No match for requisition item ${item.code}`
+      );
 
-    const { beginningBalance: outgoingPrevStock } = outgoingLine;
-    const { beginningBalance, ...remainingIncomingFields } = getMappedFields(matchedIncomingLine);
+    const { ...matchedOutgoingLine } = outgoingLines[matchedOutgoingLineIndex];
 
-    if (outgoingPrevStock !== beginningBalance) throw incorrectPrevStock(matchedIncomingLine.ID);
+    if (matchedOutgoingLine.skipped)
+      throw errorObject(
+        ERROR_MERGE,
+        'requisitionItemsMerge',
+        `Requisition line item ${item.code} matches a skipped full supply line item ${
+          matchedOutgoingLine.productCode
+        }`
+      );
 
-    updatedLines.push({ ...outgoingLine, ...remainingIncomingFields, beginningBalance });
+    const { actualQuan, Cust_stock_received, Cust_loss_adjust } = incomingLine;
+    const { beginningBalance } = matchedOutgoingLine;
+    const newStockInHand = beginningBalance - actualQuan + Cust_stock_received + Cust_loss_adjust;
+    matchedOutgoingLine.stockInHand = newStockInHand;
+
+    updatedLines.push({
+      ...matchedOutgoingLine,
+      ...getMappedFields(incomingLine),
+    });
+
+    outgoingLines.splice(matchedOutgoingLineIndex, 1);
   });
+
+  if (outgoingLines.length) {
+    outgoingLines.forEach(outgoingLine => {
+      if (!outgoingLine.skipped) {
+        throw errorObject(
+          ERROR_MERGE,
+          'requisitionItemsMerge',
+          `Unmatched, non-skippable full supply line item ${outgoingLine.productCode}`
+        );
+      }
+    });
+  }
 
   return updatedLines;
 }
-
 /**
  * Function which will merge the appropriate values of the incoming requisition
  * to match the requisition to be sent to the eSIGL server.
@@ -95,19 +110,19 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
  * @return {Object} the updated eSIGL requisition with incoming values applied.
  */
 export default function requisitionMerge(incomingRequisition, outgoingRequisition) {
-  const { requisitionLines: outgoingLines } = incomingRequisition;
-  const { fullSupplyLineItems: incomingLines } = outgoingRequisition;
+  const { requisitionLines: incomingLines } = incomingRequisition;
+  const { fullSupplyLineItems: outgoingLines } = outgoingRequisition;
 
-  if (incomingLines.length > outgoingLines.length) {
-    throw errorObject(ERROR_MERGE, 'requisitionMerge', 'Not enough requisitionLineItems provided.');
+  if (!incomingLines.length) {
+    throw errorObject(ERROR_MERGE, 'requisitionMerge', 'No requisition Line items');
   }
 
-  if (incomingLines.length < outgoingLines.length) {
-    throw errorObject(ERROR_MERGE, 'requisitionMerge', 'Too many requisitionLineItems provided.');
+  if (!outgoingLines.length) {
+    throw errorObject(ERROR_MERGE, 'requisitionMerge', 'No fully supply line items');
   }
 
   return {
     ...outgoingRequisition,
-    fullSupplyLineItems: requisitionItemsMerge(outgoingLines, incomingLines),
+    fullSupplyLineItems: requisitionItemsMerge(incomingLines, outgoingLines),
   };
 }

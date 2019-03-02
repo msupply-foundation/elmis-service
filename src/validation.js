@@ -97,7 +97,7 @@ export function programValidation(programCode, programList) {
  * @param  {Object} outgoingPeriod - Period object from eSIGL.
  * @return {number} the ID of the period matched with the incoming date.
  */
-export function periodValidation(incomingDateString, outgoingPeriods) {
+export function loosePeriodValidation(incomingDateString, outgoingPeriods) {
   const { rnr_list, periods } = outgoingPeriods;
 
   if (rnr_list.length > 0) {
@@ -131,4 +131,57 @@ export function periodValidation(incomingDateString, outgoingPeriods) {
   const incomingDateMonth = incomingDate.getMonth();
   const outgoingPeriodMonth = outgoingPeriod.getMonth();
   return incomingDateMonth === outgoingPeriodMonth;
+}
+
+export function periodValidation({ start_date, end_date }, outgoingPeriods) {
+  const { rnr_list, periods } = outgoingPeriods;
+
+  if (rnr_list.length) {
+    throw errorObject(
+      ERROR_PERIOD,
+      'periodValidation',
+      'There is already an unsubmitted requisition for this period'
+    );
+  }
+
+  if (!periods.length) {
+    throw errorObject(
+      ERROR_PERIOD,
+      'periodValidation',
+      'There are no periods created for this schedule'
+    );
+  }
+
+  const [period] = periods;
+  const { startDate, endDate } = period;
+  const incomingStartDate = new Date(start_date);
+  const incomingEndDate = new Date(end_date);
+
+  const outgoingStartDate = new Date(startDate);
+  const outgoingEndDate = new Date(endDate);
+
+  if (Number.isNaN(incomingStartDate.getTime()) || Number.isNaN(incomingEndDate.getTime())) {
+    throw errorObject(ERROR_PERIOD, 'periodValidation', 'Invalid input time');
+  }
+  if (Number.isNaN(outgoingStartDate.getTime()) || Number.isNaN(outgoingEndDate.getTime())) {
+    throw errorObject(ERROR_PERIOD, 'periodValidation', 'Outgoing period is malformed');
+  }
+
+  const startDatesEven =
+    incomingStartDate.getFullYear() === outgoingStartDate.getFullYear() &&
+    incomingStartDate.getUTCMonth() === outgoingStartDate.getUTCMonth() &&
+    incomingStartDate.getUTCDate() === outgoingStartDate.getUTCDate();
+
+  if (!startDatesEven)
+    throw errorObject(ERROR_PERIOD, 'periodValidation', 'Start dates are misaligned');
+
+  const endDatesEven =
+    incomingEndDate.getFullYear() === outgoingEndDate.getFullYear() &&
+    incomingEndDate.getUTCMonth() === outgoingEndDate.getUTCMonth() &&
+    incomingEndDate.getUTCDate() === outgoingEndDate.getUTCDate();
+
+  if (!endDatesEven)
+    throw errorObject(ERROR_PERIOD, 'periodValidation', 'End dates are misaligned');
+
+  return startDatesEven && endDatesEven;
 }

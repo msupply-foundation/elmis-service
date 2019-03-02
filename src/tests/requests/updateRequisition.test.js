@@ -19,5 +19,5 @@ test('should return true from response', async () => {
         regimenLineItems: [],
       },
     })
-  ).toEqual(true);
+  ).toEqual({ success: true });
 });

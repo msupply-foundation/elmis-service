@@ -12,5 +12,5 @@ test('should return the programList from response', async () => {
     })
   );
   const { programs } = require('../../requests');
-  expect(await programs({ cookie: '', baseURL: '' })).toEqual([]);
+  expect(await programs({ cookie: '', baseURL: '' })).toEqual({ programs: [] });
 });
