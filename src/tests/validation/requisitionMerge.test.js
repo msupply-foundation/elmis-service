@@ -16,12 +16,9 @@ const outgoingRequisition = {
       quantityReceived: 1,
       quantityDispensed: 1,
       totalLossesAndAdjustments: 1,
-      stockOutDays: 1,
-      calculatedOrderQuantity: 1,
-      reasonForRequestedQuantity: 'Comment',
       beginningBalance: 3,
-      normalizedConsumption: 1,
       anAdditionalField: 1,
+      skipped: false,
     },
     {
       id: 2,
@@ -30,12 +27,9 @@ const outgoingRequisition = {
       quantityReceived: 1,
       quantityDispensed: 1,
       totalLossesAndAdjustments: 1,
-      stockOutDays: 1,
-      calculatedOrderQuantity: 1,
-      reasonForRequestedQuantity: 'Comment',
       beginningBalance: 3,
-      normalizedConsumption: 1,
       anAdditionalField: 1,
+      skipped: false,
     },
   ],
 };
@@ -46,15 +40,9 @@ const incomingRequisition = {
       ID: 3,
       extraFieldOne: 1,
       extraFieldTwo: 1,
-      stock_on_hand: 3,
       Cust_stock_received: 3,
       actualQuan: 3,
       Cust_loss_adjust: 3,
-      days_out_or_new_demand: 3,
-      suggested_quantity: 3,
-      comment: 'Comment',
-      previous_stock_on_hand: 3,
-      adjusted_consumption: 3,
       item: {
         code: 'AAA',
       },
@@ -63,15 +51,9 @@ const incomingRequisition = {
       ID: 4,
       extraFieldOne: 1,
       extraFieldTwo: 1,
-      stock_on_hand: 3,
       Cust_stock_received: 3,
       actualQuan: 3,
       Cust_loss_adjust: 3,
-      days_out_or_new_demand: 3,
-      suggested_quantity: 3,
-      comment: 'Comment',
-      previous_stock_on_hand: 3,
-      adjusted_consumption: 3,
       item: {
         code: 'BBB',
       },
@@ -84,30 +66,24 @@ const mergedRequisition = {
     {
       id: 1,
       productCode: 'AAA',
-      stockInHand: 3,
+      stockInHand: 6,
       quantityReceived: 3,
       quantityDispensed: 3,
       totalLossesAndAdjustments: 3,
-      stockOutDays: 3,
-      calculatedOrderQuantity: 3,
-      reasonForRequestedQuantity: 'Comment',
       beginningBalance: 3,
-      normalizedConsumption: 3,
       anAdditionalField: 1,
+      skipped: false,
     },
     {
       id: 2,
       productCode: 'BBB',
-      stockInHand: 3,
+      stockInHand: 6,
       quantityReceived: 3,
       quantityDispensed: 3,
       totalLossesAndAdjustments: 3,
-      stockOutDays: 3,
-      calculatedOrderQuantity: 3,
-      reasonForRequestedQuantity: 'Comment',
       beginningBalance: 3,
-      normalizedConsumption: 3,
       anAdditionalField: 1,
+      skipped: false,
     },
   ],
 };
@@ -116,10 +92,21 @@ test('should return a new object', () => {
   expect(requisitionMerge(incomingRequisition, outgoingRequisition)).toEqual(mergedRequisition);
 });
 
-test('should return an ERROR_MERGE, due to having to many requisition line items', () => {
+test('should return an ERROR_MERGE, due to having ', () => {
   let errorCatcher;
   const requisitionLines = [...incomingRequisition.requisitionLines];
-  requisitionLines.push({});
+  const newReq = {
+    ID: 4,
+    extraFieldOne: 1,
+    extraFieldTwo: 1,
+    Cust_stock_received: 3,
+    actualQuan: 3,
+    Cust_loss_adjust: 3,
+    item: {
+      code: 'CCC',
+    },
+  };
+  requisitionLines.push(newReq);
   const testingRequisition = { ...incomingRequisition, requisitionLines };
   try {
     requisitionMerge(testingRequisition, outgoingRequisition);
@@ -128,7 +115,11 @@ test('should return an ERROR_MERGE, due to having to many requisition line items
   }
 
   expect(errorCatcher).toEqual(
-    errorObject(ERROR_MERGE, 'requisitionMerge', 'Too many requisitionLineItems provided.')
+    errorObject(
+      ERROR_MERGE,
+      'requisitionItemsMerge',
+      `No match for requisition item ${newReq.item.code}`
+    )
   );
 });
 
@@ -144,46 +135,56 @@ test('should return an ERROR_MERGE, due to having not enough requisition line it
   }
 
   expect(errorCatcher).toEqual(
-    errorObject(ERROR_MERGE, 'requisitionMerge', 'Not enough requisitionLineItems provided.')
-  );
-});
-
-test('should return an ERROR_MERGE, for an unmatched item', () => {
-  let errorCatcher;
-  const requisitionLines = [...incomingRequisition.requisitionLines];
-  const firstLine = { ...requisitionLines[0] };
-  const itemCopy = { ...firstLine.item };
-  itemCopy.code = 'CCC';
-  firstLine.item = itemCopy;
-  requisitionLines[0] = firstLine;
-
-  const testingRequisition = { ...incomingRequisition, requisitionLines };
-  try {
-    requisitionMerge(testingRequisition, outgoingRequisition);
-  } catch (error) {
-    errorCatcher = error;
-  }
-
-  expect(errorCatcher).toEqual(
     errorObject(
       ERROR_MERGE,
       'requisitionItemsMerge',
-      `Could not find a match for an outgoing line item ${
-        outgoingRequisition.fullSupplyLineItems[0].id
+      `Unmatched, non-skippable full supply line item ${
+        outgoingRequisition.fullSupplyLineItems[1].productCode
       }`
     )
   );
 });
 
-test('should return an ERROR_MERGE, for differences in previous stock', () => {
+test('should return an ERROR_MERGE, due to have no requisition items', () => {
   let errorCatcher;
-  const requisitionLines = [...incomingRequisition.requisitionLines];
-  const [firstLine] = requisitionLines;
-  firstLine.previous_stock_on_hand = 10;
+  const requisitionLines = [];
   const testingRequisition = { ...incomingRequisition, requisitionLines };
-
   try {
     requisitionMerge(testingRequisition, outgoingRequisition);
+  } catch (error) {
+    errorCatcher = error;
+  }
+
+  expect(errorCatcher).toEqual(
+    errorObject(ERROR_MERGE, 'requisitionMerge', 'No requisition Line items')
+  );
+});
+
+test('should return an ERROR_MERGE, due to having no full supply line items', () => {
+  let errorCatcher;
+  const fullSupplyLineItems = [];
+  const testingRequisition = { ...outgoingRequisition, fullSupplyLineItems };
+  try {
+    requisitionMerge(incomingRequisition, testingRequisition);
+  } catch (error) {
+    errorCatcher = error;
+  }
+
+  expect(errorCatcher).toEqual(
+    errorObject(ERROR_MERGE, 'requisitionMerge', 'No fully supply line items')
+  );
+});
+
+test('should return an ERROR_MERGE, due to having no full supply line items', () => {
+  let errorCatcher;
+  const testingRequisition = { ...outgoingRequisition };
+  const fullSupplyLineItems = [...testingRequisition.fullSupplyLineItems];
+  const [firstItem] = fullSupplyLineItems;
+  firstItem.skipped = true;
+
+  fullSupplyLineItems[0] = firstItem;
+  try {
+    requisitionMerge(incomingRequisition, { ...testingRequisition, fullSupplyLineItems });
   } catch (error) {
     errorCatcher = error;
   }
@@ -192,7 +193,9 @@ test('should return an ERROR_MERGE, for differences in previous stock', () => {
     errorObject(
       ERROR_MERGE,
       'requisitionItemsMerge',
-      `${incomingRequisition.requisitionLines[0].ID} has an incorrect previous stock quantity`
+      `Requisition line item ${
+        incomingRequisition.requisitionLines[0].item.code
+      } matches a skipped full supply line item ${firstItem.productCode}`
     )
   );
 });
