@@ -113,7 +113,7 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
  */
 export default function requisitionMerge(incomingRequisition, outgoingRequisition) {
   const { requisitionLines: incomingLines } = incomingRequisition;
-  const { fullSupplyLineItems: outgoingLines } = outgoingRequisition;
+  const { fullSupplyLineItems: outgoingLines, regimenLineItems } = outgoingRequisition;
 
   if (!incomingLines.length) {
     throw errorObject(ERROR_MERGE, 'requisitionMerge', 'No requisition Line items');
@@ -123,10 +123,12 @@ export default function requisitionMerge(incomingRequisition, outgoingRequisitio
     throw errorObject(ERROR_MERGE, 'requisitionMerge', 'No fully supply line items');
   }
 
-  outgoingRequisition.regimenLineItems.forEach(regimenItem => {
-    // eslint-disable-next-line no-param-reassign
-    regimenItem.patientsOnTreatment = 0;
-  });
+  if (regimenLineItems) {
+    regimenLineItems.forEach(regimenItem => {
+      // eslint-disable-next-line no-param-reassign
+      regimenItem.patientsOnTreatment = 0;
+    });
+  }
 
   return {
     ...outgoingRequisition,
