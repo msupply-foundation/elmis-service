@@ -43,6 +43,7 @@ const incomingRequisition = {
       Cust_stock_received: 3,
       actualQuan: 3,
       Cust_loss_adjust: 3,
+      Cust_stock_order: 3,
       item: {
         code: 'AAA',
       },
@@ -54,6 +55,7 @@ const incomingRequisition = {
       Cust_stock_received: 3,
       actualQuan: 3,
       Cust_loss_adjust: 3,
+      Cust_stock_order: 3,
       item: {
         code: 'BBB',
       },
@@ -73,6 +75,8 @@ const mergedRequisition = {
       beginningBalance: 3,
       anAdditionalField: 1,
       skipped: false,
+      quantityRequested: 3,
+      reasonForRequestedQuantity: 'a',
     },
     {
       id: 2,
@@ -84,6 +88,8 @@ const mergedRequisition = {
       beginningBalance: 3,
       anAdditionalField: 1,
       skipped: false,
+      quantityRequested: 3,
+      reasonForRequestedQuantity: 'a',
     },
   ],
 };
