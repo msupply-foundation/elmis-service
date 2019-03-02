@@ -8,6 +8,9 @@ import {
   ERROR_COOKIE,
   ERROR_AUTHENTICATION,
   ERROR_UNKNOWN,
+  ERROR_INCORRECT_URL,
+  ERROR_LOGIN,
+  ERROR_UNEXPECTED_RESPONSE,
 } from './errors/errors';
 
 /**
@@ -34,15 +37,17 @@ import {
 export async function login({ username, password, baseURL }) {
   const config = ApiConfigs.getLoginConfig({ username, password, baseURL });
   try {
-    const { headers } = await axios(config);
+    const data = await axios(config);
+    const { headers } = data;
     return { cookie: headers['set-cookie'][0].split(';')[0] };
   } catch (error) {
     const { response, request } = error;
     if (response) {
       const { status } = response;
-      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'login');
+      if (status === 401) throw errorObject(ERROR_LOGIN, 'login');
+      if (status === 404) throw errorObject(ERROR_INCORRECT_URL, 'login');
       if (status === 500) throw errorObject(ERROR_SERVER, 'login');
-      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'login', status);
+      throw errorObject(ERROR_UNEXPECTED_RESPONSE, 'login', status);
     }
     if (request) throw errorObject(ERROR_REQUEST, 'login');
     throw errorObject(ERROR_COOKIE, 'login');

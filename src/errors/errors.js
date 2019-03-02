@@ -6,9 +6,16 @@
  * paremeter for the exact code block the error
  * occured.
  */
+
+export const ERROR_INCORRECT_URL = method => `Error: During ${method}, incorrect base URL`;
+export const ERROR_UNEXPECTED_RESPONSE = (method, status) =>
+  `Error: During ${method}, an unexpected response ${status} was received`;
+
+export const ERROR_LOGIN = method => `Error: During ${method}, incorrect username or password`;
+
 export const ERROR_RESPONSE = method => `${method} Error: Malformed response`;
 export const ERROR_UNKNOWN = method => `${method} Error: Unkown error occured`;
-export const ERROR_LOGIN = method => `${method} Error: Incorrect username or password`;
+
 export const ERROR_SERVER = method => `${method} Error: Unknown Server Error`;
 export const ERROR_UNKNOWN_RESPONSE = (method, status) =>
   `${method} Error: Unknown status code error - ${status}`;
