@@ -9,6 +9,7 @@
   "scripts": {
     "start": "babel-node ./src/index.js",
     "test": "jest",
+    "testClearCache": "jest --clearCache",
     "build": "rimraf build/ && babel ./src --out-dir build/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files"
   },
   "husky": {
