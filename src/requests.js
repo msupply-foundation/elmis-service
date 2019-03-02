@@ -35,7 +35,7 @@ export async function login({ username, password, baseURL }) {
   const config = ApiConfigs.getLoginConfig({ username, password, baseURL });
   try {
     const { headers } = await axios(config);
-    return headers['set-cookie'][0].split(';')[0];
+    return { cookie: headers['set-cookie'][0].split(';')[0] };
   } catch (error) {
     const { response, request } = error;
     if (response) {
@@ -62,7 +62,7 @@ export async function programs({ baseURL, cookie }) {
   try {
     const { data } = await axios(config);
     const { programList } = data;
-    return programList;
+    return { programs: programList };
   } catch (error) {
     const { response, request } = error;
     if (response) {
@@ -91,7 +91,7 @@ export async function facilities({ baseURL, cookie, programId }) {
   try {
     const { data } = await axios(config);
     const { facilities: facilityList } = data;
-    return facilityList;
+    return { facilities: facilityList };
   } catch (error) {
     const { response, request } = error;
     if (response) {
@@ -129,7 +129,7 @@ export async function periods({ baseURL, cookie, emergency, facilityId, programI
   try {
     const { data } = await axios(config);
     const { periods: periodsList } = data;
-    return periodsList;
+    return { periods: periodsList };
   } catch (error) {
     const { response, request } = error;
     if (response) {
@@ -163,7 +163,7 @@ export async function authorizeRequisition({ baseURL, cookie, requisitionId }) {
   try {
     const { data } = await axios(config);
     const { success } = data;
-    return success === 'R&R authorized successfully!';
+    return { success: success === 'R&R authorized successfully!' };
   } catch (error) {
     const { response, request } = error;
     if (response) {
@@ -197,7 +197,7 @@ export async function approveRequisition({ baseURL, cookie, requisitionId }) {
   try {
     const { data } = await axios(config);
     const { success } = data;
-    return success === 'R&R approved successfully!';
+    return { success: success === 'R&R approved successfully!' };
   } catch (error) {
     const { response, request } = error;
     if (response) {
@@ -229,7 +229,7 @@ export async function submitRequisition({ baseURL, cookie, requisitionId }) {
   try {
     const { data } = await axios(config);
     const { success } = data;
-    return success === 'R&R submitted successfully!';
+    return { success: success === 'R&R submitted successfully!' };
   } catch (error) {
     const { response, request } = error;
     if (response) {
@@ -260,7 +260,7 @@ export async function requisitionToOrder({ baseURL, cookie, requisitionId }) {
   });
   try {
     const { status } = await axios(config);
-    return status === 201;
+    return { success: status === 201 };
   } catch (error) {
     const { response, request } = error;
     if (response) {
@@ -304,7 +304,7 @@ export async function createRequisition({
   try {
     const { data } = await axios(config);
     const { rnr } = data;
-    return rnr;
+    return { requisition: { ...rnr } };
   } catch (error) {
     const { response, request } = error;
     if (response) {
@@ -331,7 +331,7 @@ export async function updateRequisition({ baseURL, cookie, requisition }) {
   try {
     const { data } = await axios(config);
     const { success } = data;
-    return success === 'R&R saved successfully!';
+    return { success: success === 'R&R saved successfully!' };
   } catch (error) {
     const { response, request } = error;
     if (response) {
@@ -357,7 +357,7 @@ export async function deleteRequisition({ baseURL, cookie, requisitionId }) {
   const config = ApiConfigs.getDeleteConfig({ baseURL, cookie, requisitionId });
   try {
     const { status } = await axios(config);
-    return status === 200;
+    return { success: status === 200 };
   } catch (error) {
     const { response, request } = error;
     if (response) {
