@@ -5,25 +5,46 @@ import { errorObject, ERROR_VALIDATION, ERROR_PERIOD } from './errors/errors';
 // TODO: Some methods can be made more generic, will keep as is for initial
 // development, but need to check this before merging into master.
 
+function isObject(objectToCheck) {
+  if (typeof objectToCheck === 'object' && (!Array.isArray(objectToCheck) || objectToCheck)) {
+    return true;
+  }
+  return false;
+}
+
 /**
- * Validates the incoming parameters. These may need to be refactored
- * or at least renamed if each method (Login, getPrograms etc.) within
- * the module are made to be called individually as well as as being
- * a more specific 'bulk pusher' into eSigl.
- * @param  {Object} inputParameters {
- * requisition: {}, requisitionLines: [], regimeLines: []
- * }
+ * Validates the incoming parameters for sending a requisition to eSIGL.
+ * Ensures there is a requisition and option field, a baseURL field within
+ * the options, a requisitionLines field within requisition and it is non
+ * empty. Will throw an error otherwise.
+ * @param  {object} inputParameters
+ * @param {object} inputParameters.requisition
+ * @param {array} inputParameters.requisition.requisitionLines
  * @return {bool}   true on validation, will throw an error otherwise.
  */
-export function parameterValidation(inputParameters) {
-  const { requisition, requisitionLines, regimeLines } = inputParameters;
+export function integrationValidation(inputParameters) {
+  if (!inputParameters) {
+    throw errorObject(ERROR_VALIDATION, 'integrationValidation');
+  }
 
-  if (!(Array.isArray(requisitionLines) && Array.isArray(regimeLines))) {
-    throw errorObject(ERROR_VALIDATION, 'parameterValidation');
+  const { requisition, options } = inputParameters;
+
+  if (!(isObject(requisition) && isObject(options))) {
+    throw errorObject(ERROR_VALIDATION, 'integrationValidation');
   }
-  if ((typeof requisition === 'object' && Array.isArray(requisition)) || !requisition) {
-    throw errorObject(ERROR_VALIDATION, 'parameterValidation');
+
+  const { baseURL } = options;
+
+  if (!/^https?:\/\//.test(baseURL)) {
+    throw errorObject(ERROR_VALIDATION, 'integrationValidation');
   }
+
+  const { requisitionLines } = requisition;
+
+  if (!Array.isArray(requisitionLines) || !requisitionLines.length) {
+    throw errorObject(ERROR_VALIDATION, 'integrationValidation');
+  }
+
   return true;
 }
 
