@@ -128,8 +128,7 @@ export async function periods({ baseURL, cookie, emergency, facilityId, programI
   });
   try {
     const { data } = await axios(config);
-    const { periods: periodsList } = data;
-    return { periods: periodsList };
+    return { periods: data };
   } catch (error) {
     const { response, request } = error;
     if (response) {
@@ -221,7 +220,7 @@ export async function approveRequisition({ baseURL, cookie, requisitionId }) {
  * @return {bool}    confirmation of a requisition being succesfully submitted
  */
 export async function submitRequisition({ baseURL, cookie, requisitionId }) {
-  const config = ApiConfigs.getApproveConfig({
+  const config = ApiConfigs.getSubmitConfig({
     baseURL,
     cookie,
     requisitionId,

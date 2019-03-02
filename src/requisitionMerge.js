@@ -17,6 +17,7 @@ const MERGE_FIELDS_MAPPING = {
   quantityReceived: 'Cust_stock_received',
   quantityDispensed: 'actualQuan',
   totalLossesAndAdjustments: 'Cust_loss_adjust',
+  quantityRequested: 'Cust_stock_order',
 };
 
 /**
@@ -78,6 +79,7 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
     const { beginningBalance } = matchedOutgoingLine;
     const newStockInHand = beginningBalance - actualQuan + Cust_stock_received + Cust_loss_adjust;
     matchedOutgoingLine.stockInHand = newStockInHand;
+    matchedOutgoingLine.reasonForRequestedQuantity = 'a';
 
     updatedLines.push({
       ...matchedOutgoingLine,
@@ -120,6 +122,11 @@ export default function requisitionMerge(incomingRequisition, outgoingRequisitio
   if (!outgoingLines.length) {
     throw errorObject(ERROR_MERGE, 'requisitionMerge', 'No fully supply line items');
   }
+
+  outgoingRequisition.regimenLineItems.forEach(regimenItem => {
+    // eslint-disable-next-line no-param-reassign
+    regimenItem.patientsOnTreatment = 0;
+  });
 
   return {
     ...outgoingRequisition,
