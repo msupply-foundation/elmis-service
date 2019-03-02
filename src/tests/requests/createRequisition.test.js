@@ -17,5 +17,5 @@ test('should return true from response', async () => {
       facilityId: 1,
       programId: 1,
     })
-  ).toEqual({ id: 1 });
+  ).toEqual({ requisition: { id: 1 } });
 });
