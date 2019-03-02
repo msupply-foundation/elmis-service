@@ -1,25 +1,59 @@
 import { periodValidation } from '../../validation';
 import { errorObject, ERROR_PERIOD } from '../../errors/errors';
 
-// 1492819200000 = +049275-07-23T00:00:00.000Z
+const incomingPeriods = {
+  start_date: '2018-06-01T00:00:00.000Z',
+  end_date: '2018-06-30T00:00:00.000Z',
+};
+
+const outgoingPeriods = {
+  periods: [
+    {
+      startDate: 1527811200000,
+      endDate: 1530403199000,
+    },
+  ],
+  rnr_list: [],
+};
+
 test('should return true', () => {
-  const incomingPeriod = '7-1-2019';
-  const outgoingPeriods = { periods: [{ startDate: 1492819200000 }], rnr_list: [] };
-  expect(periodValidation(incomingPeriod, outgoingPeriods)).toBe(true);
+  expect(periodValidation(incomingPeriods, outgoingPeriods)).toBe(true);
 });
 
-test('should return false', () => {
-  const incomingPeriod = '1-1-2019';
-  const outgoingPeriods = { periods: [{ startDate: 1492819200000 }], rnr_list: [] };
-  expect(periodValidation(incomingPeriod, outgoingPeriods)).toBe(false);
+test('should throw a misaligned date error', () => {
+  const testingIncomingPeriods = { ...incomingPeriods };
+  let errorCatcher;
+  testingIncomingPeriods.start_date = '2018-06-10T00:00:00.000Z';
+  try {
+    periodValidation(testingIncomingPeriods, outgoingPeriods);
+  } catch (error) {
+    errorCatcher = error;
+  }
+  expect(errorCatcher).toEqual(
+    errorObject(ERROR_PERIOD, 'periodValidation', 'Start dates are misaligned')
+  );
+});
+
+test('should throw a misaligned end date error', () => {
+  const testingIncomingPeriods = { ...incomingPeriods };
+  let errorCatcher;
+  testingIncomingPeriods.end_date = '2018-07-01T00:00:00.000Z';
+  try {
+    periodValidation(testingIncomingPeriods, outgoingPeriods);
+  } catch (error) {
+    errorCatcher = error;
+  }
+  expect(errorCatcher).toEqual(
+    errorObject(ERROR_PERIOD, 'periodValidation', 'End dates are misaligned')
+  );
 });
 
 test('should throw an error as rnr_list is not empty', () => {
-  const incomingPeriod = '1-1-2019';
-  const outgoingPeriods = { periods: [{ startDate: 1492819200000 }], rnr_list: [1] };
+  const testingOutgoingPeriods = { ...outgoingPeriods };
+  testingOutgoingPeriods.rnr_list = [1];
   let errorCatcher;
   try {
-    periodValidation(incomingPeriod, outgoingPeriods);
+    periodValidation(incomingPeriods, testingOutgoingPeriods);
   } catch (error) {
     errorCatcher = error;
   }
@@ -33,11 +67,11 @@ test('should throw an error as rnr_list is not empty', () => {
 });
 
 test('should throw an error as there are no periods', () => {
-  const incomingPeriod = '1-1-2019';
-  const outgoingPeriods = { periods: [], rnr_list: [] };
+  const testingOutgoingPeriods = { ...outgoingPeriods };
+  testingOutgoingPeriods.periods = [];
   let errorCatcher;
   try {
-    periodValidation(incomingPeriod, outgoingPeriods);
+    periodValidation(incomingPeriods, testingOutgoingPeriods);
   } catch (error) {
     errorCatcher = error;
   }
@@ -46,28 +80,14 @@ test('should throw an error as there are no periods', () => {
   );
 });
 
-test('should throw an error as input date is invalid', () => {
-  const incomingPeriod = 'invalid date';
-  const outgoingPeriods = { periods: [{ startDate: 1492819200000 }], rnr_list: [] };
+test('should throw an error as input date is not a date', () => {
+  const testingIncomingPeriods = { ...incomingPeriods };
   let errorCatcher;
+  testingIncomingPeriods.end_date = '';
   try {
-    periodValidation(incomingPeriod, outgoingPeriods);
+    periodValidation(testingIncomingPeriods, outgoingPeriods);
   } catch (error) {
     errorCatcher = error;
   }
   expect(errorCatcher).toEqual(errorObject(ERROR_PERIOD, 'periodValidation', 'Invalid input time'));
-});
-
-test('should throw an error as outgoing date is invalid', () => {
-  const incomingPeriod = '1-1-2019';
-  const outgoingPeriods = { periods: [{ startDate: 'invalid date' }], rnr_list: [] };
-  let errorCatcher;
-  try {
-    periodValidation(incomingPeriod, outgoingPeriods);
-  } catch (error) {
-    errorCatcher = error;
-  }
-  expect(errorCatcher).toEqual(
-    errorObject(ERROR_PERIOD, 'periodValidation', 'Outgoing period is malformed')
-  );
 });
