@@ -10,5 +10,7 @@ test('should return true from response', async () => {
     jest.fn(() => ({ data: { success: 'R&R authorized successfully!' } }))
   );
   const { authorizeRequisition } = require('../../requests');
-  expect(await authorizeRequisition({ cookie: '', baseURL: '', requisitionId: 1 })).toEqual(true);
+  expect(await authorizeRequisition({ cookie: '', baseURL: '', requisitionId: 1 })).toEqual({
+    success: true,
+  });
 });

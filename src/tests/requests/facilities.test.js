@@ -12,5 +12,5 @@ test('should return the facilityList from response', async () => {
     })
   );
   const { facilities } = require('../../requests');
-  expect(await facilities({ cookie: '', baseURL: '', programId: 1 })).toEqual([]);
+  expect(await facilities({ cookie: '', baseURL: '', programId: 1 })).toEqual({ facilities: [] });
 });
