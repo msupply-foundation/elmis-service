@@ -1,5 +1,12 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable camelcase */
-import { ERROR_MERGE, errorObject } from './errors/errors';
+import {
+  errorObject,
+  ERROR_MERGE_PARAMS,
+  ERROR_MERGE_UNMATCHED_ITEM,
+  ERROR_MERGE_MATCH_SKIPPED_ITEM,
+  ERROR_MERGE_LEFTOVER,
+} from './errors/errors';
 
 /**
  * Functions which merge an incoming requisition (The requisition
@@ -56,24 +63,11 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
   incomingLines.forEach(incomingLine => {
     const { item } = incomingLine;
     const matchedOutgoingLineIndex = outgoingLines.findIndex(findMatchedRequisition(item));
-
-    if (matchedOutgoingLineIndex < 0)
-      throw errorObject(
-        ERROR_MERGE,
-        'requisitionItemsMerge',
-        `No match for requisition item ${item.code}`
-      );
+    if (matchedOutgoingLineIndex < 0) throw errorObject(ERROR_MERGE_UNMATCHED_ITEM, item.code);
 
     const { ...matchedOutgoingLine } = outgoingLines[matchedOutgoingLineIndex];
-
     if (matchedOutgoingLine.skipped)
-      throw errorObject(
-        ERROR_MERGE,
-        'requisitionItemsMerge',
-        `Requisition line item ${item.code} matches a skipped full supply line item ${
-          matchedOutgoingLine.productCode
-        }`
-      );
+      throw errorObject(ERROR_MERGE_MATCH_SKIPPED_ITEM, item.code, matchedOutgoingLine.productCode);
 
     const { actualQuan, Cust_stock_received, Cust_loss_adjust } = incomingLine;
     const { beginningBalance } = matchedOutgoingLine;
@@ -92,15 +86,10 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
   if (outgoingLines.length) {
     outgoingLines.forEach(outgoingLine => {
       if (!outgoingLine.skipped) {
-        throw errorObject(
-          ERROR_MERGE,
-          'requisitionItemsMerge',
-          `Unmatched, non-skippable full supply line item ${outgoingLine.productCode}`
-        );
+        throw errorObject(ERROR_MERGE_LEFTOVER, outgoingLine.productCode);
       }
     });
   }
-
   return updatedLines;
 }
 /**
@@ -115,17 +104,11 @@ export default function requisitionMerge(incomingRequisition, outgoingRequisitio
   const { requisitionLines: incomingLines } = incomingRequisition;
   const { fullSupplyLineItems: outgoingLines, regimenLineItems } = outgoingRequisition;
 
-  if (!incomingLines.length) {
-    throw errorObject(ERROR_MERGE, 'requisitionMerge', 'No requisition Line items');
-  }
-
-  if (!outgoingLines.length) {
-    throw errorObject(ERROR_MERGE, 'requisitionMerge', 'No fully supply line items');
-  }
+  if (!incomingLines || !incomingLines.length) throw errorObject(ERROR_MERGE_PARAMS, 'incoming');
+  if (!outgoingLines || !outgoingLines.length) throw errorObject(ERROR_MERGE_PARAMS, 'outgoing');
 
   if (regimenLineItems) {
     regimenLineItems.forEach(regimenItem => {
-      // eslint-disable-next-line no-param-reassign
       regimenItem.patientsOnTreatment = 0;
     });
   }
