@@ -1,5 +1,5 @@
 import { integrationValidation } from '../../validation';
-import { errorObject, ERROR_VALIDATION } from '../../errors/errors';
+import { errorObject, ERROR_PARAMETERS_DATA_TYPE, ERROR_PARAMETERS_URL } from '../../errors/errors';
 
 test('should return true', () => {
   expect(
@@ -17,7 +17,7 @@ test('should throw when fields are not correct data types', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(errorObject(ERROR_VALIDATION, 'integrationValidation'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_PARAMETERS_DATA_TYPE));
   errorCatcher = null;
 
   try {
@@ -25,7 +25,7 @@ test('should throw when fields are not correct data types', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(errorObject(ERROR_VALIDATION, 'integrationValidation'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_PARAMETERS_DATA_TYPE));
 });
 
 test('should throw when parameter is not an object', () => {
@@ -35,7 +35,7 @@ test('should throw when parameter is not an object', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(errorObject(ERROR_VALIDATION, 'integrationValidation'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_PARAMETERS_DATA_TYPE));
 });
 
 test('should throw when fields not present', () => {
@@ -45,7 +45,7 @@ test('should throw when fields not present', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(errorObject(ERROR_VALIDATION, 'integrationValidation', 'lines'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_PARAMETERS_DATA_TYPE));
   errorCatcher = null;
 
   try {
@@ -53,9 +53,7 @@ test('should throw when fields not present', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(
-    errorObject(ERROR_VALIDATION, 'integrationValidation', 'requisition')
-  );
+  expect(errorCatcher).toEqual(errorObject(ERROR_PARAMETERS_DATA_TYPE));
 });
 
 test('should throw when an invalid url is passed', () => {
@@ -68,5 +66,5 @@ test('should throw when an invalid url is passed', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(errorObject(ERROR_VALIDATION, 'integrationValidation'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_PARAMETERS_URL));
 });

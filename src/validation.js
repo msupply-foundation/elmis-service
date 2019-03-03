@@ -1,12 +1,26 @@
 /* eslint-disable camelcase */
-import { errorObject, ERROR_VALIDATION, ERROR_PERIOD } from './errors/errors';
+import {
+  errorObject,
+  ERROR_PARAMETERS_NONE,
+  ERROR_PARAMETERS_DATA_TYPE,
+  ERROR_PARAMETERS_URL,
+  ERROR_PARAMETERS_LINES,
+  ERROR_MATCH_FACILITIES,
+  ERROR_MATCH_PROGRAM,
+  ERROR_PERIOD_UNFINISHED,
+  ERROR_PERIOD_NONE,
+  ERROR_PERIOD_INVALID_INCOMING,
+  ERROR_PERIOD_INVALID_OUTGOING,
+  ERROR_PERIOD_MISALIGNED_START,
+  ERROR_PERIOD_MISALIGNED_END,
+} from './errors/errors';
 
 // TODO: Validation the incorrect term? Some methods also return IDs etc
 // TODO: Some methods can be made more generic, will keep as is for initial
 // development, but need to check this before merging into master.
 
 function isObject(objectToCheck) {
-  if (typeof objectToCheck === 'object' && (!Array.isArray(objectToCheck) || objectToCheck)) {
+  if (typeof objectToCheck === 'object' && !Array.isArray(objectToCheck) && objectToCheck) {
     return true;
   }
   return false;
@@ -24,25 +38,20 @@ function isObject(objectToCheck) {
  */
 export function integrationValidation(inputParameters) {
   if (!inputParameters) {
-    throw errorObject(ERROR_VALIDATION, 'integrationValidation');
+    throw errorObject(ERROR_PARAMETERS_NONE);
   }
 
   const { requisition, options } = inputParameters;
-
   if (!(isObject(requisition) && isObject(options))) {
-    throw errorObject(ERROR_VALIDATION, 'integrationValidation');
+    throw errorObject(ERROR_PARAMETERS_DATA_TYPE);
   }
 
   const { baseURL } = options;
-
-  if (!/^https?:\/\//.test(baseURL)) {
-    throw errorObject(ERROR_VALIDATION, 'integrationValidation');
-  }
+  if (!/^https?:\/\//.test(baseURL)) throw errorObject(ERROR_PARAMETERS_URL);
 
   const { requisitionLines } = requisition;
-
   if (!Array.isArray(requisitionLines) || !requisitionLines.length) {
-    throw errorObject(ERROR_VALIDATION, 'integrationValidation');
+    throw errorObject(ERROR_PARAMETERS_LINES);
   }
 
   return true;
@@ -64,7 +73,7 @@ export function facilitiesValidation(facilityCode, facilitiesList) {
     });
     return facilityId;
   } catch (error) {
-    throw errorObject(ERROR_VALIDATION, 'facilitiesValidation');
+    throw errorObject(ERROR_MATCH_FACILITIES);
   }
 }
 
@@ -84,7 +93,7 @@ export function programValidation(programCode, programList) {
     });
     return programId;
   } catch (error) {
-    throw errorObject(ERROR_VALIDATION, 'programValidation');
+    throw errorObject(ERROR_MATCH_PROGRAM);
   }
 }
 
@@ -97,61 +106,17 @@ export function programValidation(programCode, programList) {
  * @param  {Object} outgoingPeriod - Period object from eSIGL.
  * @return {number} the ID of the period matched with the incoming date.
  */
-export function loosePeriodValidation(incomingDateString, outgoingPeriods) {
-  const { rnr_list, periods } = outgoingPeriods;
-
-  if (rnr_list.length > 0) {
-    throw errorObject(
-      ERROR_PERIOD,
-      'periodValidation',
-      'There is already an unsubmitted requisition for this period'
-    );
-  }
-
-  if (periods.length === 0) {
-    throw errorObject(
-      ERROR_PERIOD,
-      'periodValidation',
-      'There are no periods created for this schedule'
-    );
-  }
-
-  const [period] = periods;
-  const { startDate } = period;
-  const incomingDate = new Date(incomingDateString);
-  const outgoingPeriod = new Date(startDate * 1000);
-
-  if (Number.isNaN(incomingDate.getTime())) {
-    throw errorObject(ERROR_PERIOD, 'periodValidation', 'Invalid input time');
-  }
-  if (Number.isNaN(outgoingPeriod.getTime())) {
-    throw errorObject(ERROR_PERIOD, 'periodValidation', 'Outgoing period is malformed');
-  }
-
-  const incomingDateMonth = incomingDate.getMonth();
-  const outgoingPeriodMonth = outgoingPeriod.getMonth();
-  return incomingDateMonth === outgoingPeriodMonth;
-}
-
 export function periodValidation({ start_date, end_date }, outgoingPeriods) {
   const { rnr_list, periods } = outgoingPeriods;
 
   if (rnr_list) {
     if (rnr_list.length) {
-      throw errorObject(
-        ERROR_PERIOD,
-        'periodValidation',
-        'There is already an unsubmitted requisition for this period'
-      );
+      throw errorObject(ERROR_PERIOD_UNFINISHED);
     }
   }
 
   if (!periods.length) {
-    throw errorObject(
-      ERROR_PERIOD,
-      'periodValidation',
-      'There are no periods created for this schedule'
-    );
+    throw errorObject(ERROR_PERIOD_NONE);
   }
 
   const [period] = periods;
@@ -163,10 +128,10 @@ export function periodValidation({ start_date, end_date }, outgoingPeriods) {
   const outgoingEndDate = new Date(endDate);
 
   if (Number.isNaN(incomingStartDate.getTime()) || Number.isNaN(incomingEndDate.getTime())) {
-    throw errorObject(ERROR_PERIOD, 'periodValidation', 'Invalid input time');
+    throw errorObject(ERROR_PERIOD_INVALID_INCOMING);
   }
   if (Number.isNaN(outgoingStartDate.getTime()) || Number.isNaN(outgoingEndDate.getTime())) {
-    throw errorObject(ERROR_PERIOD, 'periodValidation', 'Outgoing period is malformed');
+    throw errorObject(ERROR_PERIOD_INVALID_OUTGOING);
   }
 
   const startDatesEven =
@@ -174,16 +139,14 @@ export function periodValidation({ start_date, end_date }, outgoingPeriods) {
     incomingStartDate.getUTCMonth() === outgoingStartDate.getUTCMonth() &&
     incomingStartDate.getUTCDate() === outgoingStartDate.getUTCDate();
 
-  if (!startDatesEven)
-    throw errorObject(ERROR_PERIOD, 'periodValidation', 'Start dates are misaligned');
+  if (!startDatesEven) throw errorObject(ERROR_PERIOD_MISALIGNED_START);
 
   const endDatesEven =
     incomingEndDate.getFullYear() === outgoingEndDate.getFullYear() &&
     incomingEndDate.getUTCMonth() === outgoingEndDate.getUTCMonth() &&
     incomingEndDate.getUTCDate() === outgoingEndDate.getUTCDate();
 
-  if (!endDatesEven)
-    throw errorObject(ERROR_PERIOD, 'periodValidation', 'End dates are misaligned');
+  if (!endDatesEven) throw errorObject(ERROR_PERIOD_MISALIGNED_END);
 
   return startDatesEven && endDatesEven;
 }

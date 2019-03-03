@@ -1,5 +1,12 @@
 import { periodValidation } from '../../validation';
-import { errorObject, ERROR_PERIOD } from '../../errors/errors';
+import {
+  errorObject,
+  ERROR_PERIOD_UNFINISHED,
+  ERROR_PERIOD_NONE,
+  ERROR_PERIOD_INVALID_INCOMING,
+  ERROR_PERIOD_MISALIGNED_START,
+  ERROR_PERIOD_MISALIGNED_END,
+} from '../../errors/errors';
 
 const incomingPeriods = {
   start_date: '2018-06-01T00:00:00.000Z',
@@ -29,9 +36,7 @@ test('should throw a misaligned date error', () => {
   } catch (error) {
     errorCatcher = error;
   }
-  expect(errorCatcher).toEqual(
-    errorObject(ERROR_PERIOD, 'periodValidation', 'Start dates are misaligned')
-  );
+  expect(errorCatcher).toEqual(errorObject(ERROR_PERIOD_MISALIGNED_START));
 });
 
 test('should throw a misaligned end date error', () => {
@@ -43,9 +48,7 @@ test('should throw a misaligned end date error', () => {
   } catch (error) {
     errorCatcher = error;
   }
-  expect(errorCatcher).toEqual(
-    errorObject(ERROR_PERIOD, 'periodValidation', 'End dates are misaligned')
-  );
+  expect(errorCatcher).toEqual(errorObject(ERROR_PERIOD_MISALIGNED_END));
 });
 
 test('should throw an error as rnr_list is not empty', () => {
@@ -57,13 +60,7 @@ test('should throw an error as rnr_list is not empty', () => {
   } catch (error) {
     errorCatcher = error;
   }
-  expect(errorCatcher).toEqual(
-    errorObject(
-      ERROR_PERIOD,
-      'periodValidation',
-      'There is already an unsubmitted requisition for this period'
-    )
-  );
+  expect(errorCatcher).toEqual(errorObject(ERROR_PERIOD_UNFINISHED));
 });
 
 test('should throw an error as there are no periods', () => {
@@ -75,9 +72,7 @@ test('should throw an error as there are no periods', () => {
   } catch (error) {
     errorCatcher = error;
   }
-  expect(errorCatcher).toEqual(
-    errorObject(ERROR_PERIOD, 'periodValidation', 'There are no periods created for this schedule')
-  );
+  expect(errorCatcher).toEqual(errorObject(ERROR_PERIOD_NONE));
 });
 
 test('should throw an error as input date is not a date', () => {
@@ -89,5 +84,5 @@ test('should throw an error as input date is not a date', () => {
   } catch (error) {
     errorCatcher = error;
   }
-  expect(errorCatcher).toEqual(errorObject(ERROR_PERIOD, 'periodValidation', 'Invalid input time'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_PERIOD_INVALID_INCOMING));
 });

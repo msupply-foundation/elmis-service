@@ -1,5 +1,6 @@
 import '@babel/polyfill';
-import { errorObject, ERROR_COOKIE } from '../../errors/errors';
+import { errorObject, ERROR_COOKIE, ERROR_LOGIN } from '../../errors/errors';
+import { throw401 } from './testingUtilities';
 
 beforeEach(() => {
   jest.resetModules();
@@ -43,4 +44,16 @@ test('should throw a cookie error as the set-cookie header is malformed', async 
     errorCatcher = error;
   }
   expect(errorCatcher).toEqual(errorObject(ERROR_COOKIE, 'login'));
+});
+
+test('should throw ', async () => {
+  jest.doMock('axios', () => jest.fn(throw401));
+  let errorCatcher;
+  try {
+    const { login } = require('../../requests');
+    await login({});
+  } catch (error) {
+    errorCatcher = error;
+  }
+  expect(errorCatcher).toEqual(errorObject(ERROR_LOGIN, 'login'));
 });

@@ -1,5 +1,5 @@
 import { programValidation } from '../../validation';
-import { ERROR_VALIDATION, errorObject } from '../../errors/errors';
+import { errorObject, ERROR_MATCH_PROGRAM } from '../../errors/errors';
 
 // TODO: Potentially make a file for 'Test data' for
 // testing objects etc.
@@ -30,7 +30,7 @@ test('should throw on unmatched code', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(errorObject(ERROR_VALIDATION, 'programValidation', 'program'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_MATCH_PROGRAM));
 });
 
 test('should throw on empty array', () => {
@@ -43,5 +43,5 @@ test('should throw on empty array', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(errorObject(ERROR_VALIDATION, 'programValidation', 'program'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_MATCH_PROGRAM));
 });
