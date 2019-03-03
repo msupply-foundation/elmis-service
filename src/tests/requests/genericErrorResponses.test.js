@@ -7,7 +7,7 @@ import {
   ERROR_NETWORK,
   ERROR_FACILITIES_SERVER,
 } from '../../errors/errors';
-import { throw401, throw500, throwRequestError, throwUnpredictedStatus } from './testingUtilities';
+import { throw401, throw500, throwRequestError, throwUnpredictedStatus } from '../testingUtilities';
 
 beforeEach(() => {
   jest.resetModules();
