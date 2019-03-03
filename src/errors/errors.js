@@ -7,6 +7,9 @@
  * occured.
  */
 
+export const ERROR_RUNTIME = errorMessage =>
+  `Error: Unexpected runtime error occurred. ${errorMessage}`;
+
 export const ERROR_FACILITIES_SERVER = () =>
   `Error: During facilities, Status code 500 in response. Potentially incorrect program ID`;
 export const ERROR_INCORRECT_URL = method => `Error: During ${method}, incorrect base URL`;
@@ -38,8 +41,6 @@ export const ERROR_PERIOD_INVALID_OUTGOING = () => `Error: Invalid outgoing peri
 export const ERROR_PERIOD_MISALIGNED_START = () => `Error: Starting period dates are misaligned`;
 export const ERROR_PERIOD_MISALIGNED_END = () => `Error: Ending period dates are misaligned`;
 
-export const ERROR_MERGE = (method, additional) =>
-  `${method} Error: Merging failed due to ${additional}`;
 export const ERROR_MERGE_PARAMS = direction => `Error: ${direction} parameters are invalid `;
 export const ERROR_MERGE_UNMATCHED_ITEM = itemCode => `Error: Item Code ${itemCode} has no match`;
 export const ERROR_MERGE_MATCH_SKIPPED_ITEM = (incomingCode, outgoingCode) =>
@@ -54,10 +55,9 @@ export const ERROR_MERGE_LEFTOVER = outgoingCode =>
  * TODO: Specific error code constants.
  * @param {string} message Description of the error
  */
-export function errorObject(ERROR_CODE, method, block) {
+export function errorObject(ERROR_CODE, paramOne, paramTwo) {
   return {
-    success: 'false',
-    message: ERROR_CODE(method, block),
     code: ERROR_CODE.name,
+    message: ERROR_CODE(paramOne, paramTwo),
   };
 }

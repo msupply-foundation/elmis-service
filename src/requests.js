@@ -1,7 +1,6 @@
 import axios from 'axios';
 import ApiConfigs from './api/ApiConfigs';
 import { getErrorObject } from './errors/errorLookupTable';
-
 /**
  * Method which will return a valid authentication cookie for eSigl.
  * Returned with the name=value pair JSESSIONID=XXXX.
@@ -20,11 +19,10 @@ import { getErrorObject } from './errors/errorLookupTable';
 export async function login({ username, password, baseURL }) {
   const config = ApiConfigs.getLoginConfig({ username, password, baseURL });
   try {
-    const data = await axios(config);
-    const { headers } = data;
+    const { headers } = await axios(config);
     return { cookie: headers['set-cookie'][0].split(';')[0] };
   } catch (error) {
-    throw getErrorObject(error, 'login');
+    throw getErrorObject(error, `login`);
   }
 }
 
@@ -210,7 +208,7 @@ export async function requisitionToOrder({ baseURL, cookie, requisitionId }) {
 export async function createRequisition({
   baseURL,
   cookie,
-  emergency,
+  emergency = false,
   periodId,
   facilityId,
   programId,
