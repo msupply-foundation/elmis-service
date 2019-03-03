@@ -1,4 +1,4 @@
-import { errorObject, ERROR_VALIDATION } from '../../errors/errors';
+import { errorObject, ERROR_MATCH_FACILITIES } from '../../errors/errors';
 import { facilitiesValidation } from '../../validation';
 
 // TODO: Potentially make a file for 'Test data' for
@@ -52,7 +52,7 @@ test('should throw on code missing', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(errorObject(ERROR_VALIDATION, 'facilitiesValidation', 'facility'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_MATCH_FACILITIES));
 });
 
 test('should throw on non array or empty object', () => {
@@ -64,5 +64,5 @@ test('should throw on non array or empty object', () => {
   } catch (e) {
     errorCatcher = e;
   }
-  expect(errorCatcher).toEqual(errorObject(ERROR_VALIDATION, 'facilitiesValidation', 'facility'));
+  expect(errorCatcher).toEqual(errorObject(ERROR_MATCH_FACILITIES));
 });

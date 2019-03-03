@@ -1,6 +1,12 @@
 import '@babel/polyfill';
 import requisitionMerge from '../../requisitionMerge';
-import { ERROR_MERGE, errorObject } from '../../errors/errors';
+import {
+  errorObject,
+  ERROR_MERGE_PARAMS,
+  ERROR_MERGE_MATCH_SKIPPED_ITEM,
+  ERROR_MERGE_LEFTOVER,
+  ERROR_MERGE_UNMATCHED_ITEM,
+} from '../../errors/errors';
 
 beforeEach(() => {
   jest.resetModules();
@@ -120,13 +126,7 @@ test('should return an ERROR_MERGE, due to having ', () => {
     errorCatcher = error;
   }
 
-  expect(errorCatcher).toEqual(
-    errorObject(
-      ERROR_MERGE,
-      'requisitionItemsMerge',
-      `No match for requisition item ${newReq.item.code}`
-    )
-  );
+  expect(errorCatcher).toEqual(errorObject(ERROR_MERGE_UNMATCHED_ITEM, newReq.item.code));
 });
 
 test('should return an ERROR_MERGE, due to having not enough requisition line items', () => {
@@ -141,13 +141,7 @@ test('should return an ERROR_MERGE, due to having not enough requisition line it
   }
 
   expect(errorCatcher).toEqual(
-    errorObject(
-      ERROR_MERGE,
-      'requisitionItemsMerge',
-      `Unmatched, non-skippable full supply line item ${
-        outgoingRequisition.fullSupplyLineItems[1].productCode
-      }`
-    )
+    errorObject(ERROR_MERGE_LEFTOVER, outgoingRequisition.fullSupplyLineItems[1].productCode)
   );
 });
 
@@ -161,9 +155,7 @@ test('should return an ERROR_MERGE, due to have no requisition items', () => {
     errorCatcher = error;
   }
 
-  expect(errorCatcher).toEqual(
-    errorObject(ERROR_MERGE, 'requisitionMerge', 'No requisition Line items')
-  );
+  expect(errorCatcher).toEqual(errorObject(ERROR_MERGE_PARAMS, 'incoming'));
 });
 
 test('should return an ERROR_MERGE, due to having no full supply line items', () => {
@@ -176,9 +168,7 @@ test('should return an ERROR_MERGE, due to having no full supply line items', ()
     errorCatcher = error;
   }
 
-  expect(errorCatcher).toEqual(
-    errorObject(ERROR_MERGE, 'requisitionMerge', 'No fully supply line items')
-  );
+  expect(errorCatcher).toEqual(errorObject(ERROR_MERGE_PARAMS, 'outgoing'));
 });
 
 test('should return an ERROR_MERGE, due to having no full supply line items', () => {
@@ -194,14 +184,11 @@ test('should return an ERROR_MERGE, due to having no full supply line items', ()
   } catch (error) {
     errorCatcher = error;
   }
-
   expect(errorCatcher).toEqual(
     errorObject(
-      ERROR_MERGE,
-      'requisitionItemsMerge',
-      `Requisition line item ${
-        incomingRequisition.requisitionLines[0].item.code
-      } matches a skipped full supply line item ${firstItem.productCode}`
+      ERROR_MERGE_MATCH_SKIPPED_ITEM,
+      incomingRequisition.requisitionLines[0].item.code,
+      firstItem.productCode
     )
   );
 });
