@@ -73,7 +73,7 @@ export async function integrate(inputParameters) {
   } catch (error) {
     // This is not an errorObject which was deliberately thrown,
     if (!error.code) {
-      error = errorObject(ERROR_RUNTIME, error.code, error.message);
+      error = errorObject(ERROR_RUNTIME, error.message);
     }
 
     if (requisitionHasBeenCreated) {

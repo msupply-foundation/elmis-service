@@ -7,8 +7,8 @@
  * occured.
  */
 
-export const ERROR_RUNTIME = (errorCode, errorMessage) =>
-  `Error: Unexpected runtime error ${errorCode} occurred. ${errorMessage}`;
+export const ERROR_RUNTIME = errorMessage =>
+  `Error: Unexpected runtime error occurred. ${errorMessage}`;
 
 export const ERROR_FACILITIES_SERVER = () =>
   `Error: During facilities, Status code 500 in response. Potentially incorrect program ID`;
