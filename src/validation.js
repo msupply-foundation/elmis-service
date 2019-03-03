@@ -148,5 +148,5 @@ export function periodValidation({ start_date, end_date }, outgoingPeriods) {
 
   if (!endDatesEven) throw errorObject(ERROR_PERIOD_MISALIGNED_END);
 
-  return startDatesEven && endDatesEven;
+  return period.id;
 }
