@@ -7,106 +7,26 @@ import {
   ERROR_MERGE_LEFTOVER,
   ERROR_MERGE_UNMATCHED_ITEM,
 } from '../../errors/errors';
+import {
+  incomingRequisitionTestObject,
+  outgoingRequisitionTestObject,
+  mergedRequisitionTestObject,
+} from '../testData';
 
 beforeEach(() => {
   jest.resetModules();
   jest.dontMock('axios');
 });
 
-const outgoingRequisition = {
-  fullSupplyLineItems: [
-    {
-      id: 1,
-      productCode: 'AAA',
-      stockInHand: 1,
-      quantityReceived: 1,
-      quantityDispensed: 1,
-      totalLossesAndAdjustments: 1,
-      beginningBalance: 3,
-      anAdditionalField: 1,
-      skipped: false,
-    },
-    {
-      id: 2,
-      productCode: 'BBB',
-      stockInHand: 1,
-      quantityReceived: 1,
-      quantityDispensed: 1,
-      totalLossesAndAdjustments: 1,
-      beginningBalance: 3,
-      anAdditionalField: 1,
-      skipped: false,
-    },
-  ],
-};
-
-const incomingRequisition = {
-  requisitionLines: [
-    {
-      ID: 3,
-      extraFieldOne: 1,
-      extraFieldTwo: 1,
-      Cust_stock_received: 3,
-      actualQuan: 3,
-      Cust_loss_adjust: 3,
-      Cust_stock_order: 3,
-      item: {
-        code: 'AAA',
-      },
-    },
-    {
-      ID: 4,
-      extraFieldOne: 1,
-      extraFieldTwo: 1,
-      Cust_stock_received: 3,
-      actualQuan: 3,
-      Cust_loss_adjust: 3,
-      Cust_stock_order: 3,
-      item: {
-        code: 'BBB',
-      },
-    },
-  ],
-};
-
-const mergedRequisition = {
-  fullSupplyLineItems: [
-    {
-      id: 1,
-      productCode: 'AAA',
-      stockInHand: 6,
-      quantityReceived: 3,
-      quantityDispensed: 3,
-      totalLossesAndAdjustments: 3,
-      beginningBalance: 3,
-      anAdditionalField: 1,
-      skipped: false,
-      quantityRequested: 3,
-      reasonForRequestedQuantity: 'a',
-    },
-    {
-      id: 2,
-      productCode: 'BBB',
-      stockInHand: 6,
-      quantityReceived: 3,
-      quantityDispensed: 3,
-      totalLossesAndAdjustments: 3,
-      beginningBalance: 3,
-      anAdditionalField: 1,
-      skipped: false,
-      quantityRequested: 3,
-      reasonForRequestedQuantity: 'a',
-    },
-  ],
-};
-
 test('should return a new object', () => {
-  expect(requisitionMerge(incomingRequisition, outgoingRequisition)).toEqual(mergedRequisition);
+  expect(requisitionMerge(incomingRequisitionTestObject, outgoingRequisitionTestObject)).toEqual(
+    mergedRequisitionTestObject
+  );
 });
 
 test('should return an ERROR_MERGE, due to having ', () => {
   let errorCatcher;
-  const requisitionLines = [...incomingRequisition.requisitionLines];
+  const requisitionLines = [...incomingRequisitionTestObject.requisitionLines];
   const newReq = {
     ID: 4,
     extraFieldOne: 1,
@@ -119,9 +39,9 @@ test('should return an ERROR_MERGE, due to having ', () => {
     },
   };
   requisitionLines.push(newReq);
-  const testingRequisition = { ...incomingRequisition, requisitionLines };
+  const testingRequisition = { ...incomingRequisitionTestObject, requisitionLines };
   try {
-    requisitionMerge(testingRequisition, outgoingRequisition);
+    requisitionMerge(testingRequisition, outgoingRequisitionTestObject);
   } catch (error) {
     errorCatcher = error;
   }
@@ -131,26 +51,29 @@ test('should return an ERROR_MERGE, due to having ', () => {
 
 test('should return an ERROR_MERGE, due to having not enough requisition line items', () => {
   let errorCatcher;
-  const requisitionLines = [...incomingRequisition.requisitionLines];
+  const requisitionLines = [...incomingRequisitionTestObject.requisitionLines];
   requisitionLines.pop();
-  const testingRequisition = { ...incomingRequisition, requisitionLines };
+  const testingRequisition = { ...incomingRequisitionTestObject, requisitionLines };
   try {
-    requisitionMerge(testingRequisition, outgoingRequisition);
+    requisitionMerge(testingRequisition, outgoingRequisitionTestObject);
   } catch (error) {
     errorCatcher = error;
   }
 
   expect(errorCatcher).toEqual(
-    errorObject(ERROR_MERGE_LEFTOVER, outgoingRequisition.fullSupplyLineItems[1].productCode)
+    errorObject(
+      ERROR_MERGE_LEFTOVER,
+      outgoingRequisitionTestObject.fullSupplyLineItems[1].productCode
+    )
   );
 });
 
 test('should return an ERROR_MERGE, due to have no requisition items', () => {
   let errorCatcher;
   const requisitionLines = [];
-  const testingRequisition = { ...incomingRequisition, requisitionLines };
+  const testingRequisition = { ...incomingRequisitionTestObject, requisitionLines };
   try {
-    requisitionMerge(testingRequisition, outgoingRequisition);
+    requisitionMerge(testingRequisition, outgoingRequisitionTestObject);
   } catch (error) {
     errorCatcher = error;
   }
@@ -161,9 +84,9 @@ test('should return an ERROR_MERGE, due to have no requisition items', () => {
 test('should return an ERROR_MERGE, due to having no full supply line items', () => {
   let errorCatcher;
   const fullSupplyLineItems = [];
-  const testingRequisition = { ...outgoingRequisition, fullSupplyLineItems };
+  const testingRequisition = { ...outgoingRequisitionTestObject, fullSupplyLineItems };
   try {
-    requisitionMerge(incomingRequisition, testingRequisition);
+    requisitionMerge(incomingRequisitionTestObject, testingRequisition);
   } catch (error) {
     errorCatcher = error;
   }
@@ -173,21 +96,21 @@ test('should return an ERROR_MERGE, due to having no full supply line items', ()
 
 test('should return an ERROR_MERGE, due to having no full supply line items', () => {
   let errorCatcher;
-  const testingRequisition = { ...outgoingRequisition };
+  const testingRequisition = { ...outgoingRequisitionTestObject };
   const fullSupplyLineItems = [...testingRequisition.fullSupplyLineItems];
   const [firstItem] = fullSupplyLineItems;
   firstItem.skipped = true;
 
   fullSupplyLineItems[0] = firstItem;
   try {
-    requisitionMerge(incomingRequisition, { ...testingRequisition, fullSupplyLineItems });
+    requisitionMerge(incomingRequisitionTestObject, { ...testingRequisition, fullSupplyLineItems });
   } catch (error) {
     errorCatcher = error;
   }
   expect(errorCatcher).toEqual(
     errorObject(
       ERROR_MERGE_MATCH_SKIPPED_ITEM,
-      incomingRequisition.requisitionLines[0].item.code,
+      incomingRequisitionTestObject.requisitionLines[0].item.code,
       firstItem.productCode
     )
   );

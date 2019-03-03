@@ -1,54 +1,17 @@
 import { errorObject, ERROR_MATCH_FACILITIES } from '../../errors/errors';
 import { facilitiesValidation } from '../../validation';
+import { facilitiesValidationTestObject } from '../testData';
 
-// TODO: Potentially make a file for 'Test data' for
-// testing objects etc.
 test('should return four', () => {
-  const testingObject = [
-    {
-      id: 1,
-      code: 'C10',
-    },
-    {
-      id: 2,
-      code: 'C11',
-    },
-    {
-      id: 3,
-      code: 'C12',
-    },
-    {
-      id: 4,
-      code: 'C13',
-    },
-  ];
   const testingCode = 'C13';
-  expect(facilitiesValidation(testingCode, testingObject)).toBe(4);
+  expect(facilitiesValidation(testingCode, facilitiesValidationTestObject)).toBe(4);
 });
 
 test('should throw on code missing', () => {
-  const testingObject = [
-    {
-      id: 1,
-      code: 'C10',
-    },
-    {
-      id: 2,
-      code: 'C11',
-    },
-    {
-      id: 3,
-      code: 'C12',
-    },
-    {
-      id: 4,
-      code: 'C13',
-    },
-  ];
   const testingCode = 'C14';
   let errorCatcher;
   try {
-    facilitiesValidation(testingCode, testingObject);
+    facilitiesValidation(testingCode, facilitiesValidationTestObject);
   } catch (e) {
     errorCatcher = e;
   }
