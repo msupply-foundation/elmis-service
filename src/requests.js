@@ -81,7 +81,7 @@ export async function facilities({ baseURL, cookie, programId }) {
  *
  * @return {Array}  Array of period objects.
  */
-export async function periods({ baseURL, cookie, emergency, facilityId, programId }) {
+export async function periods({ baseURL, cookie, emergency = false, facilityId, programId }) {
   const config = ApiConfigs.getPeriodsConfig({
     baseURL,
     cookie,

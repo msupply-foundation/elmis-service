@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import {
   integrationValidation,
   programValidation,
@@ -20,61 +21,51 @@ import {
 
 import requisitionMerge from './requisitionMerge';
 
-// eslint-disable-next-line import/prefer-default-export
+async function processRequisition(parameterObject) {
+  await updateRequisition(parameterObject);
+  await submitRequisition(parameterObject);
+  await authorizeRequisition(parameterObject);
+  await approveRequisition(parameterObject);
+  await requisitionToOrder(parameterObject);
+}
+
+async function createParameterObject({ options, requisition }) {
+  const parameterObject = {
+    ...options,
+    ...(await login(options)),
+  };
+  parameterObject.programId = programValidation(
+    requisition.program.programSettings.code,
+    await programs(parameterObject)
+  );
+  parameterObject.facilityId = facilitiesValidation(
+    requisition.store.code,
+    await facilities(parameterObject)
+  );
+  parameterObject.periodId = periodValidation(requisition.period, await periods(parameterObject));
+
+  return parameterObject;
+}
+
 export async function integrate(inputParameters) {
   let requisitionHasBeenCreated = false;
-
+  let parameterObject;
   try {
-    // Validate the parameters
     integrationValidation(inputParameters);
-    const { options, requisition } = inputParameters;
-
-    // Get a session cookie, assign to options
-    const { cookie } = await login(options);
-    options.cookie = cookie;
-    options.emergency = false;
-
-    // Get the eSIGL programs list assosciated to the session,
-    // find the matching ID and add to options.
-    const { code: programCode } = requisition.program.programSettings;
-    const { programs: programsList } = await programs(options);
-    options.programId = programValidation(programCode, programsList);
-
-    // get eSIGL Facilities assosciated with the program and user, find the matching ID
-    const { code: storeCode } = requisition.store;
-    const { facilities: facilitiesList } = await facilities(options);
-    options.facilityId = facilitiesValidation(storeCode, facilitiesList);
-
-    // get eSIGL Periods, validate and find the correct matching ID.
-    const { period: incomingPeriods } = requisition;
-    const { periods: outgoingPeriods } = await periods(options);
-    periodValidation(incomingPeriods, outgoingPeriods);
-    const { periods: periodsList } = outgoingPeriods;
-    const [firstPeriod] = periodsList;
-    const { id: periodId } = firstPeriod;
-    options.periodId = periodId;
-
-    // Create a requisition, save the id to options
-    const { requisition: outgoingRequisition } = await createRequisition(options);
-    options.requisitionId = outgoingRequisition.id;
-
-    // Set flag for a created requisition in the eSigl system to true.
+    const { requisition } = inputParameters;
+    parameterObject = createParameterObject(inputParameters);
+    const { requisition: outgoingRequisition } = await createRequisition(parameterObject);
+    parameterObject.requisitionId = outgoingRequisition.id;
     requisitionHasBeenCreated = true;
-
-    // Merge the two requisitions, save the merged requisition in options.
-    const merge = await requisitionMerge(requisition, outgoingRequisition);
-    options.requisition = merge;
-
-    // Process the requisition into an order
-    await updateRequisition(options);
-    await submitRequisition(options);
-    await authorizeRequisition(options);
-    await approveRequisition(options);
-    await requisitionToOrder(options);
-    return { success: true, result: { requisitionId: options.requisitionId } };
+    parameterObject = {
+      ...parameterObject,
+      requisition: await requisitionMerge(requisition, outgoingRequisition),
+    };
+    processRequisition(parameterObject);
+    return { requisitionId: parameterObject.requisitionId };
   } catch (error) {
     if (requisitionHasBeenCreated) {
-      await deleteRequisition(inputParameters.options);
+      await deleteRequisition(parameterObject);
     }
     return error;
   }
