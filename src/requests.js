@@ -1,17 +1,6 @@
 import axios from 'axios';
 import ApiConfigs from './api/ApiConfigs';
-import {
-  errorObject,
-  ERROR_SERVER,
-  ERROR_UNKNOWN_RESPONSE,
-  ERROR_REQUEST,
-  ERROR_COOKIE,
-  ERROR_AUTHENTICATION,
-  ERROR_UNKNOWN,
-  ERROR_INCORRECT_URL,
-  ERROR_LOGIN,
-  ERROR_UNEXPECTED_RESPONSE,
-} from './errors/errors';
+import { getErrorObject } from './errors/errorLookupTable';
 
 /**
  * Method which will return a valid authentication cookie for eSigl.
@@ -20,12 +9,6 @@ import {
  * the login page HTML. The axios login config limits redirects to 0,
  * causing the response status 302, which has been set as a valid response
  * code.
- * Errors: Errors will be thrown within the try by either JS or Axios. An axios
- * error will have a response or request property (or both). If an error is
- * thrown with a response property, the request has returned from the server
- * but has an invalid status code. Without a response property, the request
- * has failed to reach the server. With neither, the request has not been set at all.
- *
  * @param  {Object} configParams
  * @param  {string} configParams.username - plain text username for eSIGL
  * @param  {string} configParams.password - plain text password for eSIGL
@@ -41,16 +24,7 @@ export async function login({ username, password, baseURL }) {
     const { headers } = data;
     return { cookie: headers['set-cookie'][0].split(';')[0] };
   } catch (error) {
-    const { response, request } = error;
-    if (response) {
-      const { status } = response;
-      if (status === 401) throw errorObject(ERROR_LOGIN, 'login');
-      if (status === 404) throw errorObject(ERROR_INCORRECT_URL, 'login');
-      if (status === 500) throw errorObject(ERROR_SERVER, 'login');
-      throw errorObject(ERROR_UNEXPECTED_RESPONSE, 'login', status);
-    }
-    if (request) throw errorObject(ERROR_REQUEST, 'login');
-    throw errorObject(ERROR_COOKIE, 'login');
+    throw getErrorObject(error, 'login');
   }
 }
 
@@ -69,15 +43,7 @@ export async function programs({ baseURL, cookie }) {
     const { programList } = data;
     return { programs: programList };
   } catch (error) {
-    const { response, request } = error;
-    if (response) {
-      const { status } = response;
-      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'programs');
-      if (status === 500) throw errorObject(ERROR_SERVER, 'programs');
-      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'programs', status);
-    }
-    if (request) throw errorObject(ERROR_REQUEST, 'programs');
-    throw errorObject(ERROR_UNKNOWN, 'programs');
+    throw getErrorObject(error, 'programs');
   }
 }
 
@@ -98,15 +64,7 @@ export async function facilities({ baseURL, cookie, programId }) {
     const { facilities: facilityList } = data;
     return { facilities: facilityList };
   } catch (error) {
-    const { response, request } = error;
-    if (response) {
-      const { status } = response;
-      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'facilities');
-      if (status === 500) throw errorObject(ERROR_SERVER, 'facilities');
-      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'facilities', status);
-    }
-    if (request) throw errorObject(ERROR_REQUEST, 'facilities');
-    throw errorObject(ERROR_UNKNOWN, 'facilities');
+    throw getErrorObject(error, 'facilities');
   }
 }
 
@@ -135,15 +93,7 @@ export async function periods({ baseURL, cookie, emergency, facilityId, programI
     const { data } = await axios(config);
     return { periods: data };
   } catch (error) {
-    const { response, request } = error;
-    if (response) {
-      const { status } = response;
-      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'periods');
-      if (status === 500) throw errorObject(ERROR_SERVER, 'periods');
-      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'periods', status);
-    }
-    if (request) throw errorObject(ERROR_REQUEST, 'periods');
-    throw errorObject(ERROR_UNKNOWN, 'periods');
+    throw getErrorObject(error, 'periods');
   }
 }
 
@@ -169,15 +119,7 @@ export async function authorizeRequisition({ baseURL, cookie, requisitionId }) {
     const { success } = data;
     return { success: success === 'R&R authorized successfully!' };
   } catch (error) {
-    const { response, request } = error;
-    if (response) {
-      const { status } = response;
-      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'authorizeRequisition');
-      if (status === 500) throw errorObject(ERROR_SERVER, 'authorizeRequisition');
-      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'authorizeRequisition', status);
-    }
-    if (request) throw errorObject(ERROR_REQUEST, 'authorizeRequisition');
-    throw errorObject(ERROR_UNKNOWN, 'authorizeRequisition');
+    throw getErrorObject(error, 'authorizeRequisition');
   }
 }
 
@@ -203,15 +145,7 @@ export async function approveRequisition({ baseURL, cookie, requisitionId }) {
     const { success } = data;
     return { success: success === 'R&R approved successfully!' };
   } catch (error) {
-    const { response, request } = error;
-    if (response) {
-      const { status } = response;
-      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'approveRequisition');
-      if (status === 500) throw errorObject(ERROR_SERVER, 'approveRequisition');
-      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'approveRequisition', status);
-    }
-    if (request) throw errorObject(ERROR_REQUEST, 'approveRequisition');
-    throw errorObject(ERROR_UNKNOWN, 'approveRequisition');
+    throw getErrorObject(error, 'approveRequisition');
   }
 }
 
@@ -235,15 +169,7 @@ export async function submitRequisition({ baseURL, cookie, requisitionId }) {
     const { success } = data;
     return { success: success === 'R&R submitted successfully!' };
   } catch (error) {
-    const { response, request } = error;
-    if (response) {
-      const { status } = response;
-      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'submitRequisition');
-      if (status === 500) throw errorObject(ERROR_SERVER, 'submitRequisition');
-      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'submitRequisition', status);
-    }
-    if (request) throw errorObject(ERROR_REQUEST, 'submitRequisition');
-    throw errorObject(ERROR_UNKNOWN, 'submitRequisition');
+    throw getErrorObject(error, 'submitRequisition');
   }
 }
 
@@ -266,15 +192,7 @@ export async function requisitionToOrder({ baseURL, cookie, requisitionId }) {
     const { status } = await axios(config);
     return { success: status === 201 };
   } catch (error) {
-    const { response, request } = error;
-    if (response) {
-      const { status } = response;
-      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'requisitionToOrder');
-      if (status === 500) throw errorObject(ERROR_SERVER, 'requisitionToOrder');
-      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'requisitionToOrder', status);
-    }
-    if (request) throw errorObject(ERROR_REQUEST, 'requisitionToOrder');
-    throw errorObject(ERROR_UNKNOWN, 'requisitionToOrder');
+    throw getErrorObject(error, 'requisitionToOrder');
   }
 }
 
@@ -310,20 +228,11 @@ export async function createRequisition({
     const { rnr } = data;
     return { requisition: { ...rnr } };
   } catch (error) {
-    const { response, request } = error;
-    if (response) {
-      const { status } = response;
-      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'createRequisition');
-      if (status === 500) throw errorObject(ERROR_SERVER, 'createRequisition');
-      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'createRequisition', status);
-    }
-    if (request) throw errorObject(ERROR_REQUEST, 'createRequisition');
-    throw errorObject(ERROR_UNKNOWN, 'createRequisition');
+    throw getErrorObject(error, 'createRequisition');
   }
 }
 
 /**
- *
  * @param  {Object}    configParams
  * @param  {string}    configParams.baseURL       - baseURL for eSIGL
  * @param  {string}    configParams.cookie        - valid cookie string for eSIGL server
@@ -337,20 +246,11 @@ export async function updateRequisition({ baseURL, cookie, requisition }) {
     const { success } = data;
     return { success: success === 'R&R saved successfully!' };
   } catch (error) {
-    const { response, request } = error;
-    if (response) {
-      const { status } = response;
-      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'updateRequisition');
-      if (status === 500) throw errorObject(ERROR_SERVER, 'updateRequisition');
-      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'updateRequisition', status);
-    }
-    if (request) throw errorObject(ERROR_REQUEST, 'updateRequisition');
-    throw errorObject(ERROR_UNKNOWN, 'updateRequisition');
+    throw getErrorObject(error, 'updateRequisition');
   }
 }
 
 /**
- *
  * @param  {Object} configParams
  * @param  {string} configParams.baseURL         - baseURL for eSIGL
  * @param  {string} configParams.cookie          - valid cookie string for eSIGL server
@@ -363,14 +263,6 @@ export async function deleteRequisition({ baseURL, cookie, requisitionId }) {
     const { status } = await axios(config);
     return { success: status === 200 };
   } catch (error) {
-    const { response, request } = error;
-    if (response) {
-      const { status } = response;
-      if (status === 401) throw errorObject(ERROR_AUTHENTICATION, 'deleteRequisition');
-      if (status === 500) throw errorObject(ERROR_SERVER, 'deleteRequisition');
-      throw errorObject(ERROR_UNKNOWN_RESPONSE, 'deleteRequisition', status);
-    }
-    if (request) throw errorObject(ERROR_REQUEST, 'deleteRequisition');
-    throw errorObject(ERROR_UNKNOWN, 'deleteRequisition');
+    throw getErrorObject(error, 'deleteRequisition');
   }
 }
