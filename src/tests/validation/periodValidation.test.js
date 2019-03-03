@@ -16,6 +16,7 @@ const incomingPeriods = {
 const outgoingPeriods = {
   periods: [
     {
+      id: 1,
       startDate: 1527811200000,
       endDate: 1530403199000,
     },
@@ -24,7 +25,7 @@ const outgoingPeriods = {
 };
 
 test('should return true', () => {
-  expect(periodValidation(incomingPeriods, outgoingPeriods)).toBe(true);
+  expect(periodValidation(incomingPeriods, outgoingPeriods)).toBe(1);
 });
 
 test('should throw a misaligned date error', () => {
