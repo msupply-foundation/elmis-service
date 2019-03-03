@@ -1,32 +1,18 @@
 import { programValidation } from '../../validation';
 import { errorObject, ERROR_MATCH_PROGRAM } from '../../errors/errors';
-
-// TODO: Potentially make a file for 'Test data' for
-// testing objects etc.
+import { programTestObject } from '../testData';
 
 test('should return id when code matches', () => {
-  const testingObject = [
-    { id: 1, code: 'a' },
-    { id: 2, code: 'b' },
-    { id: 3, code: 'c' },
-    { id: 10, code: 'd' },
-  ];
   const testingCode = 'd';
-  expect(programValidation(testingCode, testingObject));
+  expect(programValidation(testingCode, programTestObject));
 });
 
 test('should throw on unmatched code', () => {
-  const testingObject = [
-    { id: 1, code: 'a' },
-    { id: 2, code: 'b' },
-    { id: 3, code: 'c' },
-    { id: 10, code: 'd' },
-  ];
   const testingCode = 'e';
 
   let errorCatcher;
   try {
-    programValidation(testingCode, testingObject);
+    programValidation(testingCode, programTestObject);
   } catch (e) {
     errorCatcher = e;
   }

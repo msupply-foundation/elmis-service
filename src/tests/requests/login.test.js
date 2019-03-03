@@ -1,6 +1,6 @@
 import '@babel/polyfill';
 import { errorObject, ERROR_COOKIE, ERROR_LOGIN } from '../../errors/errors';
-import { throw401 } from './testingUtilities';
+import { throw401 } from '../testingUtilities';
 
 beforeEach(() => {
   jest.resetModules();
