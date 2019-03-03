@@ -10,6 +10,7 @@ export default class ApiConfigs {
     httpsAgent: new https.Agent({
       rejectUnauthorized: false,
     }),
+    maxRedirects: 0,
   };
 
   static getLoginConfig = ({ username, password, baseURL = 'https://83.96.240.209' }) => ({
@@ -20,7 +21,6 @@ export default class ApiConfigs {
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     data: qs.stringify({ j_username: username, j_password: password }),
     validateStatus: status => (status >= 200 && status < 300) || status === 302,
-    maxRedirects: 0,
   });
 
   static getProgramsConfig = ({ baseURL, cookie }) => ({
@@ -100,7 +100,7 @@ export default class ApiConfigs {
     headers: { Cookie: cookie },
   });
 
-  // TODO: Default requisition value and || used for testing purposes
+  // Default requisition value and || used for testing purposes
   static getUpdateConfig = ({ baseURL, cookie, requisition = { id: 1 } }) => {
     const { id } = requisition;
     return {
