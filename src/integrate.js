@@ -1,3 +1,4 @@
+/* eslint-disable no-ex-assign */
 /* eslint-disable import/prefer-default-export */
 import {
   integrationValidation,
@@ -20,6 +21,7 @@ import {
 } from './requests';
 
 import requisitionMerge from './requisitionMerge';
+import { errorObject, ERROR_RUNTIME } from './errors/errors';
 
 async function processRequisition(parameterObject) {
   await updateRequisition(parameterObject);
@@ -34,15 +36,20 @@ async function createParameterObject({ options, requisition }) {
     ...options,
     ...(await login(options)),
   };
+
   parameterObject.programId = programValidation(
     requisition.program.programSettings.code,
-    await programs(parameterObject)
+    (await programs(parameterObject)).programs
   );
+
   parameterObject.facilityId = facilitiesValidation(
     requisition.store.code,
-    await facilities(parameterObject)
+    (await facilities(parameterObject)).facilities
   );
-  parameterObject.periodId = periodValidation(requisition.period, await periods(parameterObject));
+  parameterObject.periodId = periodValidation(
+    requisition.period,
+    (await periods(parameterObject)).periods
+  );
 
   return parameterObject;
 }
@@ -53,7 +60,7 @@ export async function integrate(inputParameters) {
   try {
     integrationValidation(inputParameters);
     const { requisition } = inputParameters;
-    parameterObject = createParameterObject(inputParameters);
+    parameterObject = await createParameterObject(inputParameters);
     const { requisition: outgoingRequisition } = await createRequisition(parameterObject);
     parameterObject.requisitionId = outgoingRequisition.id;
     requisitionHasBeenCreated = true;
@@ -61,12 +68,23 @@ export async function integrate(inputParameters) {
       ...parameterObject,
       requisition: await requisitionMerge(requisition, outgoingRequisition),
     };
-    processRequisition(parameterObject);
+    await processRequisition(parameterObject);
     return { requisitionId: parameterObject.requisitionId };
   } catch (error) {
-    if (requisitionHasBeenCreated) {
-      await deleteRequisition(parameterObject);
+    // This is not an errorObject which was deliberately thrown,
+    if (!error.code) {
+      error = errorObject(ERROR_RUNTIME, error.code, error.message);
     }
-    return error;
+
+    if (requisitionHasBeenCreated) {
+      try {
+        await deleteRequisition(parameterObject);
+        error.wasDeleted = true;
+      } catch (deleteError) {
+        error.wasDeleted = false;
+      }
+    }
+
+    throw error;
   }
 }
