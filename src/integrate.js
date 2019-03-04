@@ -38,7 +38,7 @@ async function createParameterObject({ options, requisition }) {
   };
 
   parameterObject.programId = programValidation(
-    requisition.program.programSettings.code,
+    requisition.program.programSettings.elmisCode,
     (await programs(parameterObject)).programs
   );
 
