@@ -1,0 +1,15 @@
+{
+  "parser": "babel-eslint",
+  "extends": ["airbnb", "prettier"],
+  "rules": {
+    "max-len": ["error", { "code": 100 }],
+    "global-require": 0,
+    "no-throw-literal": "off"
+  },
+  "plugins": ["jest"],
+  "env": {
+    "browser": true,
+    "node": true,
+    "jest/globals": true
+  }
+}
