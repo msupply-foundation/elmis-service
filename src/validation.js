@@ -15,10 +15,6 @@ import {
   ERROR_PERIOD_MISALIGNED_END,
 } from './errors/errors';
 
-// TODO: Validation the incorrect term? Some methods also return IDs etc
-// TODO: Some methods can be made more generic, will keep as is for initial
-// development, but need to check this before merging into master.
-
 function isObject(objectToCheck) {
   if (typeof objectToCheck === 'object' && !Array.isArray(objectToCheck) && objectToCheck) {
     return true;
