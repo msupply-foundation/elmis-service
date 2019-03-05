@@ -66,8 +66,6 @@ export async function facilities({ baseURL, cookie, programId }) {
   }
 }
 
-// TODO: Doc string to document parameters for method while using a single variable
-// for the parameter and arguments for config? Could also extend to each request method.
 /**
  *
  * @param  {Object}  configParams
@@ -95,8 +93,6 @@ export async function periods({ baseURL, cookie, emergency = false, facilityId, 
   }
 }
 
-// TODO: Investigate error codes on trying to authorize a requisition which is not
-// able to be authorized.
 /**
  *
  * @param  {Object}  configParams
@@ -121,8 +117,6 @@ export async function authorizeRequisition({ baseURL, cookie, requisitionId }) {
   }
 }
 
-// TODO: Investigate error codes on trying to authorize a requisition which is not
-// able to be authorized.
 /**
  *
  * @param  {Object}  configParams
