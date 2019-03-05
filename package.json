@@ -33,8 +33,7 @@
     "url": "git+https://github.com/openmsupply/elmis-service.git"
   },
   "author": "Sussol",
-  "//": "No idea which license to use here, someone with license knowledge please amend",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/openmsupply/elmis-service/issues"
   },
