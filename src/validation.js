@@ -118,15 +118,13 @@ export function periodValidation({ start_date, end_date }, outgoingPeriods) {
   if (!periods.length) {
     throw errorObject(ERROR_PERIOD_NONE);
   }
-
   const [period] = periods;
   const { startDate, endDate } = period;
-  const incomingStartDate = new Date(start_date);
-  const incomingEndDate = new Date(end_date);
+  const incomingStartDate = new Date(start_date.split('T')[0]);
+  const incomingEndDate = new Date(end_date.split('T')[0]);
 
   const outgoingStartDate = new Date(startDate);
   const outgoingEndDate = new Date(endDate);
-
   if (Number.isNaN(incomingStartDate.getTime()) || Number.isNaN(incomingEndDate.getTime())) {
     throw errorObject(ERROR_PERIOD_INVALID_INCOMING);
   }
