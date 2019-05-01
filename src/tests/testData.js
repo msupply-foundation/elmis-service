@@ -18,8 +18,8 @@ export const facilitiesValidationTestObject = [
 ];
 
 export const incomingPeriodsTestObject = {
-  start_date: '2018-06-01T00:00:00.000Z',
-  end_date: '2018-06-30T00:00:00.000Z',
+  startDate: '2018-06-01T00:00:00.000Z',
+  endDate: '2018-06-30T00:00:00.000Z',
 };
 
 export const outgoingPeriodsTestObject = {

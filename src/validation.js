@@ -102,7 +102,10 @@ export function programValidation(programCode, programList) {
  * @param  {Object} outgoingPeriod - Period object from eSIGL.
  * @return {number} the ID of the period matched with the incoming date.
  */
-export function periodValidation({ start_date, end_date }, outgoingPeriods) {
+export function periodValidation(
+  { startDate: startDateString, endDate: endDateString },
+  outgoingPeriods
+) {
   const { rnr_list, periods } = outgoingPeriods;
 
   if (rnr_list) {
@@ -116,8 +119,8 @@ export function periodValidation({ start_date, end_date }, outgoingPeriods) {
   }
   const [period] = periods;
   const { startDate, endDate } = period;
-  const incomingStartDate = new Date(start_date.split('T')[0]);
-  const incomingEndDate = new Date(end_date.split('T')[0]);
+  const incomingStartDate = new Date(startDateString.split('T')[0]);
+  const incomingEndDate = new Date(endDateString.split('T')[0]);
 
   const outgoingStartDate = new Date(startDate);
   const outgoingEndDate = new Date(endDate);

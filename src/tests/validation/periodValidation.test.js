@@ -16,7 +16,7 @@ test('should return true', () => {
 test('should throw a misaligned date error', () => {
   const testingIncomingPeriods = { ...incomingPeriodsTestObject };
   let errorCatcher;
-  testingIncomingPeriods.start_date = '2018-06-10T00:00:00.000Z';
+  testingIncomingPeriods.startDate = '2018-06-10T00:00:00.000Z';
   try {
     periodValidation(testingIncomingPeriods, outgoingPeriodsTestObject);
   } catch (error) {
@@ -28,7 +28,7 @@ test('should throw a misaligned date error', () => {
 test('should throw a misaligned end date error', () => {
   const testingIncomingPeriods = { ...incomingPeriodsTestObject };
   let errorCatcher;
-  testingIncomingPeriods.end_date = '2018-07-01T00:00:00.000Z';
+  testingIncomingPeriods.endDate = '2018-07-01T00:00:00.000Z';
   try {
     periodValidation(testingIncomingPeriods, outgoingPeriodsTestObject);
   } catch (error) {
@@ -64,7 +64,7 @@ test('should throw an error as there are no periods', () => {
 test('should throw an error as input date is not a date', () => {
   const testingIncomingPeriods = { ...incomingPeriodsTestObject };
   let errorCatcher;
-  testingIncomingPeriods.end_date = '';
+  testingIncomingPeriods.endDate = '';
   try {
     periodValidation(testingIncomingPeriods, outgoingPeriodsTestObject);
   } catch (error) {
