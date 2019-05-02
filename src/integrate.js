@@ -66,10 +66,14 @@ export async function integrate(inputParameters) {
     requisitionHasBeenCreated = true;
     parameterObject = {
       ...parameterObject,
-      requisition: await requisitionMerge(requisition, outgoingRequisition),
+      ...(await requisitionMerge(requisition, outgoingRequisition)),
     };
     await processRequisition(parameterObject);
-    return { requisitionId: parameterObject.requisitionId };
+    return {
+      requisitionId: parameterObject.requisitionId,
+      unmatchedIncomingLines: parameterObject.unmatchedIncomingLines,
+      unmatchingOutgoingLines: parameterObject.unmatchingOutgoingLines,
+    };
   } catch (error) {
     // This is not an errorObject which was deliberately thrown,
     if (!error.code) {
