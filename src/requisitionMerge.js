@@ -1,12 +1,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable camelcase */
-import {
-  errorObject,
-  ERROR_MERGE_PARAMS,
-  ERROR_MERGE_UNMATCHED_ITEM,
-  ERROR_MERGE_MATCH_SKIPPED_ITEM,
-  ERROR_MERGE_LEFTOVER,
-} from './errors/errors';
+import { errorObject, ERROR_MERGE_PARAMS } from './errors/errors';
 
 /**
  * Functions which merge an incoming requisition (The requisition
@@ -40,6 +34,7 @@ const getMappedFields = incomingLine => {
   Object.entries(MERGE_FIELDS_MAPPING).forEach(([key, value]) => {
     updatedRequisition[key] = incomingLine[value];
   });
+
   return updatedRequisition;
 };
 
@@ -48,49 +43,60 @@ const findMatchedRequisition = ({ code: incomingItemCode }) => ({
 }) => outgoingItemCode === incomingItemCode;
 
 /**
- * Merges an array of requiisition lines (incoming requisiton lines)
- * with fully supply line items (outgoing requisition lines)
+ * Merges an array of requiisition lines (incoming requisiton lines - mSupply)
+ * with fully supply line items (outgoing requisition lines - eSIGL)
  *
- * @param  {Array}  incomingRequisitionLines    Requisition lines of the incoming requisition
- * @param  {Array}  outgoingRequisitionLines Fully supply line items of the outgoing requisition
+ * @param  {Array}  incomingRequisitionLines Requisition lines of the incoming requisition
+ * @param  {Array}  outgoingRequisitionLines Full supply line items of the outgoing requisition
  * @return {Array} The merged requisition lines.
  */
 function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLines) {
+  // Create clones to avoid side-effects from manipulation
   const incomingLines = [...incomingRequisitionLines];
   const outgoingLines = [...outgoingRequisitionLines];
-  const updatedLines = [];
 
+  // Return objects
+  const updatedLines = [];
+  const unmatchedIncomingLines = [];
+  const unmatchedOutgoingLines = [];
+
+  // Iterate through the incoming lines, finding matching outgoing lines to update.
+  // Lines with no match are returned for logging purposes.
   incomingLines.forEach(incomingLine => {
     const { item } = incomingLine;
     const matchedOutgoingLineIndex = outgoingLines.findIndex(findMatchedRequisition(item));
-    if (matchedOutgoingLineIndex < 0) throw errorObject(ERROR_MERGE_UNMATCHED_ITEM, item.code);
+    // If the incoming line has no matching outgoing line,
+    if (matchedOutgoingLineIndex < 0) {
+      unmatchedIncomingLines.push(incomingLine);
+      return;
+    }
 
     const { ...matchedOutgoingLine } = outgoingLines[matchedOutgoingLineIndex];
-    if (matchedOutgoingLine.skipped)
-      throw errorObject(ERROR_MERGE_MATCH_SKIPPED_ITEM, item.code, matchedOutgoingLine.productCode);
-
     const { actualQuan, Cust_stock_received, Cust_loss_adjust } = incomingLine;
     const { beginningBalance } = matchedOutgoingLine;
     const newStockInHand = beginningBalance - actualQuan + Cust_stock_received + Cust_loss_adjust;
     matchedOutgoingLine.stockInHand = newStockInHand;
     matchedOutgoingLine.reasonForRequestedQuantity = 'a';
-
     updatedLines.push({
       ...matchedOutgoingLine,
       ...getMappedFields(incomingLine),
     });
-
     outgoingLines.splice(matchedOutgoingLineIndex, 1);
   });
-
   if (outgoingLines.length) {
     outgoingLines.forEach(outgoingLine => {
+      const { previousStockInHand } = outgoingLine;
       if (!outgoingLine.skipped) {
-        throw errorObject(ERROR_MERGE_LEFTOVER, outgoingLine.productCode);
+        unmatchedOutgoingLines.push({ ...outgoingLine });
+        updatedLines.push({
+          ...outgoingLine,
+          stockInHand: previousStockInHand,
+          quantityRequested: 0,
+        });
       }
     });
   }
-  return updatedLines;
+  return { fullSupplyLineItems: updatedLines, unmatchedIncomingLines, unmatchedOutgoingLines };
 }
 /**
  * Function which will merge the appropriate values of the incoming requisition
@@ -113,8 +119,18 @@ export default function requisitionMerge(incomingRequisition, outgoingRequisitio
     });
   }
 
+  const {
+    unmatchedIncomingLines,
+    unmatchedOutgoingLines,
+    fullSupplyLineItems,
+  } = requisitionItemsMerge(incomingLines, outgoingLines);
+
   return {
-    ...outgoingRequisition,
-    fullSupplyLineItems: requisitionItemsMerge(incomingLines, outgoingLines),
+    requisition: {
+      ...outgoingRequisition,
+      fullSupplyLineItems,
+    },
+    unmatchedIncomingLines,
+    unmatchedOutgoingLines,
   };
 }
