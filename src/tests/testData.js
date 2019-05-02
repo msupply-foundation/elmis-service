@@ -52,6 +52,7 @@ export const outgoingRequisitionTestObject = {
       beginningBalance: 3,
       anAdditionalField: 1,
       skipped: false,
+      previousStockInHand: 10,
     },
     {
       id: 2,
@@ -63,6 +64,7 @@ export const outgoingRequisitionTestObject = {
       beginningBalance: 3,
       anAdditionalField: 1,
       skipped: false,
+      previousStockInHand: 10,
     },
   ],
 };
@@ -110,6 +112,7 @@ export const mergedRequisitionTestObject = {
       skipped: false,
       quantityRequested: 3,
       reasonForRequestedQuantity: 'a',
+      previousStockInHand: 10,
     },
     {
       id: 2,
@@ -123,6 +126,7 @@ export const mergedRequisitionTestObject = {
       skipped: false,
       quantityRequested: 3,
       reasonForRequestedQuantity: 'a',
+      previousStockInHand: 10,
     },
   ],
 };

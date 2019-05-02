@@ -13,12 +13,14 @@ beforeEach(() => {
 });
 
 test('should return a new object', () => {
-  expect(requisitionMerge(incomingRequisitionTestObject, outgoingRequisitionTestObject)).toEqual(
-    mergedRequisitionTestObject
-  );
+  expect(requisitionMerge(incomingRequisitionTestObject, outgoingRequisitionTestObject)).toEqual({
+    requisition: mergedRequisitionTestObject,
+    unmatchedIncomingLines: [],
+    unmatchedOutgoingLines: [],
+  });
 });
 
-test('should return an ERROR_MERGE, due to having ', () => {
+test('should return success, with 1 object in unmatchingIncomingLines ', () => {
   let result;
   const requisitionLines = [...incomingRequisitionTestObject.requisitionLines];
   const newRequisitionLine = {
@@ -34,12 +36,12 @@ test('should return an ERROR_MERGE, due to having ', () => {
   };
   const resultShouldEqual = {
     requisition: mergedRequisitionTestObject,
-    unmatchedIncomingLines: [newRequisitionLine],
+    unmatchedIncomingLines: [{ ...newRequisitionLine }],
     unmatchedOutgoingLines: [],
   };
 
-  requisitionLines.push(newRequisitionLine);
-  const testingRequisition = { ...incomingRequisitionTestObject, requisitionLines };
+  requisitionLines.push({ ...newRequisitionLine });
+  const testingRequisition = { requisitionLines };
   try {
     result = requisitionMerge(testingRequisition, outgoingRequisitionTestObject);
   } catch (error) {
@@ -48,11 +50,11 @@ test('should return an ERROR_MERGE, due to having ', () => {
   expect(result).toEqual(resultShouldEqual);
 });
 
-test('should return an ERROR_MERGE, due to having ', () => {
+test('should return success, with one object in unmatchedOutgoingLines ', () => {
   let result;
 
-  const requisitionLines = [...outgoingRequisitionTestObject.fullSupplyLineItems];
-  const newRequisitionLine = {
+  const fullSupplyLineItems = [...outgoingRequisitionTestObject.fullSupplyLineItems];
+  const fullSupplyLineItem = {
     id: 4,
     productCode: 'CCC',
     stockInHand: 1,
@@ -62,25 +64,26 @@ test('should return an ERROR_MERGE, due to having ', () => {
     beginningBalance: 3,
     skipped: false,
     reasonForRequestedQuantity: 'a',
+    previousStockInHand: 1,
   };
 
-  requisitionLines.push(newRequisitionLine);
-  const testingRequisition = { ...incomingRequisitionTestObject, requisitionLines };
+  fullSupplyLineItems.push(fullSupplyLineItem);
+  const testingRequisition = { ...outgoingRequisitionTestObject, fullSupplyLineItems };
 
   const resultShouldEqual = {
     requisition: {
       ...mergedRequisitionTestObject,
       fullSupplyLineItems: [
         ...mergedRequisitionTestObject.fullSupplyLineItems,
-        { ...newRequisitionLine, quantityRequested: 0 },
+        { ...fullSupplyLineItem, quantityRequested: 0 },
       ],
     },
     unmatchedIncomingLines: [],
-    unmatchedOutgoingLines: [newRequisitionLine],
+    unmatchedOutgoingLines: [fullSupplyLineItem],
   };
 
   try {
-    result = requisitionMerge(testingRequisition, outgoingRequisitionTestObject);
+    result = requisitionMerge(incomingRequisitionTestObject, testingRequisition);
   } catch (error) {
     result = error;
   }
@@ -96,7 +99,6 @@ test('should return an ERROR_MERGE, due to have no requisition items', () => {
   } catch (error) {
     errorCatcher = error;
   }
-
   expect(errorCatcher).toEqual(errorObject(ERROR_MERGE_PARAMS, 'incoming'));
 });
 
@@ -109,6 +111,5 @@ test('should return an ERROR_MERGE, due to having no full supply line items', ()
   } catch (error) {
     errorCatcher = error;
   }
-
   expect(errorCatcher).toEqual(errorObject(ERROR_MERGE_PARAMS, 'outgoing'));
 });
