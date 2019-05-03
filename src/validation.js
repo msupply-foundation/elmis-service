@@ -109,16 +109,14 @@ export function periodValidation(
 ) {
   const { rnr_list, periods } = outgoingPeriods;
 
-  if (!(rnr_list && periods)) throw errorObject(ERROR_PERIOD_INVALID_OUTGOING);
-
-  if (!periods.length) {
+  if (!periods && !periods.length) {
     throw errorObject(ERROR_PERIOD_NONE);
   }
   const [period] = periods;
 
   if (emergency) return period.id;
 
-  if (rnr_list.length !== 0) {
+  if (rnr_list && rnr_list.length !== 0) {
     const anyRegularOrders = rnr_list.some(rnr => rnr.emergency !== true);
     if (anyRegularOrders) throw errorObject(ERROR_PERIOD_UNFINISHED);
   }
@@ -129,6 +127,7 @@ export function periodValidation(
 
   const outgoingStartDate = new Date(startDate);
   const outgoingEndDate = new Date(endDate);
+
   if (Number.isNaN(incomingStartDate.getTime()) || Number.isNaN(incomingEndDate.getTime())) {
     throw errorObject(ERROR_PERIOD_INVALID_INCOMING);
   }
