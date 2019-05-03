@@ -73,7 +73,7 @@ export async function integrate(inputParameters) {
     return {
       requisitionId: parameterObject.requisitionId,
       unmatchedIncomingLines: parameterObject.unmatchedIncomingLines,
-      unmatchingOutgoingLines: parameterObject.unmatchingOutgoingLines,
+      unmatchedOutgoingLines: parameterObject.unmatchingOutgoingLines,
     };
   } catch (error) {
     // This is not an errorObject which was deliberately thrown,
