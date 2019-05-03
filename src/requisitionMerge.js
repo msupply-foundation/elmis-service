@@ -80,6 +80,7 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
     updatedLines.push({
       ...matchedOutgoingLine,
       ...getMappedFields(incomingLine),
+      skipped: 'false',
     });
     outgoingLines.splice(matchedOutgoingLineIndex, 1);
   });
