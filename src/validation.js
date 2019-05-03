@@ -104,9 +104,12 @@ export function programValidation(programCode, programList) {
  */
 export function periodValidation(
   { startDate: startDateString, endDate: endDateString },
-  outgoingPeriods
+  outgoingPeriods,
+  emergency
 ) {
   const { rnr_list, periods } = outgoingPeriods;
+
+  if (!(rnr_list && periods)) throw errorObject(ERROR_PERIOD_INVALID_OUTGOING);
 
   if (rnr_list) {
     if (rnr_list.length) {
@@ -118,6 +121,9 @@ export function periodValidation(
     throw errorObject(ERROR_PERIOD_NONE);
   }
   const [period] = periods;
+
+  if (emergency) return period.id;
+
   const { startDate, endDate } = period;
   const incomingStartDate = new Date(startDateString.split('T')[0]);
   const incomingEndDate = new Date(endDateString.split('T')[0]);

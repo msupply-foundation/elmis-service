@@ -49,7 +49,8 @@ async function createParameterObject({ options, requisition }) {
   );
   parameterObject.periodId = periodValidation(
     requisition.period,
-    (await periods(parameterObject)).periods
+    (await periods(parameterObject)).periods,
+    requisition.emergency
   );
 
   return parameterObject;
