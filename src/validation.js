@@ -118,10 +118,9 @@ export function periodValidation(
 
   if (emergency) return period.id;
 
-  if (rnr_list) {
-    if (rnr_list.length) {
-      throw errorObject(ERROR_PERIOD_UNFINISHED);
-    }
+  if (rnr_list.length !== 0) {
+    const anyRegularOrders = rnr_list.some(rnr => rnr.emergency !== true);
+    if (anyRegularOrders) throw errorObject(ERROR_PERIOD_UNFINISHED);
   }
 
   const { startDate, endDate } = period;
