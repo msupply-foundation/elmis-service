@@ -111,18 +111,18 @@ export function periodValidation(
 
   if (!(rnr_list && periods)) throw errorObject(ERROR_PERIOD_INVALID_OUTGOING);
 
-  if (rnr_list) {
-    if (rnr_list.length) {
-      throw errorObject(ERROR_PERIOD_UNFINISHED);
-    }
-  }
-
   if (!periods.length) {
     throw errorObject(ERROR_PERIOD_NONE);
   }
   const [period] = periods;
 
   if (emergency) return period.id;
+
+  if (rnr_list) {
+    if (rnr_list.length) {
+      throw errorObject(ERROR_PERIOD_UNFINISHED);
+    }
+  }
 
   const { startDate, endDate } = period;
   const incomingStartDate = new Date(startDateString.split('T')[0]);
