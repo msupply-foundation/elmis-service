@@ -14,11 +14,36 @@ import { errorObject, ERROR_MERGE_PARAMS } from './errors/errors';
  * fields of the incoming requisition.
  */
 const MERGE_FIELDS_MAPPING = {
-  quantityReceived: 'Cust_stock_received',
-  quantityDispensed: 'actualQuan',
-  totalLossesAndAdjustments: 'Cust_loss_adjust',
+  quantityReceived: 'incomingStock',
+  quantityDispensed: 'outgoingStock',
+  totalLossesAndAdjustments: 'inventoryAdjustments',
   quantityRequested: 'Cust_stock_order',
 };
+
+/**
+ * Creates a minimal object of fields from the incoming
+ * requisition line for logging purposes.
+ * @param {Object} incomingLine - mSupply Requisition Line
+ */
+const minimalIncomingLine = incomingLine => ({
+  itemID: incomingLine.item && incomingLine.item.ID,
+  itemName: incomingLine.item && incomingLine.item.item_name,
+  itemCode: incomingLine.item && incomingLine.item.code,
+  itemRequestedQuantity: incomingLine.Cust_stock_order,
+});
+
+/**
+ * Creates a minimal object of fields from the outgoing
+ * requisition line for logging purposes.
+ * @param {Object} outgoingLine - eSIGL fullSupplyLine
+ */
+const minimalOutgoingLine = outgoingLine => ({
+  itemID: outgoingLine.id,
+  itemName: outgoingLine.product,
+  itemSecondaryName: outgoingLine.productPrimaryName,
+  itemCode: outgoingLine.productCode,
+  requiredItem: outgoingLine.skipped,
+});
 
 /**
  * Function which returns an object of key/value pairs where the key
@@ -66,7 +91,7 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
     // array of unmatched incoming lines for logging purposes. This item will
     // not be sent to eSIGL.
     if (matchedOutgoingLineIndex < 0) {
-      unmatchedIncomingLines.push(incomingLine);
+      unmatchedIncomingLines.push(minimalIncomingLine(incomingLine));
       return;
     }
     // get a clone of the matched outgoing line.
@@ -87,9 +112,10 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
         ? incomingLine.options.title
         : 'mSupply: Unknown Reason';
     // Push the new updated line for integrating into eSIGL
+    const mapped = getMappedFields(incomingLine);
     updatedLines.push({
       ...matchedOutgoingLine,
-      ...getMappedFields(incomingLine),
+      ...mapped,
       skipped: 'false',
     });
     // Remove the outgoing line as to not check against it again when
@@ -104,7 +130,7 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
     outgoingLines.forEach(outgoingLine => {
       const { previousStockInHand } = outgoingLine;
       if (!outgoingLine.skipped) {
-        unmatchedOutgoingLines.push({ ...outgoingLine });
+        unmatchedOutgoingLines.push(minimalOutgoingLine(outgoingLine));
         updatedLines.push({
           ...outgoingLine,
           stockInHand: previousStockInHand,
