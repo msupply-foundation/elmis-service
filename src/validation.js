@@ -46,7 +46,7 @@ export function integrationValidation(inputParameters) {
   if (!/^https?:\/\//.test(baseURL)) throw errorObject(ERROR_PARAMETERS_URL);
 
   const { requisitionLines } = requisition;
-  if (!Array.isArray(requisitionLines) || !requisitionLines.length) {
+  if (!Array.isArray(requisitionLines)) {
     throw errorObject(ERROR_PARAMETERS_LINES);
   }
 
