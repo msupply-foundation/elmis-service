@@ -35,7 +35,7 @@ async function createParameterObject({ options, requisition }) {
   const parameterObject = {
     ...options,
     ...(await login(options)),
-    emergency: true,
+    emergency: requisition.emergency,
   };
 
   parameterObject.programId = programValidation(
