@@ -61,7 +61,7 @@ export default class ApiConfigs {
     baseURL,
     method: 'PUT',
     data: {},
-    url: `/requisitions/${requisitionId}/approe.json`,
+    url: `/requisitions/${requisitionId}/approve.json`,
     headers: { Cookie: cookie, 'Content-Type': 'application/javascript' },
   });
 
