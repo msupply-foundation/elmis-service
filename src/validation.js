@@ -136,14 +136,14 @@ export function periodValidation(
   }
 
   const startDatesEven =
-    incomingStartDate.getFullYear() === outgoingStartDate.getFullYear() &&
+    incomingStartDate.getUTCFullYear() === outgoingStartDate.getUTCFullYear() &&
     incomingStartDate.getUTCMonth() === outgoingStartDate.getUTCMonth() &&
     incomingStartDate.getUTCDate() === outgoingStartDate.getUTCDate();
 
   if (!startDatesEven) throw errorObject(ERROR_PERIOD_MISALIGNED_START);
 
   const endDatesEven =
-    incomingEndDate.getFullYear() === outgoingEndDate.getFullYear() &&
+    incomingEndDate.getUTCFullYear() === outgoingEndDate.getUTCFullYear() &&
     incomingEndDate.getUTCMonth() === outgoingEndDate.getUTCMonth() &&
     incomingEndDate.getUTCDate() === outgoingEndDate.getUTCDate();
 

@@ -13,7 +13,6 @@ import { errorObject, ERROR_MERGE_PARAMS } from './errors/errors';
  * Keys are fields of the outgoing requisition, values are
  * fields of the incoming requisition.
  */
-
 const MERGE_FIELDS_MAPPING = {
   quantityReceived: 'Cust_stock_received',
   quantityDispensed: 'actualQuan',
@@ -32,7 +31,7 @@ const MERGE_FIELDS_MAPPING = {
 const getMappedFields = incomingLine => {
   const updatedRequisition = {};
   Object.entries(MERGE_FIELDS_MAPPING).forEach(([key, value]) => {
-    updatedRequisition[key] = incomingLine[value];
+    updatedRequisition[key] = incomingLine ? incomingLine[value] : 0;
   });
 
   return updatedRequisition;
@@ -54,36 +53,53 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
   // Create clones to avoid side-effects from manipulation
   const incomingLines = [...incomingRequisitionLines];
   const outgoingLines = [...outgoingRequisitionLines];
-
   // Return objects
   const updatedLines = [];
   const unmatchedIncomingLines = [];
   const unmatchedOutgoingLines = [];
-
   // Iterate through the incoming lines, finding matching outgoing lines to update.
   // Lines with no match are returned for logging purposes.
   incomingLines.forEach(incomingLine => {
     const { item } = incomingLine;
     const matchedOutgoingLineIndex = outgoingLines.findIndex(findMatchedRequisition(item));
-    // If the incoming line has no matching outgoing line,
+    // If the incoming line has no matching outgoing line, push it onto the
+    // array of unmatched incoming lines for logging purposes. This item will
+    // not be sent to eSIGL.
     if (matchedOutgoingLineIndex < 0) {
       unmatchedIncomingLines.push(incomingLine);
       return;
     }
-
+    // get a clone of the matched outgoing line.
     const { ...matchedOutgoingLine } = outgoingLines[matchedOutgoingLineIndex];
     const { actualQuan, Cust_stock_received, Cust_loss_adjust } = incomingLine;
     const { beginningBalance } = matchedOutgoingLine;
-    const newStockInHand = beginningBalance - actualQuan + Cust_stock_received + Cust_loss_adjust;
+    // Set the new stock in hand using the outgoing line iniital stock on hand as a base.
+    // Take the max of this number of 0 to ensure validation is
+    const newStockInHand = Math.max(
+      beginningBalance - actualQuan + Cust_stock_received + Cust_loss_adjust,
+      0
+    );
+    // Set the new stock in hand and requested quantity. Use the reason from mSupply, if possible.
+    // Otherwise set a generic reason to pass validation
     matchedOutgoingLine.stockInHand = newStockInHand;
-    matchedOutgoingLine.reasonForRequestedQuantity = 'a';
+    matchedOutgoingLine.reasonForRequestedQuantity =
+      incomingLine.options && incomingLine.options.title
+        ? incomingLine.options.title
+        : 'mSupply: Unknown Reason';
+    // Push the new updated line for integrating into eSIGL
     updatedLines.push({
       ...matchedOutgoingLine,
       ...getMappedFields(incomingLine),
       skipped: 'false',
     });
+    // Remove the outgoing line as to not check against it again when
+    // finding new matches.
     outgoingLines.splice(matchedOutgoingLineIndex, 1);
   });
+  // If there are any outgoing lines remaining:
+  // Zero out the fields required for validation (if it is not a skipped item),
+  // and set a generic adjustment reason as to pass validation. Also push this
+  // line into the unmatchedOutgoingLines array for logging purposes.
   if (outgoingLines.length) {
     outgoingLines.forEach(outgoingLine => {
       const { previousStockInHand } = outgoingLine;
@@ -92,6 +108,10 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
         updatedLines.push({
           ...outgoingLine,
           stockInHand: previousStockInHand,
+          reasonForRequestedQuantity: 'MSupply: Zero quantity ordered',
+          quantityReceived: 0,
+          quantityDispensed: 0,
+          totalLossesAndAdjustments: 0,
           quantityRequested: 0,
         });
       }
@@ -110,22 +130,24 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
 export default function requisitionMerge(incomingRequisition, outgoingRequisition) {
   const { requisitionLines: incomingLines } = incomingRequisition;
   const { fullSupplyLineItems: outgoingLines, regimenLineItems } = outgoingRequisition;
-
-  if (!incomingLines || !incomingLines.length) throw errorObject(ERROR_MERGE_PARAMS, 'incoming');
+  // If there are no outgoing lines, nothing will be pushed. Throw an error here as
+  // something has gone wrong and no requisitions for this program and facility tuple
+  // will be pushed until it is fixed.
   if (!outgoingLines || !outgoingLines.length) throw errorObject(ERROR_MERGE_PARAMS, 'outgoing');
-
+  // Regimen items are not pushed into eSIGL. They are required for validation, Set each lines
+  // required fields for validation to 0.
   if (regimenLineItems) {
     regimenLineItems.forEach(regimenItem => {
       regimenItem.patientsOnTreatment = 0;
     });
   }
-
+  // Merge the incoming and outgoing lines.
   const {
     unmatchedIncomingLines,
     unmatchedOutgoingLines,
     fullSupplyLineItems,
   } = requisitionItemsMerge(incomingLines, outgoingLines);
-
+  // Return object for logging and pushing into eSIGL.
   return {
     requisition: {
       ...outgoingRequisition,
