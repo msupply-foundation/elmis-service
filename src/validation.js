@@ -109,7 +109,7 @@ export function periodValidation(
 ) {
   const { rnr_list, periods } = outgoingPeriods;
 
-  if (!periods && !periods.length) {
+  if (!periods || !periods.length) {
     throw errorObject(ERROR_PERIOD_NONE);
   }
   const [period] = periods;

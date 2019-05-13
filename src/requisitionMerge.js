@@ -42,8 +42,33 @@ const minimalOutgoingLine = outgoingLine => ({
   itemName: outgoingLine.product,
   itemSecondaryName: outgoingLine.productPrimaryName,
   itemCode: outgoingLine.productCode,
-  requiredItem: outgoingLine.skipped,
+  requiredItem: !outgoingLine.skipped,
 });
+
+/**
+ * Calculate the new stock in hand using the outgoing line inital stock on hand as
+ * a base. Take the max of this number and 0 to ensure validation passes
+ * @param {object}  incomingLine
+ * @return {number}
+ */
+const getNewStockOnHand = (incomingLine, outgoingLine) => {
+  const { actualQuan, Cust_stock_received, Cust_loss_adjust } = incomingLine;
+  const { beginningBalance } = outgoingLine;
+  return Math.max(beginningBalance - actualQuan + Cust_stock_received + Cust_loss_adjust, 0);
+};
+
+/**
+ * Determine the reason to apply to the outgoing line. If the incoming line has not
+ * provided a reason, provide a generic, default reason for each line.
+ * @param {object} incomingLine An incoming requisition line
+ * @return {string}
+ */
+const getNewReason = incomingLine => {
+  const { options } = incomingLine;
+  let newReason = 'mSupply: Unknown Reason';
+  if (options && options.title) newReason = options.title;
+  return newReason;
+};
 
 /**
  * Function which returns an object of key/value pairs where the key
@@ -58,7 +83,6 @@ const getMappedFields = incomingLine => {
   Object.entries(MERGE_FIELDS_MAPPING).forEach(([key, value]) => {
     updatedRequisition[key] = incomingLine ? incomingLine[value] : 0;
   });
-
   return updatedRequisition;
 };
 
@@ -94,29 +118,17 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
       unmatchedIncomingLines.push(minimalIncomingLine(incomingLine));
       return;
     }
-    // get a clone of the matched outgoing line.
+    // Make a clone of the matched outgoing line. Flat object so shallow copy is fine
     const { ...matchedOutgoingLine } = outgoingLines[matchedOutgoingLineIndex];
-    const { actualQuan, Cust_stock_received, Cust_loss_adjust } = incomingLine;
-    const { beginningBalance } = matchedOutgoingLine;
-    // Set the new stock in hand using the outgoing line iniital stock on hand as a base.
-    // Take the max of this number of 0 to ensure validation is
-    const newStockInHand = Math.max(
-      beginningBalance - actualQuan + Cust_stock_received + Cust_loss_adjust,
-      0
-    );
     // Set the new stock in hand and requested quantity. Use the reason from mSupply, if possible.
     // Otherwise set a generic reason to pass validation
-    matchedOutgoingLine.stockInHand = newStockInHand;
-    matchedOutgoingLine.reasonForRequestedQuantity =
-      incomingLine.options && incomingLine.options.title
-        ? incomingLine.options.title
-        : 'mSupply: Unknown Reason';
     // Push the new updated line for integrating into eSIGL
-    const mapped = getMappedFields(incomingLine);
     updatedLines.push({
       ...matchedOutgoingLine,
-      ...mapped,
-      skipped: 'false',
+      skipped: false,
+      stockInHand: getNewStockOnHand(incomingLine, matchedOutgoingLine),
+      reasonForRequestedQuantity: getNewReason(incomingLine),
+      ...getMappedFields(incomingLine),
     });
     // Remove the outgoing line as to not check against it again when
     // finding new matches.
@@ -133,12 +145,9 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
         unmatchedOutgoingLines.push(minimalOutgoingLine(outgoingLine));
         updatedLines.push({
           ...outgoingLine,
+          ...getMappedFields(),
           stockInHand: previousStockInHand,
           reasonForRequestedQuantity: 'MSupply: Zero quantity ordered',
-          quantityReceived: 0,
-          quantityDispensed: 0,
-          totalLossesAndAdjustments: 0,
-          quantityRequested: 0,
         });
       }
     });
