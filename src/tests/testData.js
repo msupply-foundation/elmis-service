@@ -1,3 +1,12 @@
+/**
+ * Simple test data for use within jest tests.
+ */
+
+/**
+ * Array object containing a simplified response
+ * from a call to fetch the facilities a logged in
+ * user has access to.
+ */
 export const facilitiesValidationTestObject = [
   {
     id: 1,
@@ -17,11 +26,21 @@ export const facilitiesValidationTestObject = [
   },
 ];
 
+/**
+ * Simple object representing a period object
+ * returned from the eSIGL server.
+ */
 export const incomingPeriodsTestObject = {
   startDate: '2018-06-01T00:00:00.000Z',
   endDate: '2018-06-30T00:00:00.000Z',
 };
 
+/**
+ * Simplified object representing an the response
+ * from the eSIGL server for allowable periods for
+ * a requisition to be created for a given
+ * facility/program/ordertype triple.
+ */
 export const outgoingPeriodsTestObject = {
   periods: [
     {
@@ -33,6 +52,9 @@ export const outgoingPeriodsTestObject = {
   rnr_list: [],
 };
 
+// Simplified object representing the response from the
+// eSIGL server for fetching the programs accessible for
+// a given user.
 export const programTestObject = [
   { id: 1, code: 'a' },
   { id: 2, code: 'b' },
@@ -40,6 +62,10 @@ export const programTestObject = [
   { id: 10, code: 'd' },
 ];
 
+/**
+ * Simplified response from fetching a requisition
+ * from the eSIGL server.
+ */
 export const outgoingRequisitionTestObject = {
   fullSupplyLineItems: [
     {
@@ -69,6 +95,10 @@ export const outgoingRequisitionTestObject = {
   ],
 };
 
+/**
+ * Simplified object representing a requisition
+ * sent from mSupply.
+ */
 export const incomingRequisitionTestObject = {
   requisitionLines: [
     {
@@ -79,8 +109,14 @@ export const incomingRequisitionTestObject = {
       actualQuan: 3,
       Cust_loss_adjust: 3,
       Cust_stock_order: 3,
+      incomingStock: 3,
+      outgoingStock: 3,
+      inventoryAdjustments: 3,
       item: {
         code: 'AAA',
+      },
+      options: {
+        title: 'reason',
       },
     },
     {
@@ -91,13 +127,23 @@ export const incomingRequisitionTestObject = {
       actualQuan: 3,
       Cust_loss_adjust: 3,
       Cust_stock_order: 3,
+      incomingStock: 3,
+      outgoingStock: 3,
+      inventoryAdjustments: 3,
       item: {
         code: 'BBB',
+      },
+      options: {
+        title: 'reason',
       },
     },
   ],
 };
 
+/**
+ * Expected object returned from merging the above two
+ * objects.
+ */
 export const mergedRequisitionTestObject = {
   fullSupplyLineItems: [
     {
@@ -111,7 +157,7 @@ export const mergedRequisitionTestObject = {
       anAdditionalField: 1,
       skipped: false,
       quantityRequested: 3,
-      reasonForRequestedQuantity: 'a',
+      reasonForRequestedQuantity: 'reason',
       previousStockInHand: 10,
     },
     {
@@ -125,7 +171,7 @@ export const mergedRequisitionTestObject = {
       anAdditionalField: 1,
       skipped: false,
       quantityRequested: 3,
-      reasonForRequestedQuantity: 'a',
+      reasonForRequestedQuantity: 'reason',
       previousStockInHand: 10,
     },
   ],
