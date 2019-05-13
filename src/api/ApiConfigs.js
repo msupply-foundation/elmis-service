@@ -11,7 +11,7 @@ export default class ApiConfigs {
       rejectUnauthorized: false,
     }),
     maxRedirects: 0,
-    timeout: 5000,
+    timeout: 10000,
   };
 
   static getLoginConfig = ({ username, password, baseURL = 'https://83.96.240.209' }) => ({

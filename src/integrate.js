@@ -87,6 +87,7 @@ export async function integrate(inputParameters) {
         error.wasDeleted = true;
       } catch (deleteError) {
         error.wasDeleted = false;
+        error.deleteError = deleteError;
       }
     }
 
