@@ -109,6 +109,15 @@ export function periodValidation(
 ) {
   const { rnr_list, periods } = outgoingPeriods;
 
+  // allow an unlimited number of emergency orders
+  // and only one normal order per period
+  if (rnr_list && !emergency) {
+    const rnr_length = rnr_list.filter(rnr => !rnr.emergency).length;
+    if (rnr_length) {
+      throw errorObject(ERROR_PERIOD_UNFINISHED);
+    }
+  }
+
   if (!periods || !periods.length) {
     throw errorObject(ERROR_PERIOD_NONE);
   }
