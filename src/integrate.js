@@ -94,7 +94,7 @@ export async function integrate(inputParameters) {
   }
 }
 
-export async function initiateRequisiton(inputParameters) {
+export async function initiateRequisition(inputParameters) {
   let requisitionHasBeenCreated = false;
   let parameterObject;
   try {
