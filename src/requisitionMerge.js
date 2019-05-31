@@ -91,7 +91,7 @@ const findMatchedRequisition = ({ code: incomingItemCode }) => ({
 }) => outgoingItemCode === incomingItemCode;
 
 /**
- * Merges an array of requiisition lines (incoming requisiton lines - mSupply)
+ * Merges an array of requiisition lines (incoming requisition lines - mSupply)
  * with fully supply line items (outgoing requisition lines - eSIGL)
  *
  * @param  {Array}  incomingRequisitionLines Requisition lines of the incoming requisition
