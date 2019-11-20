@@ -165,7 +165,7 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
 export default function requisitionMerge(incomingRequisition, outgoingRequisition) {
   const { requisitionLines: incomingLines, custom_data } = incomingRequisition;
   const { fullSupplyLineItems: outgoingLines, regimenLineItems } = outgoingRequisition;
-  const regimenData = custom_data.regimenData || [];
+  const regimenData = (custom_data && custom_data.regimenData) || [];
   // If there are no outgoing lines, nothing will be pushed. Throw an error here as
   // something has gone wrong and no requisitions for this program and facility tuple
   // will be pushed until it is fixed.
