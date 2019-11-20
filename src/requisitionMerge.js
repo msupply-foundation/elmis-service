@@ -163,19 +163,23 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
  * @return {Object} the updated eSIGL requisition with incoming values applied.
  */
 export default function requisitionMerge(incomingRequisition, outgoingRequisition) {
-  const { requisitionLines: incomingLines } = incomingRequisition;
+  const { requisitionLines: incomingLines, custom_data } = incomingRequisition;
   const { fullSupplyLineItems: outgoingLines, regimenLineItems } = outgoingRequisition;
+  const regimenData = custom_data.regimenData || [];
   // If there are no outgoing lines, nothing will be pushed. Throw an error here as
   // something has gone wrong and no requisitions for this program and facility tuple
   // will be pushed until it is fixed.
+
   if (!outgoingLines || !outgoingLines.length) throw errorObject(ERROR_MERGE_PARAMS, 'outgoing');
-  // Regimen items are not pushed into eSIGL. They are required for validation, Set each lines
-  // required fields for validation to 0.
+  // Regimen items are required for validation. Set the value of each item, defaulting to 0.
   if (regimenLineItems) {
     regimenLineItems.forEach(regimenItem => {
-      regimenItem.patientsOnTreatment = 0;
+      const matchingItem = regimenData.find(regimenDatum => regimenDatum.code === regimenItem.code);
+      const value = matchingItem === null ? 0 : matchingItem.value || 0;
+      regimenItem.patientsOnTreatment = value;
     });
   }
+
   // Merge the incoming and outgoing lines.
   const {
     unmatchedIncomingLines,
