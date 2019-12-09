@@ -175,7 +175,7 @@ export default function requisitionMerge(incomingRequisition, outgoingRequisitio
   if (regimenLineItems) {
     regimenLineItems.forEach(regimenItem => {
       const matchingItem = regimenData.find(regimenDatum => regimenDatum.code === regimenItem.code);
-      const value = matchingItem === null ? 0 : matchingItem.value || 0;
+      const value = !matchingItem ? 0 : matchingItem.value || 0;
       regimenItem.patientsOnTreatment = value;
     });
   }
