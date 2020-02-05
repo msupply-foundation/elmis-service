@@ -21,6 +21,67 @@ const MERGE_FIELDS_MAPPING = {
 };
 
 /**
+ * Regimen columns which should be altered in the merging process.
+ * Keys are columns of the outgoing requisition, values are
+ * columns of the incoming requisition.
+ */
+const MERGE_REGIMENS_MAPPING = {
+  patients_adultes_recus: 'patientsOnTreatmentAdult',
+  patients_enfants_recus: 'patientsOnTreatmentChildren',
+  nouvelle_inclusion_adulte: 'patientsToInitiateTreatmentAdult',
+  nouvelle_inclusion_enfant: 'patientsToInitiateTreatmentChild',
+  regimen_value: 'value',
+  regimen_comment: 'comment',
+  referes: 'remarks',
+};
+
+/**
+ * Convert mSupply indicators data to eSIGL regimen lines.
+ * @param {Object} regimenData
+ * {
+ *   indicators: [ { "ID": ..., "code": ..., "program_ID": ... }, ... ],
+ *   rows: [ { "ID": ..., "code": ..., "indicator_ID": ... }, ... ],
+ *   columns: [ { "ID": ..., "code": ..., "indicator_ID" ... }, ... ],
+ *   values: [ { "ID": ..., "column_ID": ..., "row_ID": ..., "value": ... }, ... ],
+ * }
+ * @return {Object} [ { code: ..., columnCodeA: ..., columnCodeB: ..., ... }, ... ]
+ */
+const createRegimenLineItems = regimenData => {
+  const { indicators, rows, columns, values } = regimenData;
+  // Convert each indicator to set of associated regimen lines.
+  const regimenLineItems = indicators
+    .map(indicator => {
+      const indicatorRows = rows.filter(
+        ({ indicator_ID: rowIndicatorID }) => rowIndicatorID === indicator.ID
+      );
+      const indicatorColumns = columns.filter(
+        ({ indicator_ID: columnIndicatorID }) => columnIndicatorID === indicator.ID
+      );
+      // Convert each indicator row to matching eSIGL regimen line.
+      const indicatorRegimenLineItems = indicatorRows.map(indicatorRow => {
+        const { code } = indicatorRow;
+        const regimenColumns = indicatorColumns.map(indicatorColumn => {
+          const [{ value: columnValue }] = values.filter(
+            ({ row_ID: rowID, column_ID: columnID }) =>
+              rowID === indicatorRow.ID && columnID === indicatorColumn.ID
+          );
+          const regimenColumn = MERGE_REGIMENS_MAPPING[indicatorColumn.code];
+          return { [regimenColumn]: columnValue };
+        });
+        const regimenValues = Object.assign(...regimenColumns);
+        const regimenLineItem = {
+          code,
+          ...regimenValues,
+        };
+        return regimenLineItem;
+      });
+      return indicatorRegimenLineItems;
+    })
+    .flat();
+  return regimenLineItems;
+};
+
+/**
  * Creates a minimal object of fields from the incoming
  * requisition line for logging purposes.
  * @param {Object} incomingLine - mSupply Requisition Line
@@ -163,22 +224,33 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
  * @return {Object} the updated eSIGL requisition with incoming values applied.
  */
 export default function requisitionMerge(incomingRequisition, outgoingRequisition) {
-  const { requisitionLines: incomingLines, custom_data } = incomingRequisition;
-  const { fullSupplyLineItems: outgoingLines, regimenLineItems } = outgoingRequisition;
-  const regimenData = (custom_data && custom_data.regimenData) || [];
+  const { requisitionLines: incomingLines, regimenData: incomingRegimenData } = incomingRequisition;
+  const {
+    fullSupplyLineItems: outgoingLines,
+    regimenLineItems: outgoingRegimenLineItems,
+  } = outgoingRequisition;
   // If there are no outgoing lines, nothing will be pushed. Throw an error here as
   // something has gone wrong and no requisitions for this program and facility tuple
   // will be pushed until it is fixed.
-
   if (!outgoingLines || !outgoingLines.length) throw errorObject(ERROR_MERGE_PARAMS, 'outgoing');
+  // Get incoming regimen lines.
+  const incomingRegimenLineItems = createRegimenLineItems(incomingRegimenData);
   // Regimen items are required for validation. Set the value of each item, defaulting to 0.
-  if (regimenLineItems) {
-    regimenLineItems.forEach(regimenItem => {
-      const matchingItem = regimenData.find(regimenDatum => regimenDatum.code === regimenItem.code);
-      const value = !matchingItem ? 0 : matchingItem.value || 0;
-      regimenItem.patientsOnTreatment = value;
-    });
-  }
+  const regimenLineItems = outgoingRegimenLineItems.map(outgoingRegimenLineItem => {
+    // Populate each outgoing regimen line with incoming regimen line value. If no matching
+    // incoming regimen line exists, use default value.
+    const { code: outgoingRegimenLineCode } = outgoingRegimenLineItem;
+    const incomingRegimenLineItem =
+      (incomingRegimenLineItems &&
+        incomingRegimenLineItems.find(
+          ({ code: incomingRegimenLineCode }) => incomingRegimenLineCode === outgoingRegimenLineCode
+        )) ||
+      {};
+    return {
+      ...outgoingRegimenLineItem,
+      ...incomingRegimenLineItem,
+    };
+  });
 
   // Merge the incoming and outgoing lines.
   const {
@@ -190,6 +262,7 @@ export default function requisitionMerge(incomingRequisition, outgoingRequisitio
   return {
     requisition: {
       ...outgoingRequisition,
+      regimenLineItems,
       fullSupplyLineItems,
     },
     unmatchedIncomingLines,
