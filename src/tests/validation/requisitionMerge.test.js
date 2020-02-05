@@ -24,6 +24,22 @@ test('should return a new object', () => {
   });
 });
 
+test('should return success', () => {
+  const resultShouldEqual = {
+    requisition: mergedRequisitionTestObject,
+    unmatchedIncomingLines: [],
+    unmatchedOutgoingLines: [],
+  };
+
+  let result;
+  try {
+    result = requisitionMerge(incomingRequisitionTestObject, outgoingRequisitionTestObject);
+  } catch (error) {
+    result = error;
+  }
+  expect(result).toEqual(resultShouldEqual);
+});
+
 test('should return success, with 1 object in unmatchingIncomingLines ', () => {
   let result;
   const requisitionLines = [...incomingRequisitionTestObject.requisitionLines];
@@ -53,7 +69,7 @@ test('should return success, with 1 object in unmatchingIncomingLines ', () => {
   };
 
   requisitionLines.push({ ...newRequisitionLine });
-  const testingRequisition = { requisitionLines };
+  const testingRequisition = { ...incomingRequisitionTestObject, requisitionLines };
   try {
     result = requisitionMerge(testingRequisition, outgoingRequisitionTestObject);
   } catch (error) {

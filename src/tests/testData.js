@@ -2,6 +2,8 @@
  * Simple test data for use within jest tests.
  */
 
+import { regimens } from './fixtures';
+
 /**
  * Array object containing a simplified response
  * from a call to fetch the facilities a logged in
@@ -67,6 +69,7 @@ export const programTestObject = [
  * from the eSIGL server.
  */
 export const outgoingRequisitionTestObject = {
+  regimenLineItems: regimens.regimenLineItemsOutgoing,
   fullSupplyLineItems: [
     {
       id: 1,
@@ -100,6 +103,7 @@ export const outgoingRequisitionTestObject = {
  * sent from mSupply.
  */
 export const incomingRequisitionTestObject = {
+  regimenData: regimens.regimenDataIncoming,
   requisitionLines: [
     {
       ID: 3,
@@ -145,6 +149,7 @@ export const incomingRequisitionTestObject = {
  * objects.
  */
 export const mergedRequisitionTestObject = {
+  regimenLineItems: regimens.regimenLineItemsMerged,
   fullSupplyLineItems: [
     {
       id: 1,
