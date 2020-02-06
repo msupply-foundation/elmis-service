@@ -61,7 +61,7 @@ const createRegimenLineItems = regimenData => {
       const indicatorRegimenLineItems = indicatorRows.map(indicatorRow => {
         const { code } = indicatorRow;
         const regimenColumns = indicatorColumns.map(indicatorColumn => {
-          const [{ value: columnValue }] = values.filter(
+          const { value: columnValue } = values.find(
             ({ row_ID: rowID, column_ID: columnID }) =>
               rowID === indicatorRow.ID && columnID === indicatorColumn.ID
           );
