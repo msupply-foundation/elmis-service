@@ -26,6 +26,7 @@ const MERGE_FIELDS_MAPPING = {
  * columns of the incoming requisition.
  */
 const MERGE_REGIMENS_MAPPING = {
+  code: 'code',
   patients_adultes_recus: 'patientsOnTreatmentAdult',
   patients_enfants_recus: 'patientsOnTreatmentChildren',
   nouvelle_inclusion_adulte: 'patientsToInitiateTreatmentAdult',
@@ -57,16 +58,16 @@ const createRegimenLineItems = regimenData => {
       const indicatorColumns = columns.filter(
         ({ indicator_ID: columnIndicatorID }) => columnIndicatorID === indicator.ID
       );
-      // Convert each indicator row to matching eSIGL regimen line.
+      // Convert each indicator row to eSIGL regimen line.
       const indicatorRegimenLineItems = indicatorRows.map(indicatorRow => {
         const { code } = indicatorRow;
         const regimenColumns = indicatorColumns.map(indicatorColumn => {
           const { value: columnValue } = values.find(
             ({ row_ID: rowID, column_ID: columnID }) =>
               rowID === indicatorRow.ID && columnID === indicatorColumn.ID
-          );
-          const regimenColumn = MERGE_REGIMENS_MAPPING[indicatorColumn.code];
-          return { [regimenColumn]: columnValue };
+          ) || { value: '' };
+          const { code: columnCode } = indicatorColumn;
+          return { [columnCode]: columnValue };
         });
         const regimenValues = Object.assign(...regimenColumns);
         const regimenLineItem = {
@@ -131,6 +132,14 @@ const getNewReason = incomingLine => {
   return newReason;
 };
 
+const getMappedRegimenColumns = incomingRegimenLine => {
+  const updatedRegimenLine = {};
+  Object.entries(incomingRegimenLine).forEach(([key, value]) => {
+    if (MERGE_REGIMENS_MAPPING[key]) updatedRegimenLine[MERGE_REGIMENS_MAPPING[key]] = value;
+  });
+  return updatedRegimenLine;
+};
+
 /**
  * Function which returns an object of key/value pairs where the key
  * is the outgoing requisition field and value is from the incoming
@@ -150,6 +159,48 @@ const getMappedFields = incomingLine => {
 const findMatchedRequisition = ({ code: incomingItemCode }) => ({
   productCode: outgoingItemCode,
 }) => outgoingItemCode === incomingItemCode;
+
+/**
+ * Merges an array of incoming regimen lines with outgoing regimen lines.
+ *
+ * @param  {Array} incomingRegimenLines Regimen lines of the incoming requisition
+ * @param  {Array} outgoingRegimenLines Regimen lines of the outgoing requisition
+ * @return {Array} The merged regimen lines.
+ */
+const requisitionRegimensMerge = (incomingRegimenLines, outgoingRegimenLines) => {
+  const incomingLines = [...incomingRegimenLines.map(getMappedRegimenColumns)];
+  const outgoingLines = [...outgoingRegimenLines];
+
+  console.log(incomingRegimenLines);
+  console.log(incomingLines);
+
+  const incomingRegimens = new Set(incomingLines);
+  const outgoingRegimens = new Set(outgoingLines);
+  const incomingRegimenCodes = new Set(incomingLines.map(({ code }) => code));
+  const outgoingRegimenCodes = new Set(outgoingLines.map(({ code }) => code));
+
+  const matchingRegimenCodes = new Set(
+    [...incomingRegimenCodes].filter(code => outgoingRegimenCodes.has(code))
+  );
+  const unmatchedIncomingCodes = new Set(
+    [...incomingRegimenCodes].filter(code => !matchingRegimenCodes.has(code))
+  );
+  const unmatchedOutgoingCodes = new Set(
+    [...outgoingRegimenCodes].filter(code => !matchingRegimenCodes.has(code))
+  );
+
+  const fullRegimenLineItems = [...incomingRegimens].filter(({ code }) =>
+    matchingRegimenCodes.has(code)
+  );
+  const unmatchedIncomingRegimenLines = [...incomingRegimens].filter(({ code }) =>
+    unmatchedIncomingCodes.has(code)
+  );
+  const unmatchedOutgoingRegimenLines = [...outgoingRegimens].filter(({ code }) =>
+    unmatchedOutgoingCodes.has(code)
+  );
+
+  return { fullRegimenLineItems, unmatchedIncomingRegimenLines, unmatchedOutgoingRegimenLines };
+};
 
 /**
  * Merges an array of requiisition lines (incoming requisition lines - mSupply)
@@ -235,29 +286,19 @@ export default function requisitionMerge(incomingRequisition, outgoingRequisitio
   if (!outgoingLines || !outgoingLines.length) throw errorObject(ERROR_MERGE_PARAMS, 'outgoing');
   // Get incoming regimen lines.
   const incomingRegimenLineItems = createRegimenLineItems(incomingRegimenData);
-  // Regimen items are required for validation. Set the value of each item, defaulting to 0.
-  const regimenLineItems = outgoingRegimenLineItems.map(outgoingRegimenLineItem => {
-    // Populate each outgoing regimen line with incoming regimen line value. If no matching
-    // incoming regimen line exists, use default value.
-    const { code: outgoingRegimenLineCode } = outgoingRegimenLineItem;
-    const incomingRegimenLineItem =
-      (incomingRegimenLineItems &&
-        incomingRegimenLineItems.find(
-          ({ code: incomingRegimenLineCode }) => incomingRegimenLineCode === outgoingRegimenLineCode
-        )) ||
-      {};
-    return {
-      ...outgoingRegimenLineItem,
-      ...incomingRegimenLineItem,
-    };
-  });
-
-  // Merge the incoming and outgoing lines.
+  // Merge the incoming and outgoing regimen lines.
+  const {
+    unmatchedIncomingRegimenLines,
+    unmatchedOutgoingRegimenLines,
+    fullRegimenLineItems: regimenLineItems,
+  } = requisitionRegimensMerge(incomingRegimenLineItems, outgoingRegimenLineItems);
+  // Merge the incoming and outgoing item lines.
   const {
     unmatchedIncomingLines,
     unmatchedOutgoingLines,
     fullSupplyLineItems,
   } = requisitionItemsMerge(incomingLines, outgoingLines);
+
   // Return object for logging and pushing into eSIGL.
   return {
     requisition: {
@@ -265,6 +306,8 @@ export default function requisitionMerge(incomingRequisition, outgoingRequisitio
       regimenLineItems,
       fullSupplyLineItems,
     },
+    unmatchedIncomingRegimenLines,
+    unmatchedOutgoingRegimenLines,
     unmatchedIncomingLines,
     unmatchedOutgoingLines,
   };

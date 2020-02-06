@@ -181,3 +181,5 @@ export const mergedRequisitionTestObject = {
     },
   ],
 };
+
+export const { unmatchedIncomingRegimenLines, unmatchedOutgoingRegimenLines } = regimens;

@@ -5,8 +5,8 @@
 const HIV_COLUMNS = {
   PATIENT_ADMITTED_ADULT: 'patient_admitted_adult',
   PATIENT_ADMITTED_CHILD: 'patient_admitted_child',
-  // PATIENT_STABLE_ADULT: 'patient_stable_adulte',
-  // PATIENT_STABLE_CHILD: 'patient_stable_child',
+  PATIENT_STABLE_ADULT: 'patient_stable_adulte',
+  PATIENT_STABLE_CHILD: 'patient_stable_child',
   PATIENT_NEW_ADULT: 'nouvelle_inclusion_adulte',
   PATIENT_NEW_CHILD: 'nouvelle_inckusion_child',
   COMMENT: 'comment',
@@ -35,8 +35,8 @@ const REGIMEN_COLUMNS_MSUPPLY = {
 const HIV_COLUMNS_ESIGL = {
   [HIV_COLUMNS.PATIENT_ADMITTED_ADULT]: 'patientsOnTreatmentAdult',
   [HIV_COLUMNS.PATIENT_ADMITTED_CHILD]: 'patientsOnTreatmentChildren',
-  // [HIV_COLUMNS.PATIENT_STABLE_ADULT]: 'patient_stable_adulte',
-  // [HIV_COLUMNS.PATIENT_STABLE_CHILD]: 'patients_stable_enfant',
+  // [HIV_COLUMNS.PATIENT_STABLE_ADULT]: '',
+  // [HIV_COLUMNS.PATIENT_STABLE_CHILD]: '',
   [HIV_COLUMNS.PATIENT_NEW_ADULT]: 'patientsToInitiateTreatmentAdult',
   [HIV_COLUMNS.PATIENT_NEW_CHILD]: 'patientsToInitiateTreatmentChildren',
   [HIV_COLUMNS.COMMENT]: 'remarks',
@@ -75,6 +75,11 @@ export const regimenDataIncoming = {
       ID: '79710F13C0DE42F8AE359395B7CE8572',
       indicator_ID: 'FE958EB51D77448DBCF8783391E4AA24',
       code: 'Code régime1',
+    },
+    {
+      ID: 'AAA',
+      indicator_ID: 'FE958EB51D77448DBCF8783391E4AA24',
+      code: 'UNMATCHED_INCOMING_REGIMEN',
     },
   ],
   columns: [
@@ -155,6 +160,10 @@ export const regimenLineItemsOutgoing = [
     [REGIMEN_COLUMNS_ESIGL[REGIMEN_COLUMNS.VALUE]]: '',
     [REGIMEN_COLUMNS_ESIGL[REGIMEN_COLUMNS.COMMENT]]: '',
   },
+  {
+    code: 'UNMATCHED_OUTGOING_REGIMEN',
+    unmatched_column: '',
+  },
 ];
 
 export const regimenLineItemsMerged = [
@@ -173,5 +182,20 @@ export const regimenLineItemsMerged = [
     [REGIMEN_COLUMNS_ESIGL[REGIMEN_COLUMNS.VALUE]]: '5',
     [REGIMEN_COLUMNS_ESIGL[REGIMEN_COLUMNS.COMMENT]]:
       'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.',
+  },
+];
+
+export const unmatchedIncomingRegimenLines = [
+  {
+    code: 'UNMATCHED_INCOMING_REGIMEN',
+    comment: '',
+    value: '',
+  },
+];
+
+export const unmatchedOutgoingRegimenLines = [
+  {
+    code: 'UNMATCHED_OUTGOING_REGIMEN',
+    unmatched_column: '',
   },
 ];
