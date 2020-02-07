@@ -156,17 +156,19 @@ const getMappedFields = incomingLine => {
   return updatedRequisition;
 };
 
+/**
+ * A helper function for extracting codes from an array of regimen lines.
+ * @param {Array} regimenLines
+ * @returns {Array}
+ */
 const extractRegimenCodes = regimenLines => regimenLines.map(({ code }) => code);
 
+/**
+ * A helper function which returns a closure for filtering an array by element codes.
+ * @param {Function} filterFunction
+ * @returns {Function}
+ */
 const filterByRegimenCode = filterFunction => ({ code }) => filterFunction(code);
-
-const filterRegimenLines = filterFunction => {
-  return regimenLines =>
-    regimenLines.reduce(
-      (acc, regimenLine) => (filterFunction(regimenLine) ? [...acc, regimenLine] : acc),
-      []
-    );
-};
 
 const findMatchedRequisition = ({ code: incomingItemCode }) => ({
   productCode: outgoingItemCode,
@@ -180,24 +182,22 @@ const findMatchedRequisition = ({ code: incomingItemCode }) => ({
  * @return {Array} The merged regimen lines.
  */
 const requisitionRegimensMerge = (incomingRegimenLines, outgoingRegimenLines) => {
+  // Map incoming regimen line column codes from mSupply to eSIGL.
   const incomingLines = incomingRegimenLines.map(getMappedRegimenColumns);
   const outgoingLines = [...outgoingRegimenLines];
-
+  // Get all distinct outgoing regimen codes.
   const outgoingRegimenLineCodes = new Set(extractRegimenCodes(outgoingLines));
+  // Get all incoming regimen lines with valid codes.
   const filterByOutgoingRegimenLines = code => outgoingRegimenLineCodes.has(code);
-  const filterFullRegimenLines = filterRegimenLines(
-    filterByRegimenCode(filterByOutgoingRegimenLines)
-  );
-  const fullRegimenLineItems = filterFullRegimenLines(incomingLines);
-
+  const filterFullRegimenLines = filterByRegimenCode(filterByOutgoingRegimenLines);
+  const fullRegimenLineItems = incomingLines.filter(filterFullRegimenLines);
+  // Get all distinct full regimen line codes.
   const fullRegimenLineCodes = new Set(extractRegimenCodes(fullRegimenLineItems));
+  // Get all incoming and outgoing regimen lines with unmatched codes.
   const filterByFullRegimenLines = code => !fullRegimenLineCodes.has(code);
-  const filterUnmatchedRegimenLines = filterRegimenLines(
-    filterByRegimenCode(filterByFullRegimenLines)
-  );
-  const unmatchedIncomingRegimenLines = filterUnmatchedRegimenLines(incomingLines);
-  const unmatchedOutgoingRegimenLines = filterUnmatchedRegimenLines(outgoingLines);
-
+  const filterUnmatchedRegimenLines = filterByRegimenCode(filterByFullRegimenLines);
+  const unmatchedIncomingRegimenLines = incomingLines.filter(filterUnmatchedRegimenLines);
+  const unmatchedOutgoingRegimenLines = outgoingLines.filter(filterUnmatchedRegimenLines);
   return { fullRegimenLineItems, unmatchedIncomingRegimenLines, unmatchedOutgoingRegimenLines };
 };
 
