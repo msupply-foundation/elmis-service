@@ -156,6 +156,18 @@ const getMappedFields = incomingLine => {
   return updatedRequisition;
 };
 
+const extractRegimenCodes = regimenLines => regimenLines.map(({ code }) => code);
+
+const filterByRegimenCode = filterFunction => ({ code }) => filterFunction(code);
+
+const filterRegimenLines = filterFunction => {
+  return regimenLines =>
+    regimenLines.reduce(
+      (acc, regimenLine) => (filterFunction(regimenLine) ? [...acc, regimenLine] : acc),
+      []
+    );
+};
+
 const findMatchedRequisition = ({ code: incomingItemCode }) => ({
   productCode: outgoingItemCode,
 }) => outgoingItemCode === incomingItemCode;
@@ -168,27 +180,23 @@ const findMatchedRequisition = ({ code: incomingItemCode }) => ({
  * @return {Array} The merged regimen lines.
  */
 const requisitionRegimensMerge = (incomingRegimenLines, outgoingRegimenLines) => {
-  const incomingLines = [...incomingRegimenLines.map(getMappedRegimenColumns)];
+  const incomingLines = incomingRegimenLines.map(getMappedRegimenColumns);
   const outgoingLines = [...outgoingRegimenLines];
 
-  const outgoingRegimenCodes = new Set(outgoingLines.map(({ code }) => code));
-  const matchingRegimenCodes = new Set(
-    incomingLines.filter(({ code }) => outgoingRegimenCodes.has(code))
+  const outgoingRegimenLineCodes = new Set(extractRegimenCodes(outgoingLines));
+  const filterByOutgoingRegimenLines = code => outgoingRegimenLineCodes.has(code);
+  const filterFullRegimenLines = filterRegimenLines(
+    filterByRegimenCode(filterByOutgoingRegimenLines)
   );
-  const unmatchedIncomingCodes = new Set(
-    incomingLines.filter(({ code }) => !matchingRegimenCodes.has(code))
-  );
-  const unmatchedOutgoingCodes = new Set(
-    outgoingLines.filter(code => !matchingRegimenCodes.has(code))
-  );
+  const fullRegimenLineItems = filterFullRegimenLines(incomingLines);
 
-  const fullRegimenLineItems = incomingLines.filter(({ code }) => matchingRegimenCodes.has(code));
-  const unmatchedIncomingRegimenLines = incomingLines.filter(({ code }) =>
-    unmatchedIncomingCodes.has(code)
+  const fullRegimenLineCodes = new Set(extractRegimenCodes(fullRegimenLineItems));
+  const filterByFullRegimenLines = code => !fullRegimenLineCodes.has(code);
+  const filterUnmatchedRegimenLines = filterRegimenLines(
+    filterByRegimenCode(filterByFullRegimenLines)
   );
-  const unmatchedOutgoingRegimenLines = outgoingLines.filter(({ code }) =>
-    unmatchedOutgoingCodes.has(code)
-  );
+  const unmatchedIncomingRegimenLines = filterUnmatchedRegimenLines(incomingLines);
+  const unmatchedOutgoingRegimenLines = filterUnmatchedRegimenLines(outgoingLines);
 
   return { fullRegimenLineItems, unmatchedIncomingRegimenLines, unmatchedOutgoingRegimenLines };
 };
