@@ -171,31 +171,22 @@ const requisitionRegimensMerge = (incomingRegimenLines, outgoingRegimenLines) =>
   const incomingLines = [...incomingRegimenLines.map(getMappedRegimenColumns)];
   const outgoingLines = [...outgoingRegimenLines];
 
-  console.log(incomingRegimenLines);
-  console.log(incomingLines);
-
-  const incomingRegimens = new Set(incomingLines);
-  const outgoingRegimens = new Set(outgoingLines);
-  const incomingRegimenCodes = new Set(incomingLines.map(({ code }) => code));
   const outgoingRegimenCodes = new Set(outgoingLines.map(({ code }) => code));
-
   const matchingRegimenCodes = new Set(
-    [...incomingRegimenCodes].filter(code => outgoingRegimenCodes.has(code))
+    incomingLines.filter(({ code }) => outgoingRegimenCodes.has(code))
   );
   const unmatchedIncomingCodes = new Set(
-    [...incomingRegimenCodes].filter(code => !matchingRegimenCodes.has(code))
+    incomingLines.filter(({ code }) => !matchingRegimenCodes.has(code))
   );
   const unmatchedOutgoingCodes = new Set(
-    [...outgoingRegimenCodes].filter(code => !matchingRegimenCodes.has(code))
+    outgoingLines.filter(code => !matchingRegimenCodes.has(code))
   );
 
-  const fullRegimenLineItems = [...incomingRegimens].filter(({ code }) =>
-    matchingRegimenCodes.has(code)
-  );
-  const unmatchedIncomingRegimenLines = [...incomingRegimens].filter(({ code }) =>
+  const fullRegimenLineItems = incomingLines.filter(({ code }) => matchingRegimenCodes.has(code));
+  const unmatchedIncomingRegimenLines = incomingLines.filter(({ code }) =>
     unmatchedIncomingCodes.has(code)
   );
-  const unmatchedOutgoingRegimenLines = [...outgoingRegimens].filter(({ code }) =>
+  const unmatchedOutgoingRegimenLines = outgoingLines.filter(({ code }) =>
     unmatchedOutgoingCodes.has(code)
   );
 
