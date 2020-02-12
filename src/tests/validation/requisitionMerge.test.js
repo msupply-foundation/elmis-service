@@ -5,6 +5,8 @@ import {
   incomingRequisitionTestObject,
   outgoingRequisitionTestObject,
   mergedRequisitionTestObject,
+  unmatchedIncomingRegimenLines,
+  unmatchedOutgoingRegimenLines,
 } from '../testData';
 
 beforeEach(() => {
@@ -19,9 +21,29 @@ test('should return a new object', () => {
   );
   expect(mergedRequisition).toEqual({
     requisition: mergedRequisitionTestObject,
+    unmatchedIncomingRegimenLines,
+    unmatchedOutgoingRegimenLines,
     unmatchedIncomingLines: [],
     unmatchedOutgoingLines: [],
   });
+});
+
+test('should return success', () => {
+  const resultShouldEqual = {
+    requisition: mergedRequisitionTestObject,
+    unmatchedIncomingRegimenLines,
+    unmatchedOutgoingRegimenLines,
+    unmatchedIncomingLines: [],
+    unmatchedOutgoingLines: [],
+  };
+
+  let result;
+  try {
+    result = requisitionMerge(incomingRequisitionTestObject, outgoingRequisitionTestObject);
+  } catch (error) {
+    result = error;
+  }
+  expect(result).toEqual(resultShouldEqual);
 });
 
 test('should return success, with 1 object in unmatchingIncomingLines ', () => {
@@ -46,6 +68,8 @@ test('should return success, with 1 object in unmatchingIncomingLines ', () => {
   };
   const resultShouldEqual = {
     requisition: mergedRequisitionTestObject,
+    unmatchedIncomingRegimenLines,
+    unmatchedOutgoingRegimenLines,
     unmatchedIncomingLines: [
       { itemCode: 'CCC', itemID: 4, itemName: 'item', itemRequestedQuantity: 3 },
     ],
@@ -53,7 +77,7 @@ test('should return success, with 1 object in unmatchingIncomingLines ', () => {
   };
 
   requisitionLines.push({ ...newRequisitionLine });
-  const testingRequisition = { requisitionLines };
+  const testingRequisition = { ...incomingRequisitionTestObject, requisitionLines };
   try {
     result = requisitionMerge(testingRequisition, outgoingRequisitionTestObject);
   } catch (error) {
@@ -92,6 +116,8 @@ test('should return success, with one object in unmatchedOutgoingLines ', () => 
         { ...fullSupplyLineItem, quantityRequested: 0 },
       ],
     },
+    unmatchedIncomingRegimenLines,
+    unmatchedOutgoingRegimenLines,
     unmatchedIncomingLines: [],
     unmatchedOutgoingLines: [
       {
