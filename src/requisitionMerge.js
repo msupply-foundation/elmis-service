@@ -78,7 +78,7 @@ const createRegimenLineItems = regimenData => {
       });
       return indicatorRegimenLineItems;
     })
-    .reduce((acc, indicatorRegimenLineItems) => [...acc, ...indicatorRegimenLineItems]);
+    .reduce((acc, indicatorRegimenLineItems) => [...acc, ...indicatorRegimenLineItems], []);
   return regimenLineItems;
 };
 
