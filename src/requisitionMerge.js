@@ -15,9 +15,10 @@ import { errorObject, ERROR_MERGE_PARAMS } from './errors/errors';
  */
 const MERGE_FIELDS_MAPPING = {
   quantityReceived: 'incomingStock',
-  quantityDispensed: 'outgoingStock',
-  totalLossesAndAdjustments: 'inventoryAdjustments',
   quantityRequested: 'Cust_stock_order',
+  quantityDispensed: 'outgoingStock',
+  stockInHand: 'stock_on_hand',
+  totalLossesAndAdjustments: 'inventoryAdjustments',
 };
 
 /**
@@ -106,18 +107,6 @@ const minimalOutgoingLine = outgoingLine => ({
   itemCode: outgoingLine.productCode,
   requiredItem: !outgoingLine.skipped,
 });
-
-/**
- * Calculate the new stock in hand using the outgoing line inital stock on hand as
- * a base. Take the max of this number and 0 to ensure validation passes
- * @param {object}  incomingLine
- * @return {number}
- */
-const getNewStockOnHand = (incomingLine, outgoingLine) => {
-  const { actualQuan, Cust_stock_received, Cust_loss_adjust } = incomingLine;
-  const { beginningBalance } = outgoingLine;
-  return Math.max(beginningBalance - actualQuan + Cust_stock_received + Cust_loss_adjust, 0);
-};
 
 const getConsumption = incomingLine => {
   const { daily_usage } = incomingLine;
@@ -239,13 +228,11 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
     // Set the new stock in hand and requested quantity. Use the reason from mSupply, if possible.
     // Otherwise set a generic reason to pass validation
     // Push the new updated line for integrating into eSIGL
-    const stockInHand = getNewStockOnHand(incomingLine, matchedOutgoingLine);
     const reasonForRequestedQuantity = getNewReason(incomingLine);
     const consumption = getConsumption(incomingLine);
     updatedLines.push({
       ...matchedOutgoingLine,
       skipped: false,
-      stockInHand,
       reasonForRequestedQuantity,
       consumption,
       normalizedConsumption: consumption,
