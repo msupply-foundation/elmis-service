@@ -18,6 +18,7 @@ const MERGE_FIELDS_MAPPING = {
   quantityRequested: 'Cust_stock_order',
   quantityDispensed: 'outgoingStock',
   stockInHand: 'stock_on_hand',
+  beginningBalance: 'stock_on_hand',
   totalLossesAndAdjustments: 'inventoryAdjustments',
 };
 
