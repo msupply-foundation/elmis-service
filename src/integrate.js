@@ -122,6 +122,8 @@ export async function initiateRequisition(inputParameters) {
       requisitionId: parameterObject.requisitionId,
       unmatchedIncomingLines: parameterObject.unmatchedIncomingLines,
       unmatchedOutgoingLines: parameterObject.unmatchedOutgoingLines,
+      unmatchedIncomingRegimenLines: parameterObject.unmatchedIncomingRegimenLines,
+      unmatchedOutgoingRegimenLines: parameterObject.unmatchedOutgoingRegimenLines,
     };
   } catch (error) {
     // If the error caught has no code, it has not been explicitly thrown
