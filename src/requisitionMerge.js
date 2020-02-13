@@ -119,6 +119,11 @@ const getNewStockOnHand = (incomingLine, outgoingLine) => {
   return Math.max(beginningBalance - actualQuan + Cust_stock_received + Cust_loss_adjust, 0);
 };
 
+const getConsumption = incomingLine => {
+  const { daily_usage } = incomingLine;
+  return daily_usage * 30;
+};
+
 /**
  * Determine the reason to apply to the outgoing line. If the incoming line has not
  * provided a reason, provide a generic, default reason for each line.
@@ -234,11 +239,16 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
     // Set the new stock in hand and requested quantity. Use the reason from mSupply, if possible.
     // Otherwise set a generic reason to pass validation
     // Push the new updated line for integrating into eSIGL
+    const stockInHand = getNewStockOnHand(incomingLine, matchedOutgoingLine);
+    const reasonForRequestedQuantity = getNewReason(incomingLine);
+    const consumption = getConsumption(incomingLine);
     updatedLines.push({
       ...matchedOutgoingLine,
       skipped: false,
-      stockInHand: getNewStockOnHand(incomingLine, matchedOutgoingLine),
-      reasonForRequestedQuantity: getNewReason(incomingLine),
+      stockInHand,
+      reasonForRequestedQuantity,
+      consumption,
+      normalizedConsumption: consumption,
       ...getMappedFields(incomingLine),
     });
     // Remove the outgoing line as to not check against it again when
