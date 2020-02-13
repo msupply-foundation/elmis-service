@@ -99,7 +99,7 @@ test('should return success, with one object in unmatchedOutgoingLines ', () => 
     quantityReceived: 0,
     quantityDispensed: 0,
     totalLossesAndAdjustments: 0,
-    beginningBalance: 3,
+    beginningBalance: 6,
     skipped: false,
     reasonForRequestedQuantity: 'MSupply: Zero quantity ordered',
     previousStockInHand: 1,
@@ -113,7 +113,7 @@ test('should return success, with one object in unmatchedOutgoingLines ', () => 
       ...mergedRequisitionTestObject,
       fullSupplyLineItems: [
         ...mergedRequisitionTestObject.fullSupplyLineItems,
-        { ...fullSupplyLineItem, quantityRequested: 0 },
+        { ...fullSupplyLineItem, quantityRequested: 0, beginningBalance: 0 },
       ],
     },
     unmatchedIncomingRegimenLines,
