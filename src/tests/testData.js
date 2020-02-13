@@ -115,6 +115,8 @@ export const incomingRequisitionTestObject = {
       Cust_stock_order: 3,
       incomingStock: 3,
       outgoingStock: 3,
+      stock_on_hand: 6,
+      daily_usage: 3,
       inventoryAdjustments: 3,
       item: {
         code: 'AAA',
@@ -133,6 +135,8 @@ export const incomingRequisitionTestObject = {
       Cust_stock_order: 3,
       incomingStock: 3,
       outgoingStock: 3,
+      stock_on_hand: 6,
+      daily_usage: 3,
       inventoryAdjustments: 3,
       item: {
         code: 'BBB',
@@ -164,6 +168,8 @@ export const mergedRequisitionTestObject = {
       quantityRequested: 3,
       reasonForRequestedQuantity: 'reason',
       previousStockInHand: 10,
+      consumption: 90,
+      normalizedConsumption: 90,
     },
     {
       id: 2,
@@ -178,6 +184,8 @@ export const mergedRequisitionTestObject = {
       quantityRequested: 3,
       reasonForRequestedQuantity: 'reason',
       previousStockInHand: 10,
+      consumption: 90,
+      normalizedConsumption: 90,
     },
   ],
 };
