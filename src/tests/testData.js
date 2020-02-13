@@ -115,6 +115,7 @@ export const incomingRequisitionTestObject = {
       Cust_stock_order: 3,
       incomingStock: 3,
       outgoingStock: 3,
+      stock_on_hand: 6,
       daily_usage: 3,
       inventoryAdjustments: 3,
       item: {
@@ -134,6 +135,7 @@ export const incomingRequisitionTestObject = {
       Cust_stock_order: 3,
       incomingStock: 3,
       outgoingStock: 3,
+      stock_on_hand: 6,
       daily_usage: 3,
       inventoryAdjustments: 3,
       item: {
