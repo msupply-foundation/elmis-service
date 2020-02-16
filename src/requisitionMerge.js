@@ -30,13 +30,13 @@ const MERGE_FIELDS_MAPPING = {
  */
 const MERGE_REGIMENS_MAPPING = {
   code: 'code',
-  patients_adultes_recus: 'patientsOnTreatmentAdult',
-  patients_enfants_recus: 'patientsOnTreatmentChildren',
   nouvelle_inclusion_adulte: 'patientsToInitiateTreatmentAdult',
   nouvelle_inclusion_enfant: 'patientsToInitiateTreatmentChild',
-  regimen_value: 'value',
-  regimen_comment: 'comment',
+  patients_adultes_recus: 'patientsOnTreatmentAdult',
+  patients_enfants_recus: 'patientsOnTreatmentChildren',
   referes: 'remarks',
+  regimen_value: 'patientsOnTreatment',
+  regimen_comment: 'remarks',
 };
 
 /**
@@ -109,11 +109,6 @@ const minimalOutgoingLine = outgoingLine => ({
   itemCode: outgoingLine.productCode,
   requiredItem: !outgoingLine.skipped,
 });
-
-const getConsumption = incomingLine => {
-  const { daily_usage } = incomingLine;
-  return daily_usage * 30;
-};
 
 /**
  * Determine the reason to apply to the outgoing line. If the incoming line has not
@@ -230,14 +225,10 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
     // Set the new stock in hand and requested quantity. Use the reason from mSupply, if possible.
     // Otherwise set a generic reason to pass validation
     // Push the new updated line for integrating into eSIGL
-    const reasonForRequestedQuantity = getNewReason(incomingLine);
-    const consumption = getConsumption(incomingLine);
     updatedLines.push({
       ...matchedOutgoingLine,
       skipped: false,
-      reasonForRequestedQuantity,
-      consumption,
-      normalizedConsumption: consumption,
+      reasonForRequestedQuantity: getNewReason(incomingLine),
       ...getMappedFields(incomingLine),
     });
     // Remove the outgoing line as to not check against it again when
