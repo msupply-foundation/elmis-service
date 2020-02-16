@@ -170,8 +170,6 @@ export const mergedRequisitionTestObject = {
       quantityRequested: 3,
       reasonForRequestedQuantity: 'reason',
       previousStockInHand: 10,
-      consumption: 90,
-      normalizedConsumption: 90,
     },
     {
       id: 2,
@@ -186,8 +184,6 @@ export const mergedRequisitionTestObject = {
       quantityRequested: 3,
       reasonForRequestedQuantity: 'reason',
       previousStockInHand: 10,
-      consumption: 90,
-      normalizedConsumption: 90,
     },
   ],
 };
