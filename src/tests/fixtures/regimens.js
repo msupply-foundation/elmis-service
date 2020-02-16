@@ -43,8 +43,8 @@ const HIV_COLUMNS_ESIGL = {
 };
 
 const REGIMEN_COLUMNS_ESIGL = {
-  [REGIMEN_COLUMNS.VALUE]: 'value',
-  [REGIMEN_COLUMNS.COMMENT]: 'comment',
+  [REGIMEN_COLUMNS.VALUE]: 'patientsOnTreatment',
+  [REGIMEN_COLUMNS.COMMENT]: 'remarks',
 };
 
 export const regimenDataIncoming = {
@@ -185,11 +185,12 @@ export const regimenLineItemsMerged = [
   },
 ];
 
+// Note: unmatched regimen lines
 export const unmatchedIncomingRegimenLines = [
   {
     code: 'UNMATCHED_INCOMING_REGIMEN',
-    comment: '',
-    value: '',
+    [REGIMEN_COLUMNS_MSUPPLY[REGIMEN_COLUMNS.VALUE]]: '',
+    [REGIMEN_COLUMNS_MSUPPLY[REGIMEN_COLUMNS.COMMENT]]: '',
   },
 ];
 
