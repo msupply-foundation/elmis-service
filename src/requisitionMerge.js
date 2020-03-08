@@ -123,6 +123,47 @@ const getNewReason = incomingLine => {
   return newReason;
 };
 
+/**
+ * Map a positive inventory adjustment to an eSIGL adjustment object.
+ */
+
+const getAdjustment = inventoryAdjustments => ({
+  type: {
+    id: null,
+    name: 'CORRECTIF_INVENTAIRE_POS',
+    description: "Correctif d'inventaire positif",
+    additive: true,
+    displayOrder: 1,
+  },
+  quantity: inventoryAdjustments,
+});
+
+/**
+ * Map a negative inventory adjustment to an eSIGL loss object.
+ */
+const getLoss = inventoryAdjustments => ({
+  type: {
+    id: null,
+    name: 'CORRECTIF_INVENTAIRE_NEG',
+    description: "Correctif d'inventaire négatif",
+    additive: false,
+    displayOrder: 1,
+  },
+  quantity: Math.abs(inventoryAdjustments),
+});
+
+/**
+ * Map an incoming line inventory adjustment to a singleton array consisting
+ * of an equivalent eSIGL loss or adjustment object.
+ */
+const getLossesAndAdjustments = incomingLine => {
+  const { inventoryAdjustments } = incomingLine;
+  if (inventoryAdjustments === 0) return [];
+  return [
+    inventoryAdjustments > 0 ? getAdjustment(inventoryAdjustments) : getLoss(inventoryAdjustments),
+  ];
+};
+
 const getMappedRegimenColumns = incomingRegimenLine => {
   const updatedRegimenLine = {};
   Object.entries(incomingRegimenLine).forEach(([key, value]) => {
@@ -225,10 +266,13 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
     // Set the new stock in hand and requested quantity. Use the reason from mSupply, if possible.
     // Otherwise set a generic reason to pass validation
     // Push the new updated line for integrating into eSIGL
+    const reasonForRequestedQuantity = getNewReason(incomingLine);
+    const lossesAndAdjustments = getLossesAndAdjustments(incomingLine);
     updatedLines.push({
       ...matchedOutgoingLine,
       skipped: false,
-      reasonForRequestedQuantity: getNewReason(incomingLine),
+      reasonForRequestedQuantity,
+      lossesAndAdjustments,
       ...getMappedFields(incomingLine),
     });
     // Remove the outgoing line as to not check against it again when

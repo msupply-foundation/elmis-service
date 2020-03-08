@@ -163,6 +163,18 @@ export const mergedRequisitionTestObject = {
       stockInHand: 6,
       quantityReceived: 3,
       quantityDispensed: 3,
+      lossesAndAdjustments: [
+        {
+          type: {
+            id: null,
+            name: 'CORRECTIF_INVENTAIRE_POS',
+            description: "Correctif d'inventaire positif",
+            additive: true,
+            displayOrder: 1,
+          },
+          quantity: 3,
+        },
+      ],
       totalLossesAndAdjustments: 3,
       beginningBalance: 6,
       anAdditionalField: 1,
@@ -177,6 +189,18 @@ export const mergedRequisitionTestObject = {
       stockInHand: 6,
       quantityReceived: 3,
       quantityDispensed: 3,
+      lossesAndAdjustments: [
+        {
+          type: {
+            id: null,
+            name: 'CORRECTIF_INVENTAIRE_POS',
+            description: "Correctif d'inventaire positif",
+            additive: true,
+            displayOrder: 1,
+          },
+          quantity: 3,
+        },
+      ],
       totalLossesAndAdjustments: 3,
       beginningBalance: 6,
       anAdditionalField: 1,
