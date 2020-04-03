@@ -30,13 +30,13 @@ const MERGE_FIELDS_MAPPING = {
  */
 const MERGE_REGIMENS_MAPPING = {
   code: 'code',
-  patients_adultes_recus: 'patientsOnTreatmentAdult',
-  patients_enfants_recus: 'patientsOnTreatmentChildren',
   nouvelle_inclusion_adulte: 'patientsToInitiateTreatmentAdult',
   nouvelle_inclusion_enfant: 'patientsToInitiateTreatmentChild',
-  regimen_value: 'value',
-  regimen_comment: 'comment',
+  patients_adultes_recus: 'patientsOnTreatmentAdult',
+  patients_enfants_recus: 'patientsOnTreatmentChildren',
   referes: 'remarks',
+  regimen_value: 'patientsOnTreatment',
+  regimen_comment: 'remarks',
 };
 
 /**
@@ -110,11 +110,6 @@ const minimalOutgoingLine = outgoingLine => ({
   requiredItem: !outgoingLine.skipped,
 });
 
-const getConsumption = incomingLine => {
-  const { daily_usage } = incomingLine;
-  return daily_usage * 30;
-};
-
 /**
  * Determine the reason to apply to the outgoing line. If the incoming line has not
  * provided a reason, provide a generic, default reason for each line.
@@ -128,7 +123,47 @@ const getNewReason = incomingLine => {
   return newReason;
 };
 
-const getMappedRegimenColumns = incomingRegimenLine => {
+/**
+ * Map a positive inventory adjustment to an eSIGL adjustment object.
+ */
+const getAdjustment = inventoryAdjustments => ({
+  type: {
+    id: null,
+    name: 'CORRECTIF_INVENTAIRE_POS',
+    description: "Correctif d'inventaire positif",
+    additive: true,
+    displayOrder: 1,
+  },
+  quantity: inventoryAdjustments,
+});
+
+/**
+ * Map a negative inventory adjustment to an eSIGL loss object.
+ */
+const getLoss = inventoryAdjustments => ({
+  type: {
+    id: null,
+    name: 'CORRECTIF_INVENTAIRE_NEG',
+    description: "Correctif d'inventaire négatif",
+    additive: false,
+    displayOrder: 1,
+  },
+  quantity: Math.abs(inventoryAdjustments),
+});
+
+/**
+ * Map an incoming line inventory adjustment to a singleton array consisting
+ * of an equivalent eSIGL loss or adjustment object.
+ */
+const getLossesAndAdjustments = incomingLine => {
+  const { inventoryAdjustments } = incomingLine;
+  if (inventoryAdjustments === 0) return [];
+  return [
+    inventoryAdjustments > 0 ? getAdjustment(inventoryAdjustments) : getLoss(inventoryAdjustments),
+  ];
+};
+
+const getMappedRegimenLine = incomingRegimenLine => {
   const updatedRegimenLine = {};
   Object.entries(incomingRegimenLine).forEach(([key, value]) => {
     if (MERGE_REGIMENS_MAPPING[key]) updatedRegimenLine[MERGE_REGIMENS_MAPPING[key]] = value;
@@ -152,20 +187,6 @@ const getMappedFields = incomingLine => {
   return updatedRequisition;
 };
 
-/**
- * A helper function for extracting codes from an array of regimen lines.
- * @param {Array} regimenLines
- * @returns {Array}
- */
-const extractRegimenCodes = regimenLines => regimenLines.map(({ code }) => code);
-
-/**
- * A helper function which returns a closure for filtering an array by element codes.
- * @param {Function} filterFunction
- * @returns {Function}
- */
-const filterByRegimenCode = filterFunction => ({ code }) => filterFunction(code);
-
 const findMatchedRequisition = ({ code: incomingItemCode }) => ({
   productCode: outgoingItemCode,
 }) => outgoingItemCode === incomingItemCode;
@@ -179,22 +200,32 @@ const findMatchedRequisition = ({ code: incomingItemCode }) => ({
  */
 const requisitionRegimensMerge = (incomingRegimenLines, outgoingRegimenLines) => {
   // Map incoming regimen line column codes from mSupply to eSIGL.
-  const incomingLines = incomingRegimenLines.map(getMappedRegimenColumns);
+  const incomingLines = [...incomingRegimenLines];
   const outgoingLines = [...outgoingRegimenLines];
   // Get all distinct outgoing regimen codes.
-  const outgoingRegimenLineCodes = new Set(extractRegimenCodes(outgoingLines));
+  const outgoingLineCodes = new Set(outgoingLines.map(({ code }) => code));
   // Get all incoming regimen lines with valid codes.
-  const filterByOutgoingRegimenLines = code => outgoingRegimenLineCodes.has(code);
-  const filterFullRegimenLines = filterByRegimenCode(filterByOutgoingRegimenLines);
-  const fullRegimenLineItems = incomingLines.filter(filterFullRegimenLines);
+  const fullLineItems = incomingLines.reduce((acc, incomingLine) => {
+    const mappedIncomingLine = getMappedRegimenLine(incomingLine);
+    return outgoingLineCodes.has(mappedIncomingLine.code) ? [...acc, mappedIncomingLine] : acc;
+  }, []);
   // Get all distinct full regimen line codes.
-  const fullRegimenLineCodes = new Set(extractRegimenCodes(fullRegimenLineItems));
-  // Get all incoming and outgoing regimen lines with unmatched codes.
-  const filterByFullRegimenLines = code => !fullRegimenLineCodes.has(code);
-  const filterUnmatchedRegimenLines = filterByRegimenCode(filterByFullRegimenLines);
-  const unmatchedIncomingRegimenLines = incomingLines.filter(filterUnmatchedRegimenLines);
-  const unmatchedOutgoingRegimenLines = outgoingLines.filter(filterUnmatchedRegimenLines);
-  return { fullRegimenLineItems, unmatchedIncomingRegimenLines, unmatchedOutgoingRegimenLines };
+  const fullLineCodes = new Set(fullLineItems.map(({ code }) => code));
+  // Get all incoming regimen lines with unmatched codes.
+  const unmatchedIncomingLines = incomingLines.reduce((acc, incomingLine) => {
+    const mappedIncomingLine = getMappedRegimenLine(incomingLine);
+    return fullLineCodes.has(mappedIncomingLine.code) ? acc : [...acc, incomingLine];
+  }, []);
+  // Get all incoming regimen lines with unmatched codes.
+  const unmatchedOutgoingLines = outgoingLines.reduce((acc, outgoingLine) => {
+    return fullLineCodes.has(outgoingLine.code) ? acc : [...acc, outgoingLine];
+  }, []);
+  // Return all matched and unmatched regimen lines.
+  return {
+    fullRegimenLineItems: fullLineItems,
+    unmatchedIncomingRegimenLines: unmatchedIncomingLines,
+    unmatchedOutgoingRegimenLines: unmatchedOutgoingLines,
+  };
 };
 
 /**
@@ -231,13 +262,12 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
     // Otherwise set a generic reason to pass validation
     // Push the new updated line for integrating into eSIGL
     const reasonForRequestedQuantity = getNewReason(incomingLine);
-    const consumption = getConsumption(incomingLine);
+    const lossesAndAdjustments = getLossesAndAdjustments(incomingLine);
     updatedLines.push({
       ...matchedOutgoingLine,
       skipped: false,
       reasonForRequestedQuantity,
-      consumption,
-      normalizedConsumption: consumption,
+      lossesAndAdjustments,
       ...getMappedFields(incomingLine),
     });
     // Remove the outgoing line as to not check against it again when
