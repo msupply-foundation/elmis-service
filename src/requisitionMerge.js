@@ -20,6 +20,7 @@ const MERGE_FIELDS_MAPPING = {
   stockInHand: 'stock_on_hand',
   previousStockInHand: 'stock_on_hand',
   totalLossesAndAdjustments: 'inventoryAdjustments',
+  stockOutDays: 'DOSforAMCadjustment',
 };
 
 /**
