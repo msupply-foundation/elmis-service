@@ -17,7 +17,6 @@ const MERGE_FIELDS_MAPPING = {
   quantityReceived: 'incomingStock',
   quantityRequested: 'Cust_stock_order',
   quantityDispensed: 'outgoingStock',
-  stockInHand: 'stock_on_hand',
   previousStockInHand: 'stock_on_hand',
   totalLossesAndAdjustments: 'inventoryAdjustments',
   stockOutDays: 'DOSforAMCadjustment',
