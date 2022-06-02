@@ -152,15 +152,39 @@ const getLoss = inventoryAdjustments => ({
 });
 
 /**
- * Map an incoming line inventory adjustment to a singleton array consisting
- * of an equivalent eSIGL loss or adjustment object.
+ * Create losses and positive adjustments as required
  */
-const getLossesAndAdjustments = incomingLine => {
+const getLossesAndAdjustments = (incomingLine, outgoingLine) => {
+  const adjustments = [];
+
+  // Correct the beginningBalance value if this differs from mSupply's stock on hand.
+  const beginningBalanceAdjustment =
+    (incomingLine.stock_on_hand || 0) -
+    (outgoingLine.beginningBalance || 0) +
+    (incomingLine.incomingStock || 0) -
+    (outgoingLine.outgoingStock || 0);
+
+  if (beginningBalanceAdjustment !== 0) {
+    const balanceAdjustment =
+      beginningBalanceAdjustment > 0
+        ? getAdjustment(beginningBalanceAdjustment)
+        : getLoss(beginningBalanceAdjustment);
+
+    balanceAdjustment.reason = 'MSupply: Balance adjustment';
+    adjustments.push(balanceAdjustment);
+  }
+
+  /**
+   * Map an incoming line inventory adjustment to a singleton array consisting
+   * of an equivalent eSIGL loss or adjustment object.
+   */
   const { inventoryAdjustments } = incomingLine;
-  if (inventoryAdjustments === 0) return [];
-  return [
-    inventoryAdjustments > 0 ? getAdjustment(inventoryAdjustments) : getLoss(inventoryAdjustments),
-  ];
+  if (inventoryAdjustments === 0) return adjustments;
+  adjustments.push(
+    inventoryAdjustments > 0 ? getAdjustment(inventoryAdjustments) : getLoss(inventoryAdjustments)
+  );
+
+  return adjustments;
 };
 
 const getMappedRegimenLine = incomingRegimenLine => {
@@ -258,11 +282,12 @@ function requisitionItemsMerge(incomingRequisitionLines, outgoingRequisitionLine
     }
     // Make a clone of the matched outgoing line. Flat object so shallow copy is fine
     const { ...matchedOutgoingLine } = outgoingLines[matchedOutgoingLineIndex];
-    // Set the new stock in hand and requested quantity. Use the reason from mSupply, if possible.
+    // Set the new stock on hand and requested quantity. Use the reason from mSupply, if possible.
     // Otherwise set a generic reason to pass validation
     // Push the new updated line for integrating into eSIGL
     const reasonForRequestedQuantity = getNewReason(incomingLine);
-    const lossesAndAdjustments = getLossesAndAdjustments(incomingLine);
+    const lossesAndAdjustments = getLossesAndAdjustments(incomingLine, matchedOutgoingLine);
+
     updatedLines.push({
       ...matchedOutgoingLine,
       skipped: false,

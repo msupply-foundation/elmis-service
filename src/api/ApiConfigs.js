@@ -27,7 +27,7 @@ export default class ApiConfigs {
   static getProgramsConfig = ({ baseURL, cookie }) => ({
     ...ApiConfigs.BASE_CONFIG,
     baseURL,
-    url: '/create/requisition/programs',
+    url: '/create/requisition/programs.json',
     headers: { Cookie: cookie },
   });
 
