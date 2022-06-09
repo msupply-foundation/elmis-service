@@ -162,7 +162,7 @@ const getLossesAndAdjustments = (incomingLine, outgoingLine) => {
     (incomingLine.stock_on_hand || 0) -
     (outgoingLine.beginningBalance || 0) +
     (incomingLine.incomingStock || 0) -
-    (outgoingLine.outgoingStock || 0);
+    (incomingLine.outgoingStock || 0);
 
   if (beginningBalanceAdjustment !== 0) {
     const balanceAdjustment =
