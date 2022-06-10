@@ -114,9 +114,9 @@ export function periodValidation(
   }
   const [period] = periods;
 
-  if (emergency) return period.id;
+  // if (emergency) return period.id;
 
-  if (rnr_list && rnr_list.length !== 0) {
+  if (!emergency && rnr_list && rnr_list.length !== 0) {
     const anyRegularOrders = rnr_list.some(rnr => rnr.emergency !== true);
     if (anyRegularOrders) throw errorObject(ERROR_PERIOD_UNFINISHED);
   }
