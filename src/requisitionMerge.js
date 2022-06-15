@@ -14,11 +14,11 @@ import { errorObject, ERROR_MERGE_PARAMS } from './errors/errors';
  * fields of the incoming requisition.
  */
 const MERGE_FIELDS_MAPPING = {
-  quantityReceived: 'incomingStock',
+  quantityReceived: 'Cust_stock_received',
   quantityRequested: 'Cust_stock_order',
-  quantityDispensed: 'outgoingStock',
+  quantityDispensed: 'Cust_stock_issued',
   stockInHand: 'stock_on_hand',
-  previousStockInHand: 'stock_on_hand',
+  previousStockInHand: 'Cust_prev_stock_balance',
   totalLossesAndAdjustments: 'inventoryAdjustments',
   stockOutDays: 'DOSforAMCadjustment',
 };
@@ -159,10 +159,7 @@ const getLossesAndAdjustments = (incomingLine, outgoingLine) => {
 
   // Correct the beginningBalance value if this differs from mSupply's stock on hand.
   const beginningBalanceAdjustment =
-    (incomingLine.stock_on_hand || 0) -
-    (outgoingLine.beginningBalance || 0) +
-    (incomingLine.incomingStock || 0) -
-    (incomingLine.outgoingStock || 0);
+    (incomingLine.Cust_prev_stock_balance || 0) - (outgoingLine.beginningBalance || 0);
 
   if (beginningBalanceAdjustment !== 0) {
     const balanceAdjustment =
