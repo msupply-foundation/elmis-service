@@ -152,6 +152,34 @@ const getLoss = inventoryAdjustments => ({
 });
 
 /**
+ * Map a positive inventory adjustment to an eSIGL adjustment object.
+ */
+const getInitialAdjustment = inventoryAdjustments => ({
+  type: {
+    id: null,
+    name: 'POSITIVE_IMBALANCE',
+    description: 'Ajustement positif du stock initial',
+    additive: true,
+    displayOrder: 14,
+  },
+  quantity: inventoryAdjustments,
+});
+
+/**
+ * Map a negative inventory adjustment to an eSIGL loss object.
+ */
+const getInitialLoss = inventoryAdjustments => ({
+  type: {
+    id: null,
+    name: 'NEGATIVE_IMBALANCE',
+    description: 'Ajustement négatif du stock initial',
+    additive: false,
+    displayOrder: 13,
+  },
+  quantity: Math.abs(inventoryAdjustments),
+});
+
+/**
  * Create losses and positive adjustments as required
  */
 const getLossesAndAdjustments = (incomingLine, outgoingLine) => {
@@ -164,8 +192,8 @@ const getLossesAndAdjustments = (incomingLine, outgoingLine) => {
   if (beginningBalanceAdjustment !== 0) {
     const balanceAdjustment =
       beginningBalanceAdjustment > 0
-        ? getAdjustment(beginningBalanceAdjustment)
-        : getLoss(beginningBalanceAdjustment);
+        ? getInitialAdjustment(beginningBalanceAdjustment)
+        : getInitialLoss(beginningBalanceAdjustment);
 
     balanceAdjustment.reason = 'MSupply: Balance adjustment';
     adjustments.push(balanceAdjustment);
