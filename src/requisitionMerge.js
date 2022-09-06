@@ -183,11 +183,12 @@ const getInitialLoss = inventoryAdjustments => ({
  * Create losses and positive adjustments as required
  */
 const getLossesAndAdjustments = (incomingLine, outgoingLine) => {
+  const { stock_on_hand, inventoryAdjustments } = incomingLine;
   const adjustments = [];
 
   // Correct the beginningBalance value if this differs from mSupply's stock on hand.
   const beginningBalanceAdjustment =
-    (incomingLine.Cust_prev_stock_balance || 0) - (outgoingLine.beginningBalance || 0);
+    (stock_on_hand || 0) - ((outgoingLine.beginningBalance || 0) + (inventoryAdjustments || 0));
 
   if (beginningBalanceAdjustment !== 0) {
     const balanceAdjustment =
@@ -203,7 +204,6 @@ const getLossesAndAdjustments = (incomingLine, outgoingLine) => {
    * Map an incoming line inventory adjustment to a singleton array consisting
    * of an equivalent eSIGL loss or adjustment object.
    */
-  const { inventoryAdjustments } = incomingLine;
   if (inventoryAdjustments === 0) return adjustments;
   adjustments.push(
     inventoryAdjustments > 0 ? getAdjustment(inventoryAdjustments) : getLoss(inventoryAdjustments)
