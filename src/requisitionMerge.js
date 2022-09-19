@@ -183,12 +183,13 @@ const getInitialLoss = inventoryAdjustments => ({
  * Create losses and positive adjustments as required
  */
 const getLossesAndAdjustments = (incomingLine, outgoingLine) => {
-  const { stock_on_hand, inventoryAdjustments } = incomingLine;
+  const { stock_on_hand, inventoryAdjustments, Cust_stock_issued } = incomingLine;
   const adjustments = [];
 
   // Correct the beginningBalance value if this differs from mSupply's stock on hand.
   const beginningBalanceAdjustment =
-    (stock_on_hand || 0) - ((outgoingLine.beginningBalance || 0) + (inventoryAdjustments || 0));
+    (stock_on_hand || 0) -
+    ((outgoingLine.beginningBalance || 0) + (inventoryAdjustments || 0) - (Cust_stock_issued || 0));
 
   if (beginningBalanceAdjustment !== 0) {
     const balanceAdjustment =
