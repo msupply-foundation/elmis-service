@@ -117,8 +117,8 @@ const minimalOutgoingLine = outgoingLine => ({
  * @return {string}
  */
 const getNewReason = incomingLine => {
-  const { options } = incomingLine;
-  let newReason = 'mSupply: Unknown Reason';
+  const { options, Cust_stock_issued } = incomingLine;
+  let newReason = !Cust_stock_issued ? 'MSupply: Zero quantity ordered' : 'mSupply: Unknown Reason';
   if (options && options.title) newReason = options.title;
   return newReason;
 };
@@ -238,7 +238,7 @@ const getMappedFields = incomingLine => {
 
 const findMatchedRequisition = ({ code: incomingItemCode }) => ({
   productCode: outgoingItemCode,
-}) => outgoingItemCode === incomingItemCode;
+}) => outgoingItemCode.trim() === incomingItemCode.trim();
 
 /**
  * Merges an array of incoming regimen lines with outgoing regimen lines.
