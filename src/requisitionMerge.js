@@ -117,8 +117,8 @@ const minimalOutgoingLine = outgoingLine => ({
  * @return {string}
  */
 const getNewReason = incomingLine => {
-  const { options, Cust_stock_issued } = incomingLine;
-  let newReason = !Cust_stock_issued ? 'MSupply: Zero quantity ordered' : 'mSupply: Unknown Reason';
+  const { options, Cust_stock_order } = incomingLine;
+  let newReason = !Cust_stock_order ? 'MSupply: Zero quantity ordered' : 'mSupply: Unknown Reason';
   if (options && options.title) newReason = options.title;
   return newReason;
 };
