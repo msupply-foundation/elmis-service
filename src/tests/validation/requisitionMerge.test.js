@@ -113,7 +113,13 @@ test('should return success, with one object in unmatchedOutgoingLines ', () => 
       ...mergedRequisitionTestObject,
       fullSupplyLineItems: [
         ...mergedRequisitionTestObject.fullSupplyLineItems,
-        { ...fullSupplyLineItem, quantityRequested: 0, beginningBalance: 0 },
+        {
+          ...fullSupplyLineItem,
+          quantityRequested: 0,
+          beginningBalance: 6,
+          previousStockInHand: 0,
+          stockOutDays: 0,
+        },
       ],
     },
     unmatchedIncomingRegimenLines,

@@ -12,5 +12,8 @@ test('should return the periods list from response', async () => {
     })
   );
   const { periods } = require('../../requests');
-  expect(await periods({ cookie: '', baseURL: '' })).toEqual({ periods: { periods: [] } });
+  expect(await periods({ cookie: '', baseURL: '' })).toEqual({
+    periods: { periods: [] },
+    success: true,
+  });
 });

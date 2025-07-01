@@ -162,8 +162,19 @@ export const mergedRequisitionTestObject = {
       productCode: 'AAA',
       stockInHand: 6,
       quantityReceived: 3,
-      quantityDispensed: 3,
+      quantityDispensed: undefined,
       lossesAndAdjustments: [
+        {
+          type: {
+            id: null,
+            name: 'NEGATIVE_IMBALANCE',
+            description: 'Ajustement négatif du stock initial',
+            additive: false,
+            displayOrder: 13,
+          },
+          quantity: 3,
+          reason: 'MSupply: Balance adjustment',
+        },
         {
           type: {
             id: null,
@@ -181,15 +192,27 @@ export const mergedRequisitionTestObject = {
       skipped: false,
       quantityRequested: 3,
       reasonForRequestedQuantity: 'reason',
-      previousStockInHand: 10,
+      previousStockInHand: undefined,
+      stockOutDays: undefined,
     },
     {
       id: 2,
       productCode: 'BBB',
       stockInHand: 6,
       quantityReceived: 3,
-      quantityDispensed: 3,
+      quantityDispensed: undefined,
       lossesAndAdjustments: [
+        {
+          type: {
+            id: null,
+            name: 'NEGATIVE_IMBALANCE',
+            description: 'Ajustement négatif du stock initial',
+            additive: false,
+            displayOrder: 13,
+          },
+          quantity: 3,
+          reason: 'MSupply: Balance adjustment',
+        },
         {
           type: {
             id: null,
@@ -207,7 +230,8 @@ export const mergedRequisitionTestObject = {
       skipped: false,
       quantityRequested: 3,
       reasonForRequestedQuantity: 'reason',
-      previousStockInHand: 10,
+      previousStockInHand: undefined,
+      stockOutDays: undefined,
     },
   ],
 };

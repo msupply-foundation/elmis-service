@@ -1,4 +1,5 @@
 import '@babel/polyfill';
+import { deleteConfig } from '../testingUtilities';
 
 beforeEach(() => {
   jest.resetModules();
@@ -6,9 +7,20 @@ beforeEach(() => {
 });
 
 test('should return true from response', async () => {
-  jest.doMock('axios', () => jest.fn(() => ({ status: 200 })));
+  jest.doMock('axios', () =>
+    jest.fn(() => ({
+      data: { success: 'The RnR has been deleted successfully.' },
+    }))
+  );
   const { deleteRequisition } = require('../../requests');
-  expect(await deleteRequisition({ cookie: '', baseURL: '', requisitionId: 1 })).toEqual({
-    success: true,
+  const { request, response } = await deleteRequisition({
+    cookie: '',
+    baseURL: '',
+    requisitionId: 1,
   });
+
+  Object.keys(deleteConfig).forEach(key => {
+    expect(request).toHaveProperty(key);
+  });
+  expect(response).toMatchObject({ success: true });
 });
