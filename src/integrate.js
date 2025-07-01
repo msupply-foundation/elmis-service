@@ -97,13 +97,26 @@ export async function integrate(inputParameters) {
 export async function initiateRequisition(inputParameters) {
   let requisitionHasBeenCreated = false;
   let parameterObject;
+  const httpLog = {
+    createRequisition: null,
+    updateRequisition: null,
+    deleteRequisition: null,
+  };
+
   try {
     // Validate input parameters - if invalid an error is thrown.
     integrationValidation(inputParameters);
     // Fetch and validate the parameters for the to-be-created requisition.
     parameterObject = await createParameterObject(inputParameters);
     // Create a requisition on the eSIGL server
-    const { requisition: outgoingRequisition } = await createRequisition(parameterObject);
+    const createResult = await createRequisition(parameterObject);
+    httpLog.createRequisition = {
+      request: createResult.request,
+      response: createResult.response,
+    };
+
+    const { requisition: outgoingRequisition } = createResult.response;
+
     // Flag to determine if deletion should occur if any errors are thrown from this point
     // to avoid having the requisition be in an inconsistent/unknown state.
     requisitionHasBeenCreated = true;
@@ -117,29 +130,58 @@ export async function initiateRequisition(inputParameters) {
     };
     // Update the requisition which has been created on the eSIGL server with values from
     // the incoming requisition.
-    await updateRequisition(parameterObject);
+    const updateResult = await updateRequisition(parameterObject);
+    httpLog.updateRequisition = {
+      request: updateResult.request,
+      response: updateResult.response,
+    };
+
     return {
       requisitionId: parameterObject.requisitionId,
       unmatchedIncomingLines: parameterObject.unmatchedIncomingLines,
       unmatchedOutgoingLines: parameterObject.unmatchedOutgoingLines,
       unmatchedIncomingRegimenLines: parameterObject.unmatchedIncomingRegimenLines,
       unmatchedOutgoingRegimenLines: parameterObject.unmatchedOutgoingRegimenLines,
+      httpLog,
     };
   } catch (error) {
     // If the error caught has no code, it has not been explicitly thrown
-    // and is an unkown runtime error.
+    // and is an unknown runtime error.
     if (!error.code) error = errorObject(ERROR_RUNTIME, error.message);
+    const { request, response, ...rest } = error;
+
+    error.httpLog = {
+      ...error.httpLog,
+      createRequisition: httpLog.createRequisition || {
+        request: request || null,
+        response: { ...response, ...rest } || null,
+      },
+      updateRequisition: httpLog.updateRequisition || {
+        request: request || null,
+        response: { ...response, ...rest } || null,
+      },
+    };
+
     // Otherwise, the error has been explicitly thrown - determine if a
     // requisition has already been created so we can attempt to delete it.
     if (requisitionHasBeenCreated) {
       try {
-        await deleteRequisition(parameterObject);
-        error.wasDeleted = true;
+        const deleteResult = await deleteRequisition(parameterObject);
+        error.httpLog.deleteRequisition = {
+          request: deleteResult.request,
+          response: deleteResult.response,
+        };
       } catch (deleteError) {
-        error.wasDeleted = false;
-        error.deleteError = deleteError;
+        const { request: deleteRequest, response: deleteResponse, ...deleteRest } = deleteError;
+        error.httpLog.deleteRequisition = {
+          request: deleteRequest || null,
+          response: { ...deleteResponse, ...deleteRest } || null,
+        };
       }
     }
+    delete error.request;
+    delete error.response;
+
     throw error;
   }
 }
