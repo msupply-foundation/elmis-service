@@ -313,8 +313,6 @@ export async function deleteRequisition({ baseURL, cookie, requisitionId }) {
       },
     };
   } catch (error) {
-    console.log('Error in deleteRequisition:', error);
-
     throw { ...error, success: false };
   }
 }
