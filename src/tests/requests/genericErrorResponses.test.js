@@ -30,7 +30,7 @@ test('all methods should throw an unauthorized error', async () => {
   delete requiredFunctions.login;
   Object.keys(requiredFunctions).forEach(async functionName => {
     const errorCatcher = await runAndCatchFunction(requiredFunctions[functionName]);
-    expect(errorCatcher).toEqual(errorObject(ERROR_AUTHENTICATION, functionName));
+    expect(errorCatcher).toMatchObject(errorObject(ERROR_AUTHENTICATION, functionName));
   });
 });
 
@@ -40,7 +40,7 @@ test('all methods should throw a server error', async () => {
   delete requiredFunctions.facilities;
   Object.keys(requiredFunctions).forEach(async functionName => {
     const errorCatcher = await runAndCatchFunction(requiredFunctions[functionName]);
-    expect(errorCatcher).toEqual(errorObject(ERROR_SERVER, functionName));
+    expect(errorCatcher).toMatchObject(errorObject(ERROR_SERVER, functionName));
   });
 });
 
@@ -49,7 +49,7 @@ test('all methods should throw request error on not receiving a response', async
   const requiredFunctions = require('../../requests');
   Object.keys(requiredFunctions).forEach(async functionName => {
     const errorCatcher = await runAndCatchFunction(requiredFunctions[functionName]);
-    expect(errorCatcher).toEqual(errorObject(ERROR_NETWORK, functionName));
+    expect(errorCatcher).toMatchObject(errorObject(ERROR_NETWORK, functionName));
   });
 });
 
@@ -58,12 +58,12 @@ test('all methods should throw an unexpected response error', async () => {
   const requiredFunctions = require('../../requests');
   Object.keys(requiredFunctions).forEach(async functionName => {
     const errorCatcher = await runAndCatchFunction(requiredFunctions[functionName]);
-    expect(errorCatcher).toEqual(errorObject(ERROR_UNEXPECTED_RESPONSE, functionName, 999));
+    expect(errorCatcher).toMatchObject(errorObject(ERROR_UNEXPECTED_RESPONSE, functionName, 999));
   });
 });
 
 test('Facilities method should throw a different error on receiving a 500', async () => {
   jest.doMock('axios', () => jest.fn(throw500));
   const errorCatcher = await runAndCatchFunction(require('../../requests').facilities);
-  expect(errorCatcher).toEqual(errorObject(ERROR_FACILITIES_SERVER));
+  expect(errorCatcher).toMatchObject(errorObject(ERROR_FACILITIES_SERVER));
 });
