@@ -1,6 +1,8 @@
-import axios from 'axios';
+import axiosRequest from './axiosUtilities';
 import ApiConfigs from './api/ApiConfigs';
 import { getErrorObject } from './errors/errorLookupTable';
+import { ERROR_COOKIE } from './errors/errors';
+
 /**
  * Method which will return a valid authentication cookie for eSigl.
  * Returned with the name=value pair JSESSIONID=XXXX.
@@ -19,10 +21,18 @@ import { getErrorObject } from './errors/errorLookupTable';
 export async function login({ username, password, baseURL }) {
   const config = ApiConfigs.getLoginConfig({ username, password, baseURL });
   try {
-    const { headers } = await axios(config);
-    return { cookie: headers['set-cookie'][0].split(';')[0] };
+    const {
+      response: { headers },
+    } = await axiosRequest(config, 'login');
+
+    // Check if the 'set-cookie' header exists and has a value
+    if (!headers || !headers['set-cookie'] || !headers['set-cookie'][0]) {
+      throw { ...getErrorObject(ERROR_COOKIE, 'login'), success: false };
+    }
+
+    return { success: true, cookie: headers['set-cookie'][0].split(';')[0] };
   } catch (error) {
-    throw getErrorObject(error, `login`);
+    throw { ...error, success: false };
   }
 }
 
@@ -37,11 +47,13 @@ export async function login({ username, password, baseURL }) {
 export async function programs({ baseURL, cookie }) {
   const config = ApiConfigs.getProgramsConfig({ baseURL, cookie });
   try {
-    const { data } = await axios(config);
+    const {
+      response: { data },
+    } = await axiosRequest(config, 'programs');
     const { programList } = data;
-    return { programs: programList };
+    return { programs: programList, success: true };
   } catch (error) {
-    throw getErrorObject(error, 'programs');
+    throw { ...error, success: false };
   }
 }
 
@@ -58,11 +70,13 @@ export async function programs({ baseURL, cookie }) {
 export async function facilities({ baseURL, cookie, programId }) {
   const config = ApiConfigs.getFacilitiesConfig({ baseURL, cookie, programId });
   try {
-    const { data } = await axios(config);
+    const {
+      response: { data },
+    } = await axiosRequest(config, 'facilities');
     const { facilities: facilityList } = data;
-    return { facilities: facilityList };
+    return { facilities: facilityList, success: true };
   } catch (error) {
-    throw getErrorObject(error, 'facilities');
+    throw { ...error, success: false };
   }
 }
 
@@ -86,10 +100,12 @@ export async function periods({ baseURL, cookie, emergency = false, facilityId, 
     programId,
   });
   try {
-    const { data } = await axios(config);
-    return { periods: data };
+    const {
+      response: { data },
+    } = await axiosRequest(config, 'periods');
+    return { periods: data, success: true };
   } catch (error) {
-    throw getErrorObject(error, 'periods');
+    throw { ...error, success: false };
   }
 }
 
@@ -109,11 +125,14 @@ export async function authorizeRequisition({ baseURL, cookie, requisitionId }) {
     requisitionId,
   });
   try {
-    const { data } = await axios(config);
-    const { success } = data;
+    const {
+      response: {
+        data: { success },
+      },
+    } = await axiosRequest(config, 'authorizeRequisition');
     return { success: success === 'R&R authorized successfully!' };
   } catch (error) {
-    throw getErrorObject(error, 'authorizeRequisition');
+    throw { ...error, success: false };
   }
 }
 
@@ -133,11 +152,14 @@ export async function approveRequisition({ baseURL, cookie, requisitionId }) {
     requisitionId,
   });
   try {
-    const { data } = await axios(config);
-    const { success } = data;
+    const {
+      response: {
+        data: { success },
+      },
+    } = await axiosRequest(config, 'approveRequisition');
     return { success: success === 'R&R approved successfully!' };
   } catch (error) {
-    throw getErrorObject(error, 'approveRequisition');
+    throw { ...error, success: false };
   }
 }
 
@@ -157,11 +179,14 @@ export async function submitRequisition({ baseURL, cookie, requisitionId }) {
     requisitionId,
   });
   try {
-    const { data } = await axios(config);
-    const { success } = data;
+    const {
+      response: {
+        data: { success },
+      },
+    } = await axiosRequest(config, 'submitRequisition');
     return { success: success === 'R&R submitted successfully!' };
   } catch (error) {
-    throw getErrorObject(error, 'submitRequisition');
+    throw { ...error, success: false };
   }
 }
 
@@ -181,10 +206,12 @@ export async function requisitionToOrder({ baseURL, cookie, requisitionId }) {
     requisitionId,
   });
   try {
-    const { status } = await axios(config);
+    const {
+      response: { status },
+    } = await axiosRequest(config, 'requisitionToOrder');
     return { success: status === 201 };
   } catch (error) {
-    throw getErrorObject(error, 'requisitionToOrder');
+    throw { ...error, success: false };
   }
 }
 
@@ -215,12 +242,23 @@ export async function createRequisition({
     facilityId,
     programId,
   });
+
   try {
-    const { data } = await axios(config);
-    const { rnr } = data;
-    return { requisition: { ...rnr } };
+    const result = await axiosRequest(config, 'createRequisition');
+    const {
+      data: { rnr },
+      ...rest
+    } = result.response;
+    return {
+      ...result,
+      response: {
+        ...rest,
+        requisition: rnr,
+        success: rnr !== null,
+      },
+    };
   } catch (error) {
-    throw getErrorObject(error, 'createRequisition');
+    throw { ...error, success: false };
   }
 }
 
@@ -233,12 +271,23 @@ export async function createRequisition({
  */
 export async function updateRequisition({ baseURL, cookie, requisition }) {
   const config = ApiConfigs.getUpdateConfig({ baseURL, cookie, requisition });
+
   try {
-    const { data } = await axios(config);
-    const { success } = data;
-    return { success: success === 'R&R saved successfully!' };
+    const result = await axiosRequest(config, 'updateRequisition', {
+      payloadSize: JSON.stringify(config.data).length,
+      data: config.data,
+    });
+    const { data, ...rest } = result.response;
+    return {
+      ...result,
+      response: {
+        ...rest,
+        ...data,
+        success: data.success === 'R&R saved successfully!',
+      },
+    };
   } catch (error) {
-    throw getErrorObject(error, 'updateRequisition');
+    throw { ...error, success: false };
   }
 }
 
@@ -251,10 +300,19 @@ export async function updateRequisition({ baseURL, cookie, requisition }) {
  */
 export async function deleteRequisition({ baseURL, cookie, requisitionId }) {
   const config = ApiConfigs.getDeleteConfig({ baseURL, cookie, requisitionId });
+
   try {
-    const { status } = await axios(config);
-    return { success: status === 200 };
+    const result = await axiosRequest(config, 'deleteRequisition', { requisitionId });
+    const { data, ...rest } = result.response;
+    return {
+      ...result,
+      response: {
+        ...rest,
+        ...data,
+        success: data.success === 'The RnR has been deleted successfully.',
+      },
+    };
   } catch (error) {
-    throw getErrorObject(error, 'deleteRequisition');
+    throw { ...error, success: false };
   }
 }

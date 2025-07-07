@@ -13,3 +13,29 @@ export const throwRequestError = () => {
 export const throwUnpredictedStatus = () => {
   throw { response: { status: 999 } };
 };
+
+const baseConfig = {
+  url: '/api/resource',
+  method: 'GET',
+  baseURL: 'http://example.com',
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 1000,
+  timestamp: new Date().toISOString(),
+};
+
+export const postConfig = {
+  ...baseConfig,
+  method: 'POST',
+};
+
+export const putConfig = {
+  ...baseConfig,
+  method: 'PUT',
+  payloadSize: 0,
+  data: {},
+};
+export const deleteConfig = {
+  ...baseConfig,
+  method: 'DELETE',
+  requisitionId: '',
+};

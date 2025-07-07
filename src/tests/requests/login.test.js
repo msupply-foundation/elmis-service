@@ -11,7 +11,7 @@ test('should return a cookie', async () => {
   jest.doMock('axios', () => jest.fn(() => ({ headers: { 'set-cookie': ['cookie; path'] } })));
   const { login } = require('../../requests');
   const cookie = await login({});
-  expect(cookie).toEqual({ cookie: 'cookie' });
+  expect(cookie).toEqual({ cookie: 'cookie', success: true });
 });
 
 test('should throw a cookie error as response lacks a set-cookie header', async () => {
@@ -27,7 +27,11 @@ test('should throw a cookie error as response lacks a set-cookie header', async 
   } catch (error) {
     errorCatcher = error;
   }
-  expect(errorCatcher).toEqual(errorObject(ERROR_COOKIE, 'login'));
+
+  const cookieError = errorObject(ERROR_COOKIE, 'login');
+  expect(errorCatcher.success).toEqual(false);
+  expect(errorCatcher.code).toEqual(cookieError.code);
+  expect(errorCatcher.message).toEqual(cookieError.message);
 });
 
 test('should throw a cookie error as the set-cookie header is malformed', async () => {
@@ -43,7 +47,10 @@ test('should throw a cookie error as the set-cookie header is malformed', async 
   } catch (error) {
     errorCatcher = error;
   }
-  expect(errorCatcher).toEqual(errorObject(ERROR_COOKIE, 'login'));
+  const cookieError = errorObject(ERROR_COOKIE, 'login');
+  expect(errorCatcher.success).toEqual(false);
+  expect(errorCatcher.code).toEqual(cookieError.code);
+  expect(errorCatcher.message).toEqual(cookieError.message);
 });
 
 test('should throw ', async () => {
@@ -55,5 +62,9 @@ test('should throw ', async () => {
   } catch (error) {
     errorCatcher = error;
   }
-  expect(errorCatcher).toEqual(errorObject(ERROR_LOGIN, 'login'));
+
+  const loginError = errorObject(ERROR_LOGIN, 'login');
+  expect(errorCatcher.success).toEqual(false);
+  expect(errorCatcher.code).toEqual(loginError.code);
+  expect(errorCatcher.message).toEqual(loginError.message);
 });
