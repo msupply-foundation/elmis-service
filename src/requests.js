@@ -47,11 +47,9 @@ export async function login({ username, password, baseURL }) {
 export async function programs({ baseURL, cookie }) {
   const config = ApiConfigs.getProgramsConfig({ baseURL, cookie });
   try {
-    const {
-      response: { data },
-    } = await axiosRequest(config, 'programs');
-    const { programList } = data;
-    return { programs: programList, success: true };
+    const result = await axiosRequest(config, 'programs');
+    const { programList } = result.response.data;
+    return { ...result, programs: programList, success: true };
   } catch (error) {
     throw { ...error, success: false };
   }
@@ -70,11 +68,9 @@ export async function programs({ baseURL, cookie }) {
 export async function facilities({ baseURL, cookie, programId }) {
   const config = ApiConfigs.getFacilitiesConfig({ baseURL, cookie, programId });
   try {
-    const {
-      response: { data },
-    } = await axiosRequest(config, 'facilities');
-    const { facilities: facilityList } = data;
-    return { facilities: facilityList, success: true };
+    const result = await axiosRequest(config, 'facilities');
+    const { facilities: facilityList } = result.response.data;
+    return { ...result, facilities: facilityList, success: true };
   } catch (error) {
     throw { ...error, success: false };
   }
@@ -100,10 +96,8 @@ export async function periods({ baseURL, cookie, emergency = false, facilityId, 
     programId,
   });
   try {
-    const {
-      response: { data },
-    } = await axiosRequest(config, 'periods');
-    return { periods: data, success: true };
+    const result = await axiosRequest(config, 'periods');
+    return { ...result, periods: result.response.data, success: true };
   } catch (error) {
     throw { ...error, success: false };
   }
@@ -125,12 +119,13 @@ export async function authorizeRequisition({ baseURL, cookie, requisitionId }) {
     requisitionId,
   });
   try {
+    const result = await axiosRequest(config, 'authorizeRequisition');
     const {
       response: {
         data: { success },
       },
-    } = await axiosRequest(config, 'authorizeRequisition');
-    return { success: success === 'R&R authorized successfully!' };
+    } = result;
+    return { ...result, success: success === 'R&R authorized successfully!' };
   } catch (error) {
     throw { ...error, success: false };
   }
@@ -152,12 +147,13 @@ export async function approveRequisition({ baseURL, cookie, requisitionId }) {
     requisitionId,
   });
   try {
+    const result = await axiosRequest(config, 'approveRequisition');
     const {
       response: {
         data: { success },
       },
-    } = await axiosRequest(config, 'approveRequisition');
-    return { success: success === 'R&R approved successfully!' };
+    } = result;
+    return { ...result, success: success === 'R&R approved successfully!' };
   } catch (error) {
     throw { ...error, success: false };
   }
@@ -179,12 +175,13 @@ export async function submitRequisition({ baseURL, cookie, requisitionId }) {
     requisitionId,
   });
   try {
+    const result = await axiosRequest(config, 'submitRequisition');
     const {
       response: {
         data: { success },
       },
-    } = await axiosRequest(config, 'submitRequisition');
-    return { success: success === 'R&R submitted successfully!' };
+    } = result;
+    return { ...result, success: success === 'R&R submitted successfully!' };
   } catch (error) {
     throw { ...error, success: false };
   }
@@ -206,10 +203,11 @@ export async function requisitionToOrder({ baseURL, cookie, requisitionId }) {
     requisitionId,
   });
   try {
+    const result = await axiosRequest(config, 'requisitionToOrder');
     const {
       response: { status },
-    } = await axiosRequest(config, 'requisitionToOrder');
-    return { success: status === 201 };
+    } = result;
+    return { ...result, success: status === 201 };
   } catch (error) {
     throw { ...error, success: false };
   }

@@ -64,21 +64,42 @@ async function createParameterObject({ options, requisition }) {
     ...(await login(options)),
     emergency: requisition.emergency,
   };
+  let requestLog = null;
 
-  parameterObject.programId = programValidation(
-    requisition.program.programSettings.elmisCode,
-    (await programs(parameterObject)).programs
-  );
+  try {
+    const programsResult = await programs(parameterObject);
+    requestLog = programsResult.request;
+    parameterObject.programId = programValidation(
+      requisition.program.programSettings.elmisCode,
+      programsResult.programs
+    );
+  } catch (error) {
+    throw { ...error, request: requestLog, success: false };
+  }
 
-  parameterObject.facilityId = facilitiesValidation(
-    requisition.store.code,
-    (await facilities(parameterObject)).facilities
-  );
-  parameterObject.periodId = periodValidation(
-    requisition.period,
-    (await periods(parameterObject)).periods,
-    requisition.emergency
-  );
+  try {
+    const facilitiesResult = await facilities(parameterObject);
+    requestLog = facilitiesResult.request;
+    parameterObject.facilityId = facilitiesValidation(
+      requisition.store.code,
+      facilitiesResult.facilities
+    );
+  } catch (error) {
+    throw { ...error, request: requestLog, success: false };
+  }
+
+  try {
+    const periodsResult = await periods(parameterObject);
+    requestLog = periodsResult.request;
+    parameterObject.periodId = periodValidation(
+      requisition.period,
+      periodsResult.periods,
+      requisition.emergency
+    );
+  } catch (error) {
+    throw { ...error, request: requestLog, success: false };
+  }
+
   return parameterObject;
 }
 
