@@ -119,6 +119,7 @@ export const incomingRequisitionTestObject = {
       stock_on_hand: 6,
       daily_usage: 3,
       inventoryAdjustments: 3,
+      Cust_prev_stock_balance: 3,
       item: {
         code: 'AAA',
       },
@@ -140,6 +141,7 @@ export const incomingRequisitionTestObject = {
       stock_on_hand: 6,
       daily_usage: 3,
       inventoryAdjustments: 3,
+      Cust_prev_stock_balance: 3,
       item: {
         code: 'BBB',
       },
@@ -192,7 +194,7 @@ export const mergedRequisitionTestObject = {
       skipped: false,
       quantityRequested: 3,
       reasonForRequestedQuantity: 'reason',
-      previousStockInHand: undefined,
+      previousStockInHand: 3,
       stockOutDays: undefined,
     },
     {
@@ -230,7 +232,7 @@ export const mergedRequisitionTestObject = {
       skipped: false,
       quantityRequested: 3,
       reasonForRequestedQuantity: 'reason',
-      previousStockInHand: undefined,
+      previousStockInHand: 3,
       stockOutDays: undefined,
     },
   ],
