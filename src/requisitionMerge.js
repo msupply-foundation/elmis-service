@@ -117,8 +117,8 @@ const minimalOutgoingLine = outgoingLine => ({
  * @return {string}
  */
 const getNewReason = incomingLine => {
-  const { options, Cust_stock_issued } = incomingLine;
-  let newReason = !Cust_stock_issued ? 'MSupply: Zero quantity ordered' : 'mSupply: Unknown Reason';
+  const { options, Cust_stock_order } = incomingLine;
+  let newReason = !Cust_stock_order ? 'MSupply: Zero quantity ordered' : 'mSupply: Unknown Reason';
   if (options && options.title) newReason = options.title;
   return newReason;
 };
@@ -183,12 +183,12 @@ const getInitialLoss = inventoryAdjustments => ({
  * Create losses and positive adjustments as required
  */
 const getLossesAndAdjustments = (incomingLine, outgoingLine) => {
-  const { stock_on_hand, inventoryAdjustments } = incomingLine;
+  const { inventoryAdjustments, Cust_prev_stock_balance } = incomingLine;
   const adjustments = [];
 
-  // Correct the beginningBalance value if this differs from mSupply's stock on hand.
+  // Correct the beginningBalance value if this differs from mSupply's previous stock balance.
   const beginningBalanceAdjustment =
-    (stock_on_hand || 0) - ((outgoingLine.beginningBalance || 0) + (inventoryAdjustments || 0));
+    (Cust_prev_stock_balance || 0) - (outgoingLine.beginningBalance || 0);
 
   if (beginningBalanceAdjustment !== 0) {
     const balanceAdjustment =
