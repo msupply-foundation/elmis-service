@@ -1,6 +1,6 @@
 {
   "name": "@openmsupply/elmis-service",
-  "version": "0.7.19",
+  "version": "0.7.20",
   "description": "Module for integration mSupply with eSigl",
   "main": "build/index.js",
   "directories": {
