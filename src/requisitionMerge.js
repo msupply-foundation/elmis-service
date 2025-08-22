@@ -31,12 +31,14 @@ const MERGE_FIELDS_MAPPING = {
 const MERGE_REGIMENS_MAPPING = {
   code: 'code',
   nouvelle_inclusion_adulte: 'patientsToInitiateTreatmentAdult',
-  nouvelle_inclusion_enfant: 'patientsToInitiateTreatmentChild',
+  nouvelle_inclusion_enfant: 'patientsToInitiateTreatmentChildren',
   patients_adultes_recus: 'patientsOnTreatmentAdult',
   patients_enfants_recus: 'patientsOnTreatmentChildren',
-  referes: 'remarks',
+  referes: 'patientsStoppedTreatment',
   regimen_value: 'patientsOnTreatment',
   regimen_comment: 'remarks',
+  patients_stable_adulte: 'patientsOnTreatment',
+  patients_stable_enfant: 'patientsToInitiateTreatment',
 };
 
 /**
